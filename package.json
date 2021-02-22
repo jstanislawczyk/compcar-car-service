@@ -1,19 +1,19 @@
 {
-  "name": "graphql-training",
+  "name": "car-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jstanislawczyk/graphql-training.git"
+    "url": "https://github.com/jstanislawczyk/compcar-car-service.git"
   },
   "keywords": [],
   "author": "Jakub Stanislawczyk",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jstanislawczyk/graphql-training/issues"
+    "url": "https://github.com/jstanislawczyk/compcar-car-service.git/issues"
   },
-  "homepage": "https://github.com/jstanislawczyk/graphql-training#readme",
+  "homepage": "https://github.com/jstanislawczyk/compcar-car-service#readme",
   "scripts": {
     "compile": "tsc",
     "lint": "eslint . --ext .ts",
@@ -32,6 +32,7 @@
     "mysql": "^2.18.1",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
+    "type-graphql-dataloader": "^0.3.7",
     "typedi": "^0.8.0",
     "typeorm": "^0.2.29",
     "typeorm-typedi-extensions": "^0.2.3",

@@ -1,4 +1,4 @@
-import {ConnectionOptions, createConnection, useContainer} from 'typeorm';
+import {Connection, ConnectionOptions, createConnection, useContainer} from 'typeorm';
 import {ApolloServer, ServerInfo} from 'apollo-server';
 import {buildSchema} from 'type-graphql';
 import {Container} from 'typedi';
@@ -6,6 +6,7 @@ import {GraphQLSchema} from 'graphql';
 import {DatabaseConfig} from './config/database.config';
 import config from 'config';
 import {Logger} from './common/logger';
+import {ApolloServerLoaderPlugin} from 'type-graphql-dataloader';
 
 export class Application {
 
@@ -16,7 +17,7 @@ export class Application {
     const databaseConfig: ConnectionOptions = DatabaseConfig.getDatabaseConnectionConfiguration();
 
     useContainer(Container);
-    await createConnection(databaseConfig);
+    const databaseConnection: Connection = await createConnection(databaseConfig);
 
     const isDev: boolean = config.get('common.isDev');
     const applicationPort: number = config.get('server.port');
@@ -29,7 +30,14 @@ export class Application {
       container: Container,
     });
 
-    this.server = new ApolloServer({ schema });
+    this.server = new ApolloServer({
+      schema,
+      plugins: [
+        ApolloServerLoaderPlugin({
+          typeormGetConnection: () => databaseConnection,
+        }),
+      ],
+    });
     this.serverInfo = await this.server.listen(applicationPort);
 
     Logger.log(`Server has started: ${this.serverInfo.url}`);

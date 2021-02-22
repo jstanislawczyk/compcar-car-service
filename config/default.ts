@@ -10,7 +10,7 @@ export default {
         port: Number(process.env.MYSQL_PORT) || 3306,
         username: process.env.MYSQL_USERNAME || 'root',
         password: process.env.MYSQL_PASSWORD || 'root',
-        database: process.env.MYSQL_DATABASE || 'graphql-training',
+        database: process.env.MYSQL_DATABASE || 'compcar',
         logging: Boolean(process.env.MYSQL_LOGGING) || false,
     },
 };
