@@ -1,7 +1,7 @@
 import {Resolver, Arg, Mutation, Query} from 'type-graphql';
 import {Service} from 'typedi';
 import {UserService} from '../services/user.service';
-import {User} from '../models/user';
+import {User} from '../entities/user';
 import {RegisterUserInput} from '../inputs/user/register-user.input';
 import {Logger} from '../common/logger';
 

@@ -32,5 +32,10 @@ export class User {
     () => Comment,
     (comment: Comment) => comment.user,
   )
-  public comments?: Promise<Comment[]>;
+  @TypeormLoader(
+    () => Comment,
+    (comment: Comment) => comment.userId,
+    { selfKey: true },
+  )
+  public comments?: Comment[];
 }

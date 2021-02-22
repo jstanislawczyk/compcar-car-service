@@ -17,8 +17,8 @@ export class DatabaseConfig {
       logging: config.get('mysql.logging'),
       entities: [
         isDev
-          ? 'src/models/**/*.ts'
-          : 'build/src/models/**/*.js',
+          ? 'src/entities/**/*.ts'
+          : 'build/src/entities**/*.js',
       ],
       migrations: [
         isDev
