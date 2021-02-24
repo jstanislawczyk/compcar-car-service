@@ -12,7 +12,9 @@ export class Comment {
   public id?: number;
 
   @Field()
-  @Column()
+  @Column({
+    length: 512,
+  })
   public text: string;
 
   @Field()
@@ -35,5 +37,5 @@ export class Comment {
   public user?: User;
 
   @RelationId((comment: Comment) => comment.user)
-  userId?: number;
+  public userId?: number;
 }

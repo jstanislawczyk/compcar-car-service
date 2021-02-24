@@ -2,6 +2,7 @@ import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from 'typeorm';
 import {ObjectType, Field, ID} from 'type-graphql';
 import {Comment} from './comment';
 import {TypeormLoader} from 'type-graphql-dataloader';
+import {UserRole} from '../enums/user-role';
 
 @Entity()
 @ObjectType()
@@ -12,12 +13,22 @@ export class User {
   public id?: number;
 
   @Field()
-  @Column()
+  @Column({
+    length: 320,
+  })
   public email: string;
 
   @Field()
-  @Column()
+  @Column({
+    length: 80,
+  })
   public password: string;
+
+  @Field()
+  @Column({
+    length: 20,
+  })
+  public role: UserRole;
 
   @Field()
   @Column()

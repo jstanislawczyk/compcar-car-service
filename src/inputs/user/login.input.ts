@@ -2,13 +2,13 @@ import {InputType, Field} from 'type-graphql';
 import {IsString} from 'class-validator';
 
 @InputType()
-export class RegisterUserInput {
+export class LoginInput {
 
   @Field()
   @IsString()
-  public email: string;
+  public readonly email: string;
 
   @Field()
   @IsString()
-  public password: string;
+  public readonly password: string;
 }
