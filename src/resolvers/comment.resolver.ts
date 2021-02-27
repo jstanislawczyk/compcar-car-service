@@ -1,10 +1,10 @@
 import {Resolver, Arg, Mutation, Query} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
-import {Comment} from '../entities/comment';
 import {CreateCommentInput} from '../inputs/comments/create-comment.input';
 import {UserCommentFacade} from '../facades/user-comment.facade';
 import {CommentMapper} from '../mapper/comment.mapper';
+import {Comment} from '../models/entities/comment';
 
 @Service()
 @Resolver(() => Comment)

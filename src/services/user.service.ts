@@ -1,10 +1,15 @@
 import {Service} from 'typedi';
 import {UserRepository} from '../repositories/user.repository';
 import {InjectRepository} from 'typeorm-typedi-extensions';
-import {User} from '../entities/user';
-import bcrypt from 'bcrypt';
 import {UserRole} from '../enums/user-role';
-import {ApolloError} from 'apollo-server';
+import {AuthenticationError} from 'apollo-server';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import config from 'config';
+import {User} from '../models/entities/user';
+import {NotFoundError} from '../models/errors/not-found.error';
+import {JwtToken} from '../models/common/jwt-token';
+import {classToPlain} from 'class-transformer';
 
 @Service()
 export class UserService {
@@ -35,7 +40,7 @@ export class UserService {
     });
 
     if (existingUser !== undefined) {
-      throw new ApolloError(`User with email=${user.email} already exist`, '409');
+      throw new NotFoundError(`User with email=${user.email} already exist`);
     }
 
     user.password = bcrypt.hashSync(user.password, saltRounds);
@@ -44,21 +49,37 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  public async loginUser(email: string, password: string): Promise<string> {
-    const user: User = await this.userRepository.findOneOrFail({
+  public async getUserToken(email: string, password: string): Promise<string> {
+    const unauthorizedErrorMessage: string = 'Authentication data are not valid';
+    const user: User | undefined = await this.userRepository.findOne({
       email,
     });
 
-    return bcrypt.compareSync(password, user.password)
-      ? 'authorized'
-      : 'unauthorized';
+    if (user?.id === undefined) {
+      throw new AuthenticationError(unauthorizedErrorMessage);
+    }
+
+    const isCorrectPassword: boolean = bcrypt.compareSync(password, user.password);
+
+    if (isCorrectPassword) {
+      return this.createJwtToken(user.id);
+    } else {
+      throw new AuthenticationError(unauthorizedErrorMessage);
+    }
   }
 
   private async getUserRole(): Promise<UserRole> {
-    const isFirstUserCreated: boolean = await this.userRepository.findOne() === undefined;
+    const isFirstUserCreatedInDatabase: boolean = await this.userRepository.findOne() === undefined;
 
-    return isFirstUserCreated
+    return isFirstUserCreatedInDatabase
       ? UserRole.ADMIN
       : UserRole.USER;
+  }
+
+  private createJwtToken(userId: number): string {
+    const jwtSecret: string = config.get('security.jwt.secret');
+    const jwtToken: JwtToken = new JwtToken(userId);
+
+    return jwt.sign(classToPlain(jwtToken), jwtSecret);
   }
 }

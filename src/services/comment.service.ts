@@ -1,7 +1,7 @@
 import {Service} from 'typedi';
 import {InjectRepository} from 'typeorm-typedi-extensions';
 import {CommentRepository} from '../repositories/comment.repository';
-import {Comment} from '../entities/comment';
+import {Comment} from '../models/entities/comment';
 
 @Service()
 export class CommentService {

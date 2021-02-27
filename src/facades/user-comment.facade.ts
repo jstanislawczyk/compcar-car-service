@@ -1,7 +1,7 @@
 import {Service} from 'typedi';
-import {Comment} from '../entities/comment';
 import {CommentService} from '../services/comment.service';
 import {UserService} from '../services/user.service';
+import {Comment} from '../models/entities/comment';
 
 @Service()
 export class UserCommentFacade {
