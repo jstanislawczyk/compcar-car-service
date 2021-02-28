@@ -24,9 +24,15 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  public findOne(id: number): Promise<User> {
+  public findOneById(id: number): Promise<User> {
     return this.userRepository.findOneOrFail({
       id,
+    });
+  }
+
+  public findOneByEmail(email: string): Promise<User> {
+    return this.userRepository.findOneOrFail({
+      email,
     });
   }
 
@@ -49,44 +55,11 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  public async getUserToken(email: string, password: string): Promise<string> {
-    const unauthorizedErrorMessage: string = 'Authentication data are not valid';
-    const user: User | undefined = await this.userRepository.findOne({
-      email,
-    });
-
-    if (user === undefined) {
-      throw new AuthenticationError(unauthorizedErrorMessage);
-    }
-
-    const isCorrectPassword: boolean = bcrypt.compareSync(password, user.password);
-
-    if (isCorrectPassword) {
-      return this.createJwtToken(user);
-    } else {
-      throw new AuthenticationError(unauthorizedErrorMessage);
-    }
-  }
-
   private async getUserRole(): Promise<UserRole> {
     const isFirstUserCreatedInDatabase: boolean = await this.userRepository.findOne() === undefined;
 
     return isFirstUserCreatedInDatabase
       ? UserRole.ADMIN
       : UserRole.USER;
-  }
-
-  private createJwtToken(user: User): string {
-    const jwtSecret: string = config.get('security.jwt.secret');
-    const jwtTtlSeconds: number = config.get('security.jwt.ttlSeconds');
-    const jwtToken: JwtToken = new JwtToken(user);
-
-    return jwt.sign(
-      classToPlain(jwtToken),
-      jwtSecret,
-      {
-        expiresIn: jwtTtlSeconds,
-      }
-    );
   }
 }

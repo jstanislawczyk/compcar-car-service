@@ -17,7 +17,7 @@ export class UserCommentFacade {
   }
 
   public async saveUserComment(userId: number, comment: Comment): Promise<Comment> {
-    comment.user = await this.userService.findOne(userId);
+    comment.user = await this.userService.findOneById(userId);
 
     return this.commentService.saveComment(comment);
   }

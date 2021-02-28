@@ -14,10 +14,10 @@ export class UserResolver {
   }
 
   @Query(() => [User])
-  public async getUsers(): Promise<User[]> {
+  public getUsers(): Promise<User[]> {
     Logger.log('Fetching all users');
 
-    return await this.userService.findAll();
+    return this.userService.findAll();
   }
 
 }
