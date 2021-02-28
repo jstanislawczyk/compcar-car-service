@@ -40,7 +40,7 @@ export class UserService {
     });
 
     if (existingUser !== undefined) {
-      throw new NotFoundError(`User with email=${user.email} already exist`);
+      throw new NotFoundError(`User with email "${user.email}" already exist`);
     }
 
     user.password = bcrypt.hashSync(user.password, saltRounds);
@@ -55,14 +55,14 @@ export class UserService {
       email,
     });
 
-    if (user?.id === undefined) {
+    if (user === undefined) {
       throw new AuthenticationError(unauthorizedErrorMessage);
     }
 
     const isCorrectPassword: boolean = bcrypt.compareSync(password, user.password);
 
     if (isCorrectPassword) {
-      return this.createJwtToken(user.id);
+      return this.createJwtToken(user);
     } else {
       throw new AuthenticationError(unauthorizedErrorMessage);
     }
@@ -76,10 +76,17 @@ export class UserService {
       : UserRole.USER;
   }
 
-  private createJwtToken(userId: number): string {
+  private createJwtToken(user: User): string {
     const jwtSecret: string = config.get('security.jwt.secret');
-    const jwtToken: JwtToken = new JwtToken(userId);
+    const jwtTtlSeconds: number = config.get('security.jwt.ttlSeconds');
+    const jwtToken: JwtToken = new JwtToken(user);
 
-    return jwt.sign(classToPlain(jwtToken), jwtSecret);
+    return jwt.sign(
+      classToPlain(jwtToken),
+      jwtSecret,
+      {
+        expiresIn: jwtTtlSeconds,
+      }
+    );
   }
 }

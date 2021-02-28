@@ -1,14 +1,15 @@
-import config from 'config';
+import {UserRole} from '../../enums/user-role';
+import {User} from '../entities/user';
 
 export class JwtToken {
 
-  public sub: number;
+  public iat: number;
   public exp: number;
+  public sub?: number;
+  public role: UserRole;
 
-  constructor(userId: number) {
-    const jwtTtlSeconds: number = config.get('security.jwt.ttlSeconds');
-
-    this.exp = Math.round(Date.now() / 1000) + jwtTtlSeconds;
-    this.sub = userId;
+  constructor(user: User) {
+    this.sub = user.id;
+    this.role = user.role;
   }
 }

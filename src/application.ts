@@ -4,9 +4,11 @@ import {buildSchema} from 'type-graphql';
 import {Container} from 'typedi';
 import {GraphQLSchema} from 'graphql';
 import {DatabaseConfig} from './config/database.config';
-import config from 'config';
 import {Logger} from './common/logger';
 import {ApolloServerLoaderPlugin} from 'type-graphql-dataloader';
+import {customAuthChecker} from './common/auth-checker';
+import {ExpressContext} from 'apollo-server-express/src/ApolloServer';
+import config from 'config';
 
 export class Application {
 
@@ -28,6 +30,7 @@ export class Application {
           : `${__dirname}/resolvers/**/*.resolver.js`,
       ],
       container: Container,
+      authChecker: customAuthChecker,
     });
 
     this.server = new ApolloServer({
@@ -37,6 +40,7 @@ export class Application {
           typeormGetConnection: () => databaseConnection,
         }),
       ],
+      context: (context: ExpressContext) => context,
     });
     this.serverInfo = await this.server.listen(applicationPort);
 
