@@ -7,9 +7,9 @@ import {TokenService} from '../services/token.service';
 export const customAuthChecker: AuthChecker<ExpressContext> = (
   resolverData: ResolverData,
   roles: string[],
-) => {
+): boolean => {
   const context: ExpressContext = resolverData.context as ExpressContext;
-  const jwtToken: string = context.req.header('Authorization') || context.req.header('authorization') || '';
+  const jwtToken: string = context.req.headers.authorization || '';
 
   try {
     const tokenService: TokenService = Container.get(TokenService);
