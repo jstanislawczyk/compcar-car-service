@@ -1,5 +1,5 @@
 import {AuthChecker, ResolverData} from 'type-graphql';
-import {ExpressContext} from 'apollo-server-express/src/ApolloServer';
+import {ExpressContext} from 'apollo-server-express/dist/ApolloServer';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
 import {Container} from 'typedi';
 import {TokenService} from '../services/token.service';

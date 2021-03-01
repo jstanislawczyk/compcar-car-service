@@ -7,7 +7,7 @@ import {DatabaseConfig} from './config/database.config';
 import {Logger} from './common/logger';
 import {ApolloServerLoaderPlugin} from 'type-graphql-dataloader';
 import {customAuthChecker} from './common/auth-checker';
-import {ExpressContext} from 'apollo-server-express/src/ApolloServer';
+import {ExpressContext} from 'apollo-server-express/dist/ApolloServer';
 import config from 'config';
 
 export class Application {

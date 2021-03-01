@@ -18,5 +18,8 @@ export default {
             secret: process.env.JWT_SECRET || 'jwtSecret',
             ttlSeconds: Number(process.env.JWT_TTL_SECONDS) || 3600,
         },
+        bcrypt: {
+            rounds: Number(process.env.BCRYPT_ROUNDS) || 10,
+        },
     },
 };

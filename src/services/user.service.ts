@@ -2,14 +2,10 @@ import {Service} from 'typedi';
 import {UserRepository} from '../repositories/user.repository';
 import {InjectRepository} from 'typeorm-typedi-extensions';
 import {UserRole} from '../enums/user-role';
-import {AuthenticationError} from 'apollo-server';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import config from 'config';
 import {User} from '../models/entities/user';
-import {NotFoundError} from '../models/errors/not-found.error';
-import {JwtToken} from '../models/common/jwt-token';
-import {classToPlain} from 'class-transformer';
+import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
+import bcrypt from 'bcrypt';
+import config from 'config';
 
 @Service()
 export class UserService {
@@ -37,7 +33,7 @@ export class UserService {
   }
 
   public async saveUser(user: User): Promise<User> {
-    const saltRounds: number = 10;
+    const saltRounds: number = config.get('security.bcrypt.rounds');
     const existingUser: User | undefined = await this.userRepository.findOne({
       select: ['id'],
       where: {
@@ -46,7 +42,7 @@ export class UserService {
     });
 
     if (existingUser !== undefined) {
-      throw new NotFoundError(`User with email "${user.email}" already exist`);
+      throw new EntityAlreadyExistsError(`User with email "${user.email}" already exist`);
     }
 
     user.password = bcrypt.hashSync(user.password, saltRounds);
@@ -56,7 +52,10 @@ export class UserService {
   }
 
   private async getUserRole(): Promise<UserRole> {
-    const isFirstUserCreatedInDatabase: boolean = await this.userRepository.findOne() === undefined;
+    const anyUser: User | undefined = await this.userRepository.findOne({
+      select: ['id'],
+    });
+    const isFirstUserCreatedInDatabase: boolean = anyUser === undefined;
 
     return isFirstUserCreatedInDatabase
       ? UserRole.ADMIN

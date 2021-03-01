@@ -17,14 +17,14 @@ export class CommentResolver {
   }
 
   @Query(() => [Comment])
-  public getComments(): Promise<Comment[]> {
+  public async getComments(): Promise<Comment[]> {
     Logger.log('Fetching all comments');
 
-    return this.userCommentFacade.findAll();
+    return await this.userCommentFacade.findAll();
   }
 
   @Mutation(() => Comment)
-  public createComment(
+  public async createComment(
     @Arg('userId') userId: number,
     @Arg('createCommentInput') createCommentInput: CreateCommentInput,
   ): Promise<Comment> {
@@ -32,7 +32,7 @@ export class CommentResolver {
 
     const comment: Comment = this.userMapper.toEntity(createCommentInput);
 
-    return this.userCommentFacade.saveUserComment(userId, comment);
+    return await this.userCommentFacade.saveUserComment(userId, comment);
   }
 
 }

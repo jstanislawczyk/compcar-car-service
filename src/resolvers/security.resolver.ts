@@ -21,21 +21,21 @@ export class SecurityResolver {
   }
 
   @Query(() => String)
-  public login(@Arg('loginInput') loginInput: LoginInput): Promise<string> {
+  public async login(@Arg('loginInput') loginInput: LoginInput): Promise<string> {
     Logger.log(`Login user with email=${loginInput.email}`);
 
     const loginCredentials: LoginCredentials = this.loginCredentialsMapper.toLoginCredentials(loginInput);
 
-    return this.securityFacade.authorizeUser(loginCredentials);
+    return await this.securityFacade.authorizeUser(loginCredentials);
   }
 
   @Mutation(() => User)
-  public register(@Arg('registerInput') registerInput: RegisterInput): Promise<User> {
+  public async register(@Arg('registerInput') registerInput: RegisterInput): Promise<User> {
     Logger.log('Register user');
 
     const user: User = this.userMapper.toRegisterUser(registerInput);
 
-    return this.securityFacade.registerUser(user);
+    return await this.securityFacade.registerUser(user);
   }
 
 }
