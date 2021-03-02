@@ -12,6 +12,6 @@ export class IsPasswordValidator implements ValidatorConstraintInterface {
   }
 
   public defaultMessage(): string {
-    return 'Password should contain minimum eight characters, at least one uppercase letter, one lowercase letter and one number';
+    return 'Password should contain minimum six characters, at least one uppercase letter, one lowercase letter and one number';
   }
 }

@@ -5,9 +5,10 @@ export function IsPassword() {
 
   return (object: any, propertyName: string): void => {
     registerDecorator({
-      target: object.constructor,
+      name: 'IsPassword',
       propertyName,
       validator: IsPasswordValidator,
+      target: object.constructor,
     });
   };
 }
