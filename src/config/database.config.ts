@@ -18,7 +18,7 @@ export class DatabaseConfig {
       entities: [
         isDev
           ? 'src/models/entities/**/*.ts'
-          : 'build/models/src/entities**/*.js',
+          : 'build/src/models/entities**/*.js',
       ],
       migrations: [
         isDev

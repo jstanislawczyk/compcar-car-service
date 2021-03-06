@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     server: {
         port: process.env.SERVER_PORT || 4000,
     },
