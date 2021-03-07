@@ -32,7 +32,7 @@ export class User {
 
   @Field()
   @Column()
-  public registerDate: Date;
+  public registerDate: string;
 
   @Field()
   @Column()
