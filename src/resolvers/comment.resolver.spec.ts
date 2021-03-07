@@ -12,7 +12,7 @@ import {CreateCommentInput} from '../inputs/comments/create-comment.input';
 use(sinonChai);
 use(chaiAsPromised);
 
-context('CommentsResolver', () => {
+context('CommentResolver', () => {
 
   let sandbox: SinonSandbox;
   let userCommentFacadeStub: SinonStubbedInstance<UserCommentFacade>;
