@@ -10,7 +10,7 @@ export class UserMapper {
     return {
       email: registerInput.email,
       password: registerInput.password,
-      registerDate: new Date(),
+      registerDate: new Date().toISOString(),
       role: UserRole.USER,
       activated: true,
     };

@@ -12,7 +12,7 @@ export class CommentResolver {
 
   constructor(
     private readonly userCommentFacade: UserCommentFacade,
-    private readonly userMapper: CommentMapper,
+    private readonly commentMapper: CommentMapper,
   ) {
   }
 
@@ -30,7 +30,7 @@ export class CommentResolver {
   ): Promise<Comment> {
     Logger.log(`Saving comment for user with id=${userId}`);
 
-    const comment: Comment = this.userMapper.toEntity(createCommentInput);
+    const comment: Comment = this.commentMapper.toEntity(createCommentInput);
 
     return await this.userCommentFacade.saveUserComment(userId, comment);
   }

@@ -5,7 +5,7 @@ export const user: User = {
   email: 'test@user.com',
   password: '1qazXSW@',
   activated: true,
-  registerDate: new Date(),
+  registerDate: new Date().toISOString(),
   role: UserRole.USER,
 };
 

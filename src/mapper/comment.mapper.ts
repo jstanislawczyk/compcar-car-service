@@ -9,7 +9,7 @@ export class CommentMapper {
     return {
       text: createCommentInput.text,
       rating: createCommentInput.rating,
-      commentDate: new Date(),
+      commentDate: new Date().toISOString(),
     };
   }
 }

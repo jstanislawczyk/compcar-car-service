@@ -19,7 +19,7 @@ export class Comment {
 
   @Field()
   @Column()
-  public commentDate: Date;
+  public commentDate: string;
 
   @Field(() => Int)
   @Column()

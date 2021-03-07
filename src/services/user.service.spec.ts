@@ -53,7 +53,7 @@ context('UserService', () => {
       expect(userRepositoryStub.find).to.be.calledOnce;
     });
 
-    it('should throw error', () => {
+    it('should throw error', async () => {
       // Arrange
       userRepositoryStub.find.rejects(new Error('Find error'));
 
@@ -61,7 +61,7 @@ context('UserService', () => {
       const usersResult: Promise<User[]> = userService.findAll();
 
       // Assert
-      expect(usersResult).to.eventually.be.rejectedWith('Find error');
+      await expect(usersResult).to.eventually.be.rejectedWith('Find error');
     });
   });
 
@@ -81,7 +81,7 @@ context('UserService', () => {
       });
     });
 
-    it('should throw error', () => {
+    it('should throw error', async () => {
       // Arrange
       userRepositoryStub.findOneOrFail.rejects(new Error('Find error'));
 
@@ -89,7 +89,7 @@ context('UserService', () => {
       const userResult: Promise<User> = userService.findOneById(1);
 
       // Assert
-      expect(userResult).to.eventually.be.rejectedWith('Find error');
+      await expect(userResult).to.eventually.be.rejectedWith('Find error');
     });
   });
 
@@ -108,7 +108,7 @@ context('UserService', () => {
       });
     });
 
-    it('should throw error', () => {
+    it('should throw error', async () => {
       // Arrange
       userRepositoryStub.findOneOrFail.rejects(new Error('Find error'));
 
@@ -116,7 +116,7 @@ context('UserService', () => {
       const userResult: Promise<User> = userService.findOneByEmail('test@mail.com');
 
       // Assert
-      expect(userResult).to.eventually.be.rejectedWith('Find error');
+      await expect(userResult).to.eventually.be.rejectedWith('Find error');
     });
   });
 

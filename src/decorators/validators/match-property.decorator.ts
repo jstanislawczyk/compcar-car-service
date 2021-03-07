@@ -1,4 +1,4 @@
-import {registerDecorator, ValidationOptions} from 'class-validator';
+import {registerDecorator} from 'class-validator';
 import {MatchPropertyValidator} from '../../validators/match-property.validator';
 
 export function MatchProperty(property: string) {

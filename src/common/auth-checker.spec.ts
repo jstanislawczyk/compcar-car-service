@@ -27,8 +27,9 @@ context('AuthChecker', () => {
   });
 
   describe('customAuthChecker', () => {
-    it('should get users list', () => {
+    it('should validate token', () => {
       // Arrange
+      const allowedRoles: string[] = ['USER'];
       const token: string = 'TestToken';
       const resolverData: ResolverData<ExpressContext> = {
         context: {
@@ -43,11 +44,11 @@ context('AuthChecker', () => {
       validateTokenStub.returns(true);
 
       // Act
-      const validationResult: Promise<boolean> | boolean = customAuthChecker(resolverData, ['USER']);
+      const validationResult: Promise<boolean> | boolean = customAuthChecker(resolverData, allowedRoles);
 
       // Assert
       expect(validationResult).to.be.true;
-      expect(validateTokenStub).to.be.calledOnceWith(token);
+      expect(validateTokenStub).to.be.calledOnceWith(token, allowedRoles);
     });
 
     it('should reject if token validation fails', async () => {
@@ -67,6 +68,25 @@ context('AuthChecker', () => {
 
       // Act & Assert
       expect(() => customAuthChecker(resolverData, ['USER'])).to.throw(InvalidTokenError, errorMessage);
+    });
+
+    it('should get empty string if authorization header is not provided', async () => {
+      // Arrange
+      const allowedRoles: string[] = ['USER'];
+      const errorMessage: string = 'Validation Error';
+      const resolverData: ResolverData<ExpressContext> = {
+        context: {
+          req: {
+            headers: {},
+          },
+        },
+      } as unknown as ResolverData<ExpressContext>;
+
+      validateTokenStub.throws(new Error(errorMessage));
+
+      // Act & Assert
+      expect(() => customAuthChecker(resolverData, allowedRoles)).to.throw(InvalidTokenError, errorMessage);
+      expect(validateTokenStub).to.be.calledOnceWith('', allowedRoles);
     });
   });
 });

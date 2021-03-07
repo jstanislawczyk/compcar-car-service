@@ -1,7 +1,7 @@
 import {Comment} from '../../src/models/entities/comment';
 
 export const comment: Comment = {
-  commentDate: new Date(),
+  commentDate: new Date().toISOString(),
   rating: 3,
   text: 'Comment text',
 };
