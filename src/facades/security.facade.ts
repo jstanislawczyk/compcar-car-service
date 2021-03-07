@@ -10,7 +10,7 @@ export class SecurityFacade {
 
   constructor(
     private readonly userService: UserService,
-    private readonly securityService: TokenService,
+    private readonly tokenService: TokenService,
   ) {
   }
 
@@ -18,7 +18,7 @@ export class SecurityFacade {
     try {
       const user: User = await this.userService.findOneByEmail(loginCredentials.email);
 
-      return this.securityService.getUserToken(loginCredentials, user);
+      return await this.tokenService.getUserToken(loginCredentials, user);
     } catch (error) {
       throw new AuthenticationError('Authentication data are not valid');
     }

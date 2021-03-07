@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {Comment} from '../models/entities/comment';
 import {CommentMapper} from './comment.mapper';
 import {CreateCommentInput} from '../inputs/comments/create-comment.input';
-import {DateUtils} from '../../test/utils/date.utils';
+import {DateUtils} from '../../test/utils/common/date.utils';
 
 context('CommentMapper', () => {
 
@@ -13,7 +13,7 @@ context('CommentMapper', () => {
   });
 
   describe('toEntity', () => {
-    it('should map to entity', async () => {
+    it('should map to entity', () => {
       // Arrange
       const createCommentInput: CreateCommentInput = {
         rating: 5,

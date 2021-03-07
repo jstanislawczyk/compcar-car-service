@@ -12,7 +12,7 @@ context('LoginCredentialsMapper', () => {
   });
 
   describe('toLoginCredentials', () => {
-    it('should map to login credentials', async () => {
+    it('should map to login credentials', () => {
       // Arrange
       const loginInput: LoginInput = {
         email: 'test@mail.com',

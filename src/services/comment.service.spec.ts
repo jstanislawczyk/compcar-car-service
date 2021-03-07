@@ -55,7 +55,7 @@ context('CommentService', () => {
       expect(commentRepositoryStub.find).to.be.calledOnce;
     });
 
-    it('should throw error', () => {
+    it('should throw error', async () => {
       // Arrange
       commentRepositoryStub.find.rejects(new Error('Find error'));
 
@@ -63,7 +63,7 @@ context('CommentService', () => {
       const commentsResult: Promise<Comment[]> = commentService.findAll();
 
       // Assert
-      expect(commentsResult).to.eventually.be.rejectedWith('Find error');
+      await expect(commentsResult).to.eventually.be.rejectedWith('Find error');
     });
   });
 
@@ -86,7 +86,7 @@ context('CommentService', () => {
       expect(commentRepositoryStub.save).to.be.calledOnceWith(commentToSave);
     });
 
-    it('should throw error', () => {
+    it('should throw error', async () => {
       // Arrange
       commentRepositoryStub.save.rejects(new Error('Save error'));
 
@@ -94,7 +94,7 @@ context('CommentService', () => {
       const saveCommentResult: Promise<Comment> = commentService.saveComment(comment);
 
       // Assert
-      expect(saveCommentResult).to.eventually.be.rejectedWith('Save error');
+      await expect(saveCommentResult).to.eventually.be.rejectedWith('Save error');
     });
   });
 });

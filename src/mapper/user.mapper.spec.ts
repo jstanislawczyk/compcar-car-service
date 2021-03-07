@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {DateUtils} from '../../test/utils/date.utils';
+import {DateUtils} from '../../test/utils/common/date.utils';
 import {UserMapper} from './user.mapper';
 import {RegisterInput} from '../inputs/user/register.input';
 import {User} from '../models/entities/user';
@@ -14,7 +14,7 @@ context('UserMapper', () => {
   });
 
   describe('toRegisterUser', () => {
-    it('should map to user register entity', async () => {
+    it('should map to user register entity', () => {
       // Arrange
       const registerInput: RegisterInput = {
         email: 'test@mail.com',
