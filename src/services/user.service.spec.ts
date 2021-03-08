@@ -1,7 +1,6 @@
 import {UserService} from './user.service';
 import {UserRepository} from '../repositories/user.repository';
 import {expect, use} from 'chai';
-import {fullUser, user} from '../../test/fixtures/user.fixture';
 import {User} from '../models/entities/user';
 import sinon, {SinonSandbox, SinonStub, SinonStubbedInstance} from 'sinon';
 import sinonChai from 'sinon-chai';
@@ -10,6 +9,7 @@ import bcrypt from 'bcrypt';
 import config from 'config';
 import {UserRole} from '../enums/user-role';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
+import {UserBuilder} from '../../test/utils/builders/user.builder';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -26,7 +26,7 @@ context('UserService', () => {
     userRepositoryStub = sandbox.createStubInstance(UserRepository);
     userService = new UserService(userRepositoryStub as unknown as UserRepository);
 
-    userRepositoryStub.findOneOrFail.resolves(user);
+    userRepositoryStub.findOneOrFail.resolves(new UserBuilder().build());
   });
 
   afterEach(() => {
@@ -37,8 +37,8 @@ context('UserService', () => {
     it('should get users list', async () => {
       // Arrange
       const usersList: User[] = [
-        user,
-        fullUser,
+        new UserBuilder().build(),
+        new UserBuilder(true).build(),
       ];
 
       userRepositoryStub.find.resolves(usersList);
@@ -48,8 +48,8 @@ context('UserService', () => {
 
       // Assert
       expect(usersResult).to.be.have.length(2);
-      expect(usersResult[0]).to.be.eql(user);
-      expect(usersResult[1]).to.be.eql(fullUser);
+      expect(usersResult[0]).to.be.eql(usersList[0]);
+      expect(usersResult[1]).to.be.eql(usersList[1]);
       expect(userRepositoryStub.find).to.be.calledOnce;
     });
 
@@ -125,19 +125,18 @@ context('UserService', () => {
       // Arrange
       const saltRounds: number = config.get('security.bcrypt.rounds');
       const hashedPassword: string = 'hashedPassword';
-      const userToSave: User = user;
+      const userToSave: User = new UserBuilder().build();
       const plainPassword: string = userToSave.password;
-      const savedUser: User = {
-        ...user,
-        id: 11,
-        password: bcrypt.hashSync(userToSave.password, 1),
-      };
+      const savedUser: User = new UserBuilder()
+        .withId(11)
+        .withPassword(bcrypt.hashSync(userToSave.password, 1))
+        .build();
       const bcryptStub: SinonStub = sandbox.stub(bcrypt, 'hashSync');
 
       bcryptStub.returns(hashedPassword);
 
       userRepositoryStub.findOne.onFirstCall().resolves(undefined);
-      userRepositoryStub.findOne.onSecondCall().resolves(fullUser);
+      userRepositoryStub.findOne.onSecondCall().resolves(new UserBuilder(true).build());
       userRepositoryStub.save.resolves(savedUser);
 
       // Act
@@ -173,13 +172,12 @@ context('UserService', () => {
       it('if user body has ADMIN role', async () => {
         // Arrange
         const hashedPassword: string = 'hashedPassword';
-        const userToSave: User = user;
-        const savedUser: User = {
-          ...user,
-          id: 11,
-          password: bcrypt.hashSync(userToSave.password, 1),
-          role: UserRole.ADMIN,
-        };
+        const userToSave: User = new UserBuilder().build();
+        const savedUser: User = new UserBuilder(true)
+          .withId(11)
+          .withPassword(bcrypt.hashSync(userToSave.password, 1))
+          .withRole(UserRole.ADMIN)
+          .build();
         const bcryptStub: SinonStub = sandbox.stub(bcrypt, 'hashSync');
 
         bcryptStub.returns(hashedPassword);
@@ -209,12 +207,11 @@ context('UserService', () => {
       it('if user body has USER role', async () => {
         // Arrange
         const hashedPassword: string = 'hashedPassword';
-        const userToSave: User = user;
-        const savedUser: User = {
-          ...user,
-          id: 11,
-          password: bcrypt.hashSync(userToSave.password, 1),
-        };
+        const userToSave: User = new UserBuilder().build();
+        const savedUser: User = new UserBuilder(true)
+          .withId(11)
+          .withPassword(bcrypt.hashSync(userToSave.password, 1))
+          .build();
         const bcryptStub: SinonStub = sandbox.stub(bcrypt, 'hashSync');
 
         bcryptStub.returns(hashedPassword);
@@ -244,9 +241,9 @@ context('UserService', () => {
 
     it('should throw error if user already exists', async () => {
       // Arrange
-      const userToSave: User = user;
+      const userToSave: User = new UserBuilder().build();
 
-      userRepositoryStub.findOne.onFirstCall().resolves(fullUser);
+      userRepositoryStub.findOne.onFirstCall().resolves(new UserBuilder(true).build());
 
       // Act
       const savedUserResult: Promise<User> = userService.saveUser(userToSave);
@@ -260,7 +257,7 @@ context('UserService', () => {
 
     it('should rethrow error', async () => {
       // Arrange
-      const userToSave: User = user;
+      const userToSave: User = new UserBuilder().build();
 
       userRepositoryStub.findOne.onFirstCall().rejects(new Error('DB error'));
 

@@ -6,8 +6,8 @@ import {UserService} from '../services/user.service';
 import {UserCommentFacade} from './user-comment.facade';
 import {CommentService} from '../services/comment.service';
 import {Comment} from '../models/entities/comment';
-import {comment, fullComment} from '../../test/fixtures/comment.fixture';
-import {user} from '../../test/fixtures/user.fixture';
+import {CommentBuilder} from '../../test/utils/builders/comment.builder';
+import {UserBuilder} from '../../test/utils/builders/user.builder';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -39,12 +39,11 @@ context('UserCommentFacade', () => {
     it('should return comments list', async () => {
       // Arrange
       const returnedComments: Comment[] = [
-        comment,
-        {
-          ...comment,
-          rating: 1,
-          text: 'Second Comment',
-        },
+        new CommentBuilder().build(),
+        new CommentBuilder()
+          .withId(1)
+          .withText('Second Comment')
+          .build(),
       ];
 
       commentServiceStub.findAll.resolves(returnedComments);
@@ -72,17 +71,17 @@ context('UserCommentFacade', () => {
   describe('saveUserComment', () => {
     it('should save comment', async () => {
       // Arrange
-      const commentToSave: Comment = comment;
+      const commentToSave: Comment = new CommentBuilder().build();
       const userId: number = 1;
 
-      userServiceStub.findOneById.resolves(user);
-      commentServiceStub.saveComment.resolves(fullComment);
+      userServiceStub.findOneById.resolves(new UserBuilder().build());
+      commentServiceStub.saveComment.resolves(new CommentBuilder(true).build());
 
       // Act
       const savedComment: Comment = await userCommentFacade.saveUserComment(userId, commentToSave);
 
       // Assert
-      expect(savedComment).to.be.eql(fullComment);
+      expect(savedComment).to.be.eql(new CommentBuilder(true).build());
       expect(userServiceStub.findOneById).to.be.calledOnceWith(userId);
       expect(commentServiceStub.saveComment).to.be.calledOnceWith(commentToSave);
     });
@@ -93,7 +92,7 @@ context('UserCommentFacade', () => {
       userServiceStub.findOneById.rejects(new Error('FindOne error'));
 
       // Act
-      const saveUserCommentResult: Promise<Comment> = userCommentFacade.saveUserComment(userId, comment);
+      const saveUserCommentResult: Promise<Comment> = userCommentFacade.saveUserComment(userId, new CommentBuilder().build());
 
       // Assert
       await expect(saveUserCommentResult).to.eventually.be.rejectedWith('FindOne error');
@@ -103,11 +102,11 @@ context('UserCommentFacade', () => {
 
     it('should throw error if comment saving fails', async () => {
       // Arrange
-      userServiceStub.findOneById.resolves(user);
+      userServiceStub.findOneById.resolves(new UserBuilder().build());
       commentServiceStub.saveComment.rejects(new Error('SaveComment error'));
 
       // Act
-      const saveUserCommentResult: Promise<Comment> = userCommentFacade.saveUserComment(1, comment);
+      const saveUserCommentResult: Promise<Comment> = userCommentFacade.saveUserComment(1, new CommentBuilder().build());
 
       // Assert
       await expect(saveUserCommentResult).to.eventually.be.rejectedWith('SaveComment error');
