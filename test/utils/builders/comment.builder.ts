@@ -1,6 +1,7 @@
 import {Builder} from './builder';
 import {Comment} from '../../../src/models/entities/comment';
 import {CommentFixtureProvider} from '../fixture-providers/comment.fixture-provider';
+import {User} from '../../../src/models/entities/user';
 
 export class CommentBuilder extends Builder<Comment> {
 
@@ -22,6 +23,11 @@ export class CommentBuilder extends Builder<Comment> {
 
   public withText(text: string): CommentBuilder {
     this.entity.text = text;
+    return this;
+  }
+
+  public withUser(user: User): CommentBuilder {
+    this.entity.user = user;
     return this;
   }
 }

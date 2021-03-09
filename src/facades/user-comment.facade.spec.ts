@@ -81,9 +81,12 @@ context('UserCommentFacade', () => {
       const savedComment: Comment = await userCommentFacade.saveUserComment(userId, commentToSave);
 
       // Assert
+      const expectedSavedComment: Comment = new CommentBuilder()
+        .withUser(new UserBuilder().build())
+        .build();
       expect(savedComment).to.be.eql(new CommentBuilder(true).build());
       expect(userServiceStub.findOneById).to.be.calledOnceWith(userId);
-      expect(commentServiceStub.saveComment).to.be.calledOnceWith(commentToSave);
+      expect(commentServiceStub.saveComment).to.be.calledOnceWith(expectedSavedComment);
     });
 
     it('should throw error if user is not found', async () => {
