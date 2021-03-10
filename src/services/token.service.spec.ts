@@ -36,7 +36,7 @@ context('TokenService', () => {
       const token: string = tokenService.getUserToken(loginCredentials, user);
 
       // Assert
-      expect(JwtUtils.isJwt(token)).to.be.true;
+      expect(JwtUtils.isJwtToken(token)).to.be.true;
     });
 
     it('should throw error if password given in login and password in user object are different', () => {

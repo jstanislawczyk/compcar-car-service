@@ -7,6 +7,10 @@ import {User} from '../../src/models/entities/user';
 import {DateUtils} from '../utils/common/date.utils';
 import {UserRole} from '../../src/enums/user-role';
 import {UserBuilder} from '../utils/builders/user.builder';
+import {LoginInput} from '../../src/inputs/user/login.input';
+import config from 'config';
+import bcrypt from 'bcrypt';
+import {JwtUtils} from '../utils/common/jwt.utils';
 
 describe('Security', () => {
 
@@ -160,6 +164,107 @@ describe('Security', () => {
         expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
         expect(returnedUserBody.activated).to.be.true;
         expect(returnedUserBody.role).to.be.eql(UserRole.USER);
+      });
+    });
+
+    describe('login', () => {
+      it('should fail authentication for wrong email provided', async () => {
+        // Arrange
+        const loginInput: LoginInput = {
+          email: 'not_existing@mail.com',
+          password: '1qazXSW@',
+        } as LoginInput;
+
+        const query: string = `
+          {
+            login (
+              loginInput: {
+                email: "${loginInput.email}",
+                password: "${loginInput.password}"
+              }
+            )
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const errorsBody: Record<string, any> = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql('Authentication data are not valid');
+        expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
+      });
+
+      it('should fail authentication for wrong password provided', async () => {
+        // Arrange
+        const loginInput: LoginInput = {
+          email: 'test@mail.com',
+          password: '1qazXSW@',
+        } as LoginInput;
+
+        const query: string = `
+          {
+            login (
+              loginInput: {
+                email: "${loginInput.email}",
+                password: "${loginInput.password}"
+              }
+            )
+          }
+        `;
+
+        const userToSave: User = new UserBuilder()
+          .withEmail(loginInput.email)
+          .build();
+
+        await UserDatabaseUtils.saveUser(userToSave);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const errorsBody: Record<string, any> = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql('Authentication data are not valid');
+        expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
+      });
+
+      it('should authenticate user', async () => {
+        // Arrange
+        const loginInput: LoginInput = {
+          email: 'test@mail.com',
+          password: '1qazXSW@',
+        } as LoginInput;
+
+        const query: string = `
+          {
+            login (
+              loginInput: {
+                email: "${loginInput.email}",
+                password: "${loginInput.password}"
+              }
+            )
+          }
+        `;
+
+        const saltRounds: number = config.get('security.bcrypt.rounds');
+        const userToSave: User = new UserBuilder()
+          .withEmail(loginInput.email)
+          .withPassword(bcrypt.hashSync(loginInput.password, saltRounds))
+          .build();
+
+        await UserDatabaseUtils.saveUser(userToSave);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        expect(JwtUtils.isJwtToken(response.body.data.login)).to.be.true;
       });
     });
   });
