@@ -1,5 +1,5 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
-import {User} from '../../../../src/models/entities/user';
+import {User} from '../../../src/models/entities/user';
 
 export class UserDatabaseUtils {
 

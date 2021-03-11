@@ -1,16 +1,18 @@
 import request, {Response} from 'supertest';
 import {application} from '../hooks/application-hook';
 import {expect} from 'chai';
-import {UserDatabaseUtils} from '../utils/database-utils/user/user.database-utils';
+import {UserDatabaseUtils} from '../utils/database-utils/user.database-utils';
 import {RegisterInput} from '../../src/inputs/user/register.input';
 import {User} from '../../src/models/entities/user';
 import {DateUtils} from '../utils/common/date.utils';
 import {UserRole} from '../../src/enums/user-role';
 import {UserBuilder} from '../utils/builders/user.builder';
 import {LoginInput} from '../../src/inputs/user/login.input';
+import {JwtUtils} from '../utils/common/jwt.utils';
+import {ResponseError} from '../utils/interfaces/response-error';
+import {TestValidationError} from '../utils/interfaces/validation-error';
 import config from 'config';
 import bcrypt from 'bcrypt';
-import {JwtUtils} from '../utils/common/jwt.utils';
 
 describe('Security', () => {
 
@@ -33,14 +35,14 @@ describe('Security', () => {
             registerInput: {
               email: "${registerInput.email}",
               password: "${registerInput.password}",
-              passwordRepeat: "${registerInput.passwordRepeat}"
+              passwordRepeat: "${registerInput.passwordRepeat}",
             }
           ) {
             id,
             email,
             registerDate,
             activated,
-            role
+            role,
           }
         }
       `;
@@ -54,10 +56,10 @@ describe('Security', () => {
       const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
       expect(savedUsers).to.be.empty;
 
-      const errorsBody: Record<string, any> = response.body.errors[0];
+      const errorsBody: ResponseError = response.body.errors[0];
       expect(errorsBody.message).to.be.eql('Argument Validation Error');
 
-      const errors: Record<string, any>[] = errorsBody.extensions.exception.validationErrors;
+      const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
       expect(errors[0].property).to.be.eql('email');
       expect(errors[0].value).to.be.eql('wrong_mail');
       expect(errors[0].constraints.isEmail).to.be.eql('email must be an email');
@@ -86,14 +88,14 @@ describe('Security', () => {
             registerInput: {
               email: "${registerInput.email}",
               password: "${registerInput.password}",
-              passwordRepeat: "${registerInput.passwordRepeat}"
+              passwordRepeat: "${registerInput.passwordRepeat}",
             }
           ) {
             id,
             email,
             registerDate,
             activated,
-            role
+            role,
           }
         }
       `;
@@ -135,14 +137,14 @@ describe('Security', () => {
               registerInput: {
                 email: "${registerInput.email}",
                 password: "${registerInput.password}",
-                passwordRepeat: "${registerInput.passwordRepeat}"
+                passwordRepeat: "${registerInput.passwordRepeat}",
               }
             ) {
               id,
               email,
               registerDate,
               activated,
-              role
+              role,
             }
           }
         `;
@@ -180,7 +182,7 @@ describe('Security', () => {
             login (
               loginInput: {
                 email: "${loginInput.email}",
-                password: "${loginInput.password}"
+                password: "${loginInput.password}",
               }
             )
           }
@@ -192,7 +194,7 @@ describe('Security', () => {
           .send({ query })
           .expect(200);
 
-        const errorsBody: Record<string, any> = response.body.errors[0];
+        const errorsBody: ResponseError = response.body.errors[0];
         expect(errorsBody.message).to.be.eql('Authentication data are not valid');
         expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
       });
@@ -209,7 +211,7 @@ describe('Security', () => {
             login (
               loginInput: {
                 email: "${loginInput.email}",
-                password: "${loginInput.password}"
+                password: "${loginInput.password}",
               }
             )
           }
@@ -227,7 +229,7 @@ describe('Security', () => {
           .send({ query })
           .expect(200);
 
-        const errorsBody: Record<string, any> = response.body.errors[0];
+        const errorsBody: ResponseError = response.body.errors[0];
         expect(errorsBody.message).to.be.eql('Authentication data are not valid');
         expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
       });
@@ -244,7 +246,7 @@ describe('Security', () => {
             login (
               loginInput: {
                 email: "${loginInput.email}",
-                password: "${loginInput.password}"
+                password: "${loginInput.password}",
               }
             )
           }
