@@ -60,17 +60,19 @@ describe('Security', () => {
       expect(errorsBody.message).to.be.eql('Argument Validation Error');
 
       const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
+      expect(errors).to.have.lengthOf(3);
+
       expect(errors[0].property).to.be.eql('email');
       expect(errors[0].value).to.be.eql('wrong_mail');
       expect(errors[0].constraints.isEmail).to.be.eql('email must be an email');
       expect(errors[1].property).to.be.eql('password');
       expect(errors[1].value).to.be.eql('test');
-      expect(errors[1].constraints.IsPassword).to.be.eql(
+      expect(errors[1].constraints.isPassword).to.be.eql(
         'Password should contain minimum six characters, at least one uppercase letter, one lowercase letter and one number'
       );
       expect(errors[2].property).to.be.eql('passwordRepeat');
       expect(errors[2].value).to.be.eql('123');
-      expect(errors[2].constraints.MatchProperty).to.be.eql(`"password" value doesn't match "passwordRepeat" property`);
+      expect(errors[2].constraints.matchProperty).to.be.eql(`"password" value doesn't match "passwordRepeat" property`);
     });
 
     describe('should register user', () => {
@@ -83,22 +85,22 @@ describe('Security', () => {
         } as RegisterInput;
 
         const query: string = `
-        mutation {
-          register (
-            registerInput: {
-              email: "${registerInput.email}",
-              password: "${registerInput.password}",
-              passwordRepeat: "${registerInput.passwordRepeat}",
+          mutation {
+            register (
+              registerInput: {
+                email: "${registerInput.email}",
+                password: "${registerInput.password}",
+                passwordRepeat: "${registerInput.passwordRepeat}",
+              }
+            ) {
+              id,
+              email,
+              registerDate,
+              activated,
+              role,
             }
-          ) {
-            id,
-            email,
-            registerDate,
-            activated,
-            role,
           }
-        }
-      `;
+        `;
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
@@ -110,13 +112,13 @@ describe('Security', () => {
         expect(savedUsers).to.have.length(1);
 
         const returnedUserBody: User = response.body.data.register as User;
-        expect(Number(returnedUserBody.id)).to.be.be.above(0);
+        expect(Number(returnedUserBody.id)).to.be.above(0);
         expect(returnedUserBody.email).to.be.eql('test@mail.com');
         expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
         expect(returnedUserBody.activated).to.be.true;
         expect(returnedUserBody.role).to.be.eql(UserRole.ADMIN);
 
-        expect(savedUsers[0].id).to.be.be.eql(Number(returnedUserBody.id));
+        expect(savedUsers[0].id).to.be.eql(Number(returnedUserBody.id));
         expect(savedUsers[0].email).to.be.eql(returnedUserBody.email);
         expect(savedUsers[0].registerDate).to.be.eql(returnedUserBody.registerDate);
         expect(savedUsers[0].activated).to.be.eql(returnedUserBody.activated);
@@ -161,7 +163,7 @@ describe('Security', () => {
         expect(savedUsers).to.have.length(2);
 
         const returnedUserBody: User = response.body.data.register as User;
-        expect(Number(returnedUserBody.id)).to.be.be.above(0);
+        expect(Number(returnedUserBody.id)).to.be.above(0);
         expect(returnedUserBody.email).to.be.eql('test@mail.com');
         expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
         expect(returnedUserBody.activated).to.be.true;

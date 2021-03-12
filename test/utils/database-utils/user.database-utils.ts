@@ -11,6 +11,10 @@ export class UserDatabaseUtils {
     return this.getUserRepository().findOne({ id });
   }
 
+  public static getUserByIdOrFail(id: number): Promise<User> {
+    return this.getUserRepository().findOneOrFail({ id });
+  }
+
   public static saveUser(user: User): Promise<User> {
     return this.getUserRepository().save(user);
   }

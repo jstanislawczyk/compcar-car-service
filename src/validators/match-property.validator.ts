@@ -1,7 +1,7 @@
 import {ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface} from 'class-validator';
 
 @ValidatorConstraint({
-  name: 'MatchProperty',
+  name: 'matchProperty',
 })
 export class MatchPropertyValidator implements ValidatorConstraintInterface {
 
