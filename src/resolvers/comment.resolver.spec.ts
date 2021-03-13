@@ -6,8 +6,8 @@ import {CommentResolver} from './comment.resolver';
 import {UserCommentFacade} from '../facades/user-comment.facade';
 import {CommentMapper} from '../mapper/comment.mapper';
 import {Comment} from '../models/entities/comment';
-import {comment, fullComment} from '../../test/fixtures/comment.fixture';
 import {CreateCommentInput} from '../inputs/comments/create-comment.input';
+import {CommentBuilder} from '../../test/utils/builders/comment.builder';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -39,14 +39,12 @@ context('CommentResolver', () => {
     it('should return comments list', async () => {
       // Arrange
       const savedComments: Comment[] = [
-        comment,
-        {
-          ...comment,
-          rating: 2,
-          text: 'Second comment',
-        },
+        new CommentBuilder().build(),
+        new CommentBuilder()
+          .withRating(2)
+          .withText('Second comment')
+          .build(),
       ];
-
       userCommentFacadeStub.findAll.resolves(savedComments);
 
       // Act
@@ -73,8 +71,8 @@ context('CommentResolver', () => {
     it('should create comment', async () => {
       // Arrange
       const userId: number = 1;
-      const mappedComment: Comment = comment;
-      const savedComment: Comment = fullComment;
+      const mappedComment: Comment = new CommentBuilder().build();
+      const savedComment: Comment = new CommentBuilder(true).build();
       const createCommentInput: CreateCommentInput = {
         text: 'Comment text',
         rating: 2,
@@ -95,7 +93,7 @@ context('CommentResolver', () => {
     it('should throw error if comment saving fails', async () => {
       // Arrange
       const userId: number = 1;
-      const mappedComment: Comment = comment;
+      const mappedComment: Comment = new CommentBuilder().build();
       const createCommentInput: CreateCommentInput = {
         text: 'Comment text',
         rating: 2,

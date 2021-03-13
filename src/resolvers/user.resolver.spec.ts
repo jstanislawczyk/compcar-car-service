@@ -3,9 +3,9 @@ import sinon, {SinonSandbox, SinonStubbedInstance} from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import {UserService} from '../services/user.service';
-import {user} from '../../test/fixtures/user.fixture';
 import {UserResolver} from './user.resolver';
 import {User} from '../models/entities/user';
+import {UserBuilder} from '../../test/utils/builders/user.builder';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -32,12 +32,11 @@ context('UserResolver', () => {
     it('should return users list', async () => {
       // Arrange
       const savedUsers: User[] = [
-        user,
-        {
-          ...user,
-          email: 'second@mail.com',
-          activated: false,
-        },
+        new UserBuilder().build(),
+        new UserBuilder()
+          .withEmail('second@mail.com')
+          .withActivated(true)
+          .build(),
       ];
 
       userServiceStub.findAll.resolves(savedUsers);

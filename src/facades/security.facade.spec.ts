@@ -6,9 +6,9 @@ import {UserService} from '../services/user.service';
 import {SecurityFacade} from './security.facade';
 import {TokenService} from '../services/token.service';
 import {User} from '../models/entities/user';
-import {fullUser, user} from '../../test/fixtures/user.fixture';
 import {LoginCredentials} from '../models/common/login-credentials';
 import {AuthenticationError} from 'apollo-server';
+import {UserBuilder} from '../../test/utils/builders/user.builder';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -43,7 +43,7 @@ context('SecurityFacade', () => {
         email: 'test@mail.com',
         password: '1qazXSW@',
       };
-      const existingUser: User = user;
+      const existingUser: User = new UserBuilder().build();
       const generatedToken: string = 'TestToken';
 
       userServiceStub.findOneByEmail.resolves(existingUser);
@@ -85,7 +85,7 @@ context('SecurityFacade', () => {
         password: '1qazXSW@',
       };
 
-      userServiceStub.findOneByEmail.resolves(user);
+      userServiceStub.findOneByEmail.resolves(new UserBuilder().build());
       tokenServiceStub.getUserToken.rejects('TokenService Error');
 
       // Act
@@ -101,15 +101,15 @@ context('SecurityFacade', () => {
   describe('registerUser', () => {
     it('should register user', async () => {
       // Arrange
-      const userToSave: User = user;
+      const userToSave: User = new UserBuilder().build();
 
-      userServiceStub.saveUser.resolves(fullUser);
+      userServiceStub.saveUser.resolves(new UserBuilder(true).build());
 
       // Act
       const savedUser: User = await securityFacade.registerUser(userToSave);
 
       // Assert
-      expect(savedUser).to.be.eql(fullUser);
+      expect(savedUser).to.be.eql(new UserBuilder(true).build());
       expect(userServiceStub.saveUser).to.be.calledOnceWith(userToSave);
     });
 
@@ -118,7 +118,7 @@ context('SecurityFacade', () => {
       userServiceStub.saveUser.rejects(new Error('RegisterUser error'));
 
       // Act
-      const userRegisterResult: Promise<User> = securityFacade.registerUser(user);
+      const userRegisterResult: Promise<User> = securityFacade.registerUser(new UserBuilder().build());
 
       // Assert
       await expect(userRegisterResult).to.eventually.be.rejectedWith('RegisterUser error');

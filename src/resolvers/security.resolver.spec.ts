@@ -8,9 +8,9 @@ import {LoginCredentialsMapper} from '../mapper/login-credentials.mapper';
 import {UserMapper} from '../mapper/user.mapper';
 import {LoginInput} from '../inputs/user/login.input';
 import {LoginCredentials} from '../models/common/login-credentials';
-import {fullUser, user} from '../../test/fixtures/user.fixture';
 import {User} from '../models/entities/user';
 import {RegisterInput} from '../inputs/user/register.input';
+import {UserBuilder} from '../../test/utils/builders/user.builder';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -95,8 +95,8 @@ context('SecurityResolver', () => {
         password: '1qazXSW@',
         passwordRepeat: '1qazXSW@',
       };
-      const mappedUser: User = user;
-      const savedUser: User = fullUser;
+      const mappedUser: User = new UserBuilder().build();
+      const savedUser: User = new UserBuilder(true).build();
 
       userMapperStub.toRegisterUser.returns(mappedUser);
       securityFacadeStub.registerUser.resolves(savedUser);
@@ -118,7 +118,7 @@ context('SecurityResolver', () => {
         passwordRepeat: '1qazXSW@',
       };
 
-      userMapperStub.toRegisterUser.returns(user);
+      userMapperStub.toRegisterUser.returns(new UserBuilder().build());
       securityFacadeStub.registerUser.rejects(new Error('RegisterUser error'));
 
       // Act

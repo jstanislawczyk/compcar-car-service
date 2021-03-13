@@ -1,7 +1,7 @@
 import {ValidatorConstraint, ValidatorConstraintInterface} from 'class-validator';
 
 @ValidatorConstraint({
-  name: 'IsPassword',
+  name: 'isPassword',
 })
 export class IsPasswordValidator implements ValidatorConstraintInterface {
 

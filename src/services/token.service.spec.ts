@@ -1,7 +1,6 @@
 import {expect} from 'chai';
 import {TokenService} from './token.service';
 import {User} from '../models/entities/user';
-import {fullUser, user} from '../../test/fixtures/user.fixture';
 import bcrypt from 'bcrypt';
 import {LoginCredentials} from '../models/common/login-credentials';
 import {AuthenticationError} from 'apollo-server';
@@ -12,6 +11,7 @@ import jwt, {TokenExpiredError} from 'jsonwebtoken';
 import {classToPlain} from 'class-transformer';
 import config from 'config';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
+import {UserBuilder} from '../../test/utils/builders/user.builder';
 
 context('TokenService', () => {
 
@@ -24,7 +24,7 @@ context('TokenService', () => {
   describe('getUserToken', () => {
     it('should return JWT token', () => {
       // Arrange
-      const user: User = fullUser;
+      const user: User = new UserBuilder(true).build();
       const loginCredentials: LoginCredentials = {
         email: user.email,
         password: user.password,
@@ -36,18 +36,18 @@ context('TokenService', () => {
       const token: string = tokenService.getUserToken(loginCredentials, user);
 
       // Assert
-      expect(JwtUtils.isJwt(token)).to.be.true;
+      expect(JwtUtils.isJwtToken(token)).to.be.true;
     });
 
     it('should throw error if password given in login and password in user object are different', () => {
       // Arrange
-      const user: User = fullUser;
+      const user: User = new UserBuilder(true)
+        .withPassword('1qazXSW@')
+        .build();
       const loginCredentials: LoginCredentials = {
         email: user.email,
         password: 'WrongPassword',
       };
-
-      user.password = '1qazXSW@';
 
       // Act & Assert
       expect(() => tokenService.getUserToken(loginCredentials, user))
@@ -59,10 +59,9 @@ context('TokenService', () => {
   describe('validateToken', () => {
     it('should validate token', () => {
       // Arrange
-      const authenticatedUser: User = {
-        ...user,
-        role: UserRole.ADMIN,
-      };
+      const authenticatedUser: User = new UserBuilder(true)
+        .withRole(UserRole.ADMIN)
+        .build();
       const jwtSecret: string = config.get('security.jwt.secret');
       const allowedRoles: UserRole[] = [UserRole.ADMIN];
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
@@ -85,10 +84,9 @@ context('TokenService', () => {
       // Arrange
       const jwtSecret: string = config.get('security.jwt.secret');
       const allowedRoles: UserRole[] = [UserRole.ADMIN];
-      const authenticatedUser: User = {
-        ...user,
-        role: UserRole.ADMIN,
-      };
+      const authenticatedUser: User = new UserBuilder(true)
+        .withRole(UserRole.ADMIN)
+        .build();
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
       const token: string = jwt.sign(
         classToPlain(jwtToken),
@@ -107,10 +105,9 @@ context('TokenService', () => {
     it('should not validate token if is not supported role', () => {
       // Arrange
       const jwtSecret: string = config.get('security.jwt.secret');
-      const authenticatedUser: User = {
-        ...user,
-        role: 'NotSupportedRole' as UserRole,
-      };
+      const authenticatedUser: User = new UserBuilder(true)
+        .withRole('NotSupportedRole' as UserRole)
+        .build();
       const allowedRoles: UserRole[] = [UserRole.USER];
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
       const token: string = jwt.sign(
@@ -130,10 +127,9 @@ context('TokenService', () => {
     it('should not validate token if role is not allowed', () => {
       // Arrange
       const jwtSecret: string = config.get('security.jwt.secret');
-      const authenticatedUser: User = {
-        ...user,
-        role: UserRole.ADMIN,
-      };
+      const authenticatedUser: User = new UserBuilder(true)
+        .withRole(UserRole.ADMIN)
+        .build();
       const allowedRoles: UserRole[] = [UserRole.USER];
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
       const token: string = jwt.sign(
