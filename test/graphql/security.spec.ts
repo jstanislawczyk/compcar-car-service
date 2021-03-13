@@ -11,10 +11,15 @@ import {LoginInput} from '../../src/inputs/user/login.input';
 import {JwtUtils} from '../utils/common/jwt.utils';
 import {ResponseError} from '../utils/interfaces/response-error';
 import {TestValidationError} from '../utils/interfaces/validation-error';
+import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import config from 'config';
 import bcrypt from 'bcrypt';
 
 describe('Security', () => {
+
+  before(async () => {
+    await CommonDatabaseUtils.deleteAllEntities();
+  });
 
   beforeEach(async () => {
     await UserDatabaseUtils.deleteAllUsers();

@@ -11,15 +11,15 @@ import {TestValidationError} from '../utils/interfaces/validation-error';
 import {User} from '../../src/models/entities/user';
 import {UserBuilder} from '../utils/builders/user.builder';
 import {UserDatabaseUtils} from '../utils/database-utils/user.database-utils';
+import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 
 describe('Comment', () => {
 
-  beforeEach(async () => {
-    await CommentDatabaseUtils.deleteAllComments();
-    await UserDatabaseUtils.deleteAllUsers();
+  before(async () => {
+    await CommonDatabaseUtils.deleteAllEntities();
   });
 
-  after(async () => {
+  beforeEach(async () => {
     await CommentDatabaseUtils.deleteAllComments();
     await UserDatabaseUtils.deleteAllUsers();
   });
