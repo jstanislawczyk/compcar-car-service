@@ -6,7 +6,7 @@ import {User} from '../../src/models/entities/user';
 import {DateUtils} from '../utils/common/date.utils';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import {UserBuilder} from '../utils/builders/user.builder';
-import {UserRole} from '../../src/enums/user-role';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('User', () => {
 

@@ -7,9 +7,9 @@ import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import bcrypt from 'bcrypt';
 import config from 'config';
-import {UserRole} from '../enums/user-role';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
+import {UserRole} from '../models/enums/user-role';
 
 use(sinonChai);
 use(chaiAsPromised);

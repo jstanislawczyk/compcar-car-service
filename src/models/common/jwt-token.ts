@@ -1,5 +1,5 @@
-import {UserRole} from '../../enums/user-role';
 import {User} from '../entities/user';
+import {UserRole} from '../enums/user-role';
 
 export class JwtToken {
 

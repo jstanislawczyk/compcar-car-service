@@ -7,8 +7,8 @@ import {User} from '../models/entities/user';
 import {JwtToken} from '../models/common/jwt-token';
 import {classToPlain} from 'class-transformer';
 import {LoginCredentials} from '../models/common/login-credentials';
-import {UserRole} from '../enums/user-role';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 export class TokenService {

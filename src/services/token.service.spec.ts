@@ -5,13 +5,13 @@ import bcrypt from 'bcrypt';
 import {LoginCredentials} from '../models/common/login-credentials';
 import {AuthenticationError} from 'apollo-server';
 import {JwtUtils} from '../../test/utils/common/jwt.utils';
-import {UserRole} from '../enums/user-role';
 import {JwtToken} from '../models/common/jwt-token';
 import jwt, {TokenExpiredError} from 'jsonwebtoken';
 import {classToPlain} from 'class-transformer';
 import config from 'config';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
+import {UserRole} from '../models/enums/user-role';
 
 context('TokenService', () => {
 

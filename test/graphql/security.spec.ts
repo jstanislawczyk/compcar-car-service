@@ -5,7 +5,6 @@ import {UserDatabaseUtils} from '../utils/database-utils/user.database-utils';
 import {RegisterInput} from '../../src/inputs/user/register.input';
 import {User} from '../../src/models/entities/user';
 import {DateUtils} from '../utils/common/date.utils';
-import {UserRole} from '../../src/enums/user-role';
 import {UserBuilder} from '../utils/builders/user.builder';
 import {LoginInput} from '../../src/inputs/user/login.input';
 import {JwtUtils} from '../utils/common/jwt.utils';
@@ -14,6 +13,7 @@ import {TestValidationError} from '../utils/interfaces/validation-error';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import config from 'config';
 import bcrypt from 'bcrypt';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Security', () => {
 
