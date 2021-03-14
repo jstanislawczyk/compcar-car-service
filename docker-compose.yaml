@@ -1,0 +1,43 @@
+version: "3.9"
+
+networks:
+  compcar:
+    name: compcar
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: compcar
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1qazXSW@
+    volumes:
+      - compcar-database:/var/lib/mysql
+    networks:
+      compcar:
+        aliases:
+          - mysql
+
+  car-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      MYSQL_URL: mysql
+    ports:
+      - 4000:4000
+    depends_on:
+      - mysql
+    networks:
+      compcar:
+        aliases:
+          - car-service
+
+volumes:
+  compcar-database: {}
