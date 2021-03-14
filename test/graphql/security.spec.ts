@@ -8,12 +8,12 @@ import {DateUtils} from '../utils/common/date.utils';
 import {UserRole} from '../../src/enums/user-role';
 import {UserBuilder} from '../utils/builders/user.builder';
 import {LoginInput} from '../../src/inputs/user/login.input';
-import {JwtUtils} from '../utils/common/jwt.utils';
+import {StringUtils} from '../utils/common/string.utils';
 import {ResponseError} from '../utils/interfaces/response-error';
 import {TestValidationError} from '../utils/interfaces/validation-error';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import config from 'config';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 describe('Security', () => {
 
@@ -100,6 +100,7 @@ describe('Security', () => {
             ) {
               id,
               email,
+              password,
               registerDate,
               activated,
               role,
@@ -113,18 +114,20 @@ describe('Security', () => {
           .send({ query })
           .expect(200);
 
-        const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
-        expect(savedUsers).to.have.length(1);
-
         const returnedUserBody: User = response.body.data.register as User;
         expect(Number(returnedUserBody.id)).to.be.above(0);
         expect(returnedUserBody.email).to.be.eql('test@mail.com');
+        expect(StringUtils.isBcryptPassword(returnedUserBody.password)).to.be.true;
         expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
         expect(returnedUserBody.activated).to.be.true;
         expect(returnedUserBody.role).to.be.eql(UserRole.ADMIN);
 
+        const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
+        expect(savedUsers).to.have.length(1);
+
         expect(savedUsers[0].id).to.be.eql(Number(returnedUserBody.id));
         expect(savedUsers[0].email).to.be.eql(returnedUserBody.email);
+        expect(savedUsers[0].password).to.be.eql(returnedUserBody.password);
         expect(savedUsers[0].registerDate).to.be.eql(returnedUserBody.registerDate);
         expect(savedUsers[0].activated).to.be.eql(returnedUserBody.activated);
         expect(savedUsers[0].role).to.be.eql(returnedUserBody.role);
@@ -149,6 +152,7 @@ describe('Security', () => {
             ) {
               id,
               email,
+              password,
               registerDate,
               activated,
               role,
@@ -164,15 +168,26 @@ describe('Security', () => {
           .send({ query })
           .expect(200);
 
-        const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
-        expect(savedUsers).to.have.length(2);
-
         const returnedUserBody: User = response.body.data.register as User;
         expect(Number(returnedUserBody.id)).to.be.above(0);
         expect(returnedUserBody.email).to.be.eql('test@mail.com');
+        expect(StringUtils.isBcryptPassword(returnedUserBody.password)).to.be.true;
         expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
         expect(returnedUserBody.activated).to.be.true;
         expect(returnedUserBody.role).to.be.eql(UserRole.USER);
+
+        const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
+        const registeredUser: User = savedUsers.find((user: User) =>
+          user.id === Number(returnedUserBody.id)
+        ) as User;
+        expect(savedUsers).to.have.length(2);
+
+        expect(registeredUser.id).to.be.eql(Number(returnedUserBody.id));
+        expect(registeredUser.email).to.be.eql(returnedUserBody.email);
+        expect(registeredUser.password).to.be.eql(returnedUserBody.password);
+        expect(registeredUser.registerDate).to.be.eql(returnedUserBody.registerDate);
+        expect(registeredUser.activated).to.be.eql(returnedUserBody.activated);
+        expect(registeredUser.role).to.be.eql(returnedUserBody.role);
       });
     });
 
@@ -273,7 +288,7 @@ describe('Security', () => {
           .send({ query })
           .expect(200);
 
-        expect(JwtUtils.isJwtToken(response.body.data.login)).to.be.true;
+        expect(StringUtils.isJwtToken(response.body.data.login)).to.be.true;
       });
     });
   });

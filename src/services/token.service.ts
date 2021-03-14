@@ -1,6 +1,6 @@
 import {Service} from 'typedi';
 import {AuthenticationError} from 'apollo-server';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import {User} from '../models/entities/user';

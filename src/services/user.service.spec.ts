@@ -5,7 +5,7 @@ import {User} from '../models/entities/user';
 import sinon, {SinonSandbox, SinonStub, SinonStubbedInstance} from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import config from 'config';
 import {UserRole} from '../enums/user-role';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';

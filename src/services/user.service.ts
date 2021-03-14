@@ -4,7 +4,7 @@ import {InjectRepository} from 'typeorm-typedi-extensions';
 import {UserRole} from '../enums/user-role';
 import {User} from '../models/entities/user';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import config from 'config';
 
 @Service()
