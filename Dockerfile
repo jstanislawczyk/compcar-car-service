@@ -7,11 +7,13 @@ ENV NODE_ENV production
 WORKDIR /usr/src/app
 
 # Install nad build
-COPY package.json .
-RUN npm install
+COPY package*.json .
+RUN npm ci --also=dev
 
 # Build app
 ADD . /usr/src/app
+RUN find . -name "*.spec.ts" -type f -delete
+RUN rm -r test
 RUN npm run build:prod
 
 # Expose app
