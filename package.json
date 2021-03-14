@@ -31,30 +31,30 @@
   },
   "dependencies": {
     "apollo-server": "^2.19.0",
-    "bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.12.2",
     "config": "^3.3.3",
     "graphql": "^15.4.0",
     "jsonwebtoken": "^8.5.1",
-    "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
     "type-graphql-dataloader": "^0.3.7",
     "typedi": "^0.8.0",
     "typeorm": "^0.2.29",
     "typeorm-typedi-extensions": "^0.2.3",
+    "typescript": "^4.1.2",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/bcrypt": "^3.0.0",
+    "@types/bcryptjs": "^2.4.2",
     "@types/chai": "^4.2.14",
     "@types/chai-as-promised": "^7.1.3",
     "@types/config": "0.0.37",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mocha": "^8.2.0",
-    "@types/mysql": "^2.15.16",
     "@types/sinon": "^9.0.10",
     "@types/sinon-chai": "^3.2.5",
     "@types/supertest": "^2.0.10",
@@ -73,7 +73,6 @@
     "source-map-support": "^0.5.19",
     "supertest": "^6.0.1",
     "ts-node": "^9.1.1",
-    "typescript": "^4.1.2",
     "uuid": "^8.3.2"
   }
 }

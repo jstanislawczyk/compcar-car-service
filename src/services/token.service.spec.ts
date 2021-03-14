@@ -1,10 +1,10 @@
 import {expect} from 'chai';
 import {TokenService} from './token.service';
 import {User} from '../models/entities/user';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import {LoginCredentials} from '../models/common/login-credentials';
 import {AuthenticationError} from 'apollo-server';
-import {JwtUtils} from '../../test/utils/common/jwt.utils';
+import {StringUtils} from '../../test/utils/common/string.utils';
 import {UserRole} from '../enums/user-role';
 import {JwtToken} from '../models/common/jwt-token';
 import jwt, {TokenExpiredError} from 'jsonwebtoken';
@@ -36,7 +36,7 @@ context('TokenService', () => {
       const token: string = tokenService.getUserToken(loginCredentials, user);
 
       // Assert
-      expect(JwtUtils.isJwtToken(token)).to.be.true;
+      expect(StringUtils.isJwtToken(token)).to.be.true;
     });
 
     it('should throw error if password given in login and password in user object are different', () => {
