@@ -1,7 +1,7 @@
 import {Service} from 'typedi';
 import {RegisterInput} from '../inputs/user/register.input';
-import {UserRole} from '../enums/user-role';
 import {User} from '../models/entities/user';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 export class UserMapper {

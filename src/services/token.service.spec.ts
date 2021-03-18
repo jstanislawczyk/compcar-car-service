@@ -1,17 +1,17 @@
 import {expect} from 'chai';
 import {TokenService} from './token.service';
 import {User} from '../models/entities/user';
-import bcrypt from 'bcryptjs';
 import {LoginCredentials} from '../models/common/login-credentials';
 import {AuthenticationError} from 'apollo-server';
 import {StringUtils} from '../../test/utils/common/string.utils';
-import {UserRole} from '../enums/user-role';
 import {JwtToken} from '../models/common/jwt-token';
 import jwt, {TokenExpiredError} from 'jsonwebtoken';
 import {classToPlain} from 'class-transformer';
-import config from 'config';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
+import {UserRole} from '../models/enums/user-role';
+import bcrypt from 'bcryptjs';
+import config from 'config';
 
 context('TokenService', () => {
 
