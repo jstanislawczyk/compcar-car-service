@@ -6,7 +6,7 @@ import {CommentResolver} from './comment.resolver';
 import {UserCommentFacade} from '../facades/user-comment.facade';
 import {CommentMapper} from '../mapper/comment.mapper';
 import {Comment} from '../models/entities/comment';
-import {CreateCommentInput} from '../inputs/comments/create-comment.input';
+import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
 import {CommentBuilder} from '../../test/utils/builders/comment.builder';
 
 use(sinonChai);

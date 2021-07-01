@@ -1,5 +1,5 @@
 import {Service} from 'typedi';
-import {LoginInput} from '../inputs/user/login.input';
+import {LoginInput} from '../models/inputs/user/login.input';
 import {LoginCredentials} from '../models/common/login-credentials';
 
 @Service()

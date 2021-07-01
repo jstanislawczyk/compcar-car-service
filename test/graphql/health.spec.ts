@@ -4,7 +4,7 @@ import {expect} from 'chai';
 import {UserDatabaseUtils} from '../utils/database-utils/user.database-utils';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import {UserBuilder} from '../utils/builders/user.builder';
-import {ApplicationHealth} from '../../src/models/types/health/application-health';
+import {ApplicationHealth} from '../../src/models/object-types/health/application-health';
 import {HealthStatus} from '../../src/enums/health-status';
 import {UserRepository} from '../../src/repositories/user.repository';
 import sinon from 'sinon';

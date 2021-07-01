@@ -14,7 +14,6 @@ export class Painting {
   @Column({
     type: 'enum',
     enum: Color,
-    length: 32,
   })
   public color: Color;
 

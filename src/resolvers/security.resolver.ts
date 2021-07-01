@@ -1,8 +1,8 @@
 import {Resolver, Arg, Mutation, Query} from 'type-graphql';
 import {Service} from 'typedi';
-import {RegisterInput} from '../inputs/user/register.input';
+import {RegisterInput} from '../models/inputs/user/register.input';
 import {Logger} from '../common/logger';
-import {LoginInput} from '../inputs/user/login.input';
+import {LoginInput} from '../models/inputs/user/login.input';
 import {UserMapper} from '../mapper/user.mapper';
 import {User} from '../models/entities/user';
 import {SecurityFacade} from '../facades/security.facade';

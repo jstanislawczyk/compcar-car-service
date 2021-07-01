@@ -4,7 +4,7 @@ import {Country} from '../enums/country';
 
 @Entity()
 @ObjectType()
-export class Car {
+export class Brand {
 
   @Field(() => ID)
   @PrimaryGeneratedColumn()
@@ -18,7 +18,6 @@ export class Car {
 
   @Field()
   @Column({
-    length: 64,
     type: 'enum',
     enum: Country,
   })

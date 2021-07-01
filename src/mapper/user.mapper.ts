@@ -1,5 +1,5 @@
 import {Service} from 'typedi';
-import {RegisterInput} from '../inputs/user/register.input';
+import {RegisterInput} from '../models/inputs/user/register.input';
 import {User} from '../models/entities/user';
 import {UserRole} from '../models/enums/user-role';
 

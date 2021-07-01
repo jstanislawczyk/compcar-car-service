@@ -6,7 +6,7 @@ import {Comment} from '../../src/models/entities/comment';
 import {CommentBuilder} from '../utils/builders/comment.builder';
 import {DateUtils} from '../utils/common/date.utils';
 import {ResponseError} from '../utils/interfaces/response-error';
-import {CreateCommentInput} from '../../src/inputs/comments/create-comment.input';
+import {CreateCommentInput} from '../../src/models/inputs/comments/create-comment.input';
 import {TestValidationError} from '../utils/interfaces/validation-error';
 import {User} from '../../src/models/entities/user';
 import {UserBuilder} from '../utils/builders/user.builder';

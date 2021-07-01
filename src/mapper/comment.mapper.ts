@@ -1,5 +1,5 @@
 import {Service} from 'typedi';
-import {CreateCommentInput} from '../inputs/comments/create-comment.input';
+import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
 import {Comment} from '../models/entities/comment';
 
 @Service()

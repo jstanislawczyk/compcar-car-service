@@ -36,7 +36,6 @@ export class Engine {
   @Column({
     type: 'enum',
     enum: FuelType,
-    length: 32,
   })
   public fuelType: FuelType;
 }

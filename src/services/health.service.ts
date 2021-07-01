@@ -2,7 +2,7 @@ import {Service} from 'typedi';
 import {InjectRepository} from 'typeorm-typedi-extensions';
 import {UserRepository} from '../repositories/user.repository';
 import {HealthStatus} from '../enums/health-status';
-import {ApplicationHealth} from '../models/types/health/application-health';
+import {ApplicationHealth} from '../models/object-types/health/application-health';
 
 @Service()
 export class HealthService {
