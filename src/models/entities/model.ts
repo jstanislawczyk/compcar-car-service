@@ -1,12 +1,12 @@
 import {Field, ID, ObjectType} from 'type-graphql';
 import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Brand} from './brand';
 import {TypeormLoader} from 'type-graphql-dataloader';
-import {Country} from './country';
-import {Model} from './model';
+import {Generation} from './generation';
 
 @Entity()
 @ObjectType()
-export class Brand {
+export class Model {
 
   @Field(() => ID)
   @PrimaryGeneratedColumn()
@@ -14,23 +14,23 @@ export class Brand {
 
   @Field()
   @Column({
-    length: 64,
+    length: 128,
   })
   public name: string;
 
-  @Field(() => Country)
+  @Field(() => Brand)
   @ManyToOne(
-    () => Country,
-    (country: Country) => country.brands,
+    () => Brand,
+    (brand: Brand) => brand.models,
   )
   @TypeormLoader()
-  public country: Country;
+  public brand: Brand;
 
-  @Field(() => [Model])
+  @Field(() => [Generation])
   @OneToMany(
-    () => Model,
-    (model: Model) => model.brand,
+    () => Generation,
+    (generation: Generation) => generation.model,
   )
   @TypeormLoader()
-  public models?: Model[];
+  public generations?: Generation[];
 }

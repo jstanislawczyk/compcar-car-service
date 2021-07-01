@@ -28,7 +28,6 @@ context('CommentMapper', () => {
       expect(commentToSave.text).to.be.eql(createCommentInput.text);
       expect(DateUtils.isISODate(commentToSave.commentDate)).to.be.true;
       expect(commentToSave.user).to.be.undefined;
-      expect(commentToSave.userId).to.be.undefined;
       expect(commentToSave.id).to.be.undefined;
     });
   });

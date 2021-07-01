@@ -1,6 +1,7 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {FuelType} from '../enums/fuel-type';
+import {Car} from './car';
 
 @Entity()
 @ObjectType()
@@ -38,4 +39,7 @@ export class Engine {
     enum: FuelType,
   })
   public fuelType: FuelType;
+
+  @ManyToMany(() => Car, (car: Car) => car.engines)
+  public cars: Car[];
 }

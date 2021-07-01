@@ -19,7 +19,7 @@ export class Country {
 
   @Field()
   @Column({
-    length: 256,
+    length: 512,
   })
   public flagPhotoUrl: string;
 

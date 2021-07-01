@@ -177,7 +177,6 @@ describe('Comment', () => {
 
       const existingComment: Comment = await CommentDatabaseUtils.getCommentByIdOrFail(Number(savedCommentResponse.id));
       expect(savedCommentResponse.id).to.be.be.eql(existingComment.id?.toString());
-      expect(savedCommentResponse.user?.id).to.be.be.eql(existingComment.userId?.toString());
       expect(savedCommentResponse.text).to.be.be.eql(existingComment.text);
       expect(savedCommentResponse.rating).to.be.be.eql(existingComment.rating);
       expect(savedCommentResponse.commentDate).to.be.be.eql(existingComment.commentDate);

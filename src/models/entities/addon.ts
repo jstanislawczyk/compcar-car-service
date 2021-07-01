@@ -1,11 +1,11 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {TypeormLoader} from 'type-graphql-dataloader';
-import {Car} from './car';
+import {CarAddon} from './car-addon';
 
 @Entity()
 @ObjectType()
-export class Photo {
+export class Addon {
 
   @Field(() => ID)
   @PrimaryGeneratedColumn()
@@ -13,9 +13,9 @@ export class Photo {
 
   @Field()
   @Column({
-    length: 512,
+    length: 128,
   })
-  public url: string;
+  public name: string;
 
   @Field()
   @Column({
@@ -23,11 +23,11 @@ export class Photo {
   })
   public description?: string;
 
-  @Field(() => Car)
-  @ManyToOne(
-    () => Car,
-    (car: Car) => car.photos,
+  @Field(() => [CarAddon])
+  @OneToMany(
+    () => CarAddon,
+    (carAddon: CarAddon) => carAddon.addon,
   )
   @TypeormLoader()
-  public car: Car;
+  public carAddons?: CarAddon[];
 }
