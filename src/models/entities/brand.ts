@@ -1,6 +1,7 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
-import {Country} from '../enums/country';
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {TypeormLoader} from 'type-graphql-dataloader';
+import {Country} from './country';
 
 @Entity()
 @ObjectType()
@@ -16,10 +17,11 @@ export class Brand {
   })
   public name: string;
 
-  @Field()
-  @Column({
-    type: 'enum',
-    enum: Country,
-  })
+  @Field(() => Country)
+  @ManyToOne(
+    () => Country,
+    (country: Country) => country.brands,
+  )
+  @TypeormLoader()
   public country: Country;
 }

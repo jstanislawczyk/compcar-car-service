@@ -43,10 +43,6 @@ export class User {
     () => Comment,
     (comment: Comment) => comment.user,
   )
-  @TypeormLoader(
-    () => Comment,
-    (comment: Comment) => comment.userId,
-    { selfKey: true },
-  )
+  @TypeormLoader()
   public comments?: Comment[];
 }

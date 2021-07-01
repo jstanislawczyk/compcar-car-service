@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, RelationId} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
 import {ObjectType, Field, ID, Int} from 'type-graphql';
 import {User} from './user';
 import {TypeormLoader} from 'type-graphql-dataloader';
@@ -30,12 +30,6 @@ export class Comment {
     () => User,
     (user: User) => user.comments,
   )
-  @TypeormLoader(
-    () => User,
-    (comment: Comment) => comment.userId,
-  )
+  @TypeormLoader()
   public user?: User;
-
-  @RelationId((comment: Comment) => comment.user)
-  public userId?: number;
 }
