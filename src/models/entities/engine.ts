@@ -1,7 +1,9 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, ManyToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {FuelType} from '../enums/fuel-type';
 import {Car} from './car';
+import {Comment} from './comment';
+import {TypeormLoader} from 'type-graphql-dataloader';
 
 @Entity()
 @ObjectType()
@@ -40,6 +42,20 @@ export class Engine {
   })
   public fuelType: FuelType;
 
+  @Field()
+  @Column({
+    length: 4,
+  })
+  public inventedYear: string;
+
+  @Field(() => [Comment])
+  @OneToMany(
+    () => Comment,
+    (comment: Comment) => comment.engine,
+  )
+  @TypeormLoader()
+  public comments?: Comment[];
+
   @ManyToMany(() => Car, (car: Car) => car.engines)
-  public cars: Car[];
+  public cars?: Car[];
 }

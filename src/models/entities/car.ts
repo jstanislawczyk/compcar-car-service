@@ -5,6 +5,8 @@ import {Generation} from './generation';
 import {Photo} from './photo';
 import {CarAddon} from './car-addon';
 import {Engine} from './engine';
+import {Painting} from './painting';
+import {Comment} from './comment';
 
 @Entity()
 @ObjectType()
@@ -28,6 +30,14 @@ export class Car {
   @TypeormLoader()
   public generation: Generation;
 
+  @Field(() => Painting)
+  @ManyToOne(
+    () => Painting,
+    (painting: Painting) => painting.cars,
+  )
+  @TypeormLoader()
+  public painting: Painting;
+
   @Field(() => [Photo])
   @OneToMany(
     () => Photo,
@@ -44,7 +54,15 @@ export class Car {
   @TypeormLoader()
   public carAddons?: CarAddon[];
 
+  @Field(() => [Comment])
+  @OneToMany(
+    () => Comment,
+    (comment: Comment) => comment.car,
+  )
+  @TypeormLoader()
+  public comments?: Comment[];
+
   @ManyToMany(() => Engine, (engine: Engine) => engine.cars)
   @JoinTable()
-  public engines: Engine[];
+  public engines?: Engine[];
 }
