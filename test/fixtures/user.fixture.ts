@@ -1,5 +1,5 @@
 import {User} from '../../src/models/entities/user';
-import {UserRole} from '../../src/enums/user-role';
+import {UserRole} from '../../src/models/enums/user-role';
 
 export const user: User = {
   email: 'test@user.com',

@@ -1,7 +1,7 @@
 import {Builder} from './builder';
 import {User} from '../../../src/models/entities/user';
 import {UserFixtureProvider} from '../fixture-providers/user.fixture-provider';
-import {UserRole} from '../../../src/enums/user-role';
+import {UserRole} from '../../../src/models/enums/user-role';
 
 export class UserBuilder extends Builder<User> {
 

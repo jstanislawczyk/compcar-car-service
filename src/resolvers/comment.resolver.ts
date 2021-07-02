@@ -1,7 +1,7 @@
 import {Resolver, Arg, Mutation, Query} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
-import {CreateCommentInput} from '../inputs/comments/create-comment.input';
+import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
 import {UserCommentFacade} from '../facades/user-comment.facade';
 import {CommentMapper} from '../mapper/comment.mapper';
 import {Comment} from '../models/entities/comment';

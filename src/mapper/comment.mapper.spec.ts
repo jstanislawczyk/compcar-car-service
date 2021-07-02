@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {Comment} from '../models/entities/comment';
 import {CommentMapper} from './comment.mapper';
-import {CreateCommentInput} from '../inputs/comments/create-comment.input';
+import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
 import {DateUtils} from '../../test/utils/common/date.utils';
 
 context('CommentMapper', () => {
@@ -28,7 +28,6 @@ context('CommentMapper', () => {
       expect(commentToSave.text).to.be.eql(createCommentInput.text);
       expect(DateUtils.isISODate(commentToSave.commentDate)).to.be.true;
       expect(commentToSave.user).to.be.undefined;
-      expect(commentToSave.userId).to.be.undefined;
       expect(commentToSave.id).to.be.undefined;
     });
   });

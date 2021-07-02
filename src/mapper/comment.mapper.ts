@@ -1,5 +1,5 @@
 import {Service} from 'typedi';
-import {CreateCommentInput} from '../inputs/comments/create-comment.input';
+import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
 import {Comment} from '../models/entities/comment';
 
 @Service()
@@ -10,6 +10,8 @@ export class CommentMapper {
       text: createCommentInput.text,
       rating: createCommentInput.rating,
       commentDate: new Date().toISOString(),
+      car: undefined,
+      engine: undefined,
     };
   }
 }

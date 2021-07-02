@@ -1,11 +1,11 @@
 import {Service} from 'typedi';
 import {UserRepository} from '../repositories/user.repository';
 import {InjectRepository} from 'typeorm-typedi-extensions';
-import {UserRole} from '../enums/user-role';
 import {User} from '../models/entities/user';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
 import bcrypt from 'bcryptjs';
 import config from 'config';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 export class UserService {

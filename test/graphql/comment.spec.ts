@@ -6,7 +6,7 @@ import {Comment} from '../../src/models/entities/comment';
 import {CommentBuilder} from '../utils/builders/comment.builder';
 import {DateUtils} from '../utils/common/date.utils';
 import {ResponseError} from '../utils/interfaces/response-error';
-import {CreateCommentInput} from '../../src/inputs/comments/create-comment.input';
+import {CreateCommentInput} from '../../src/models/inputs/comments/create-comment.input';
 import {TestValidationError} from '../utils/interfaces/validation-error';
 import {User} from '../../src/models/entities/user';
 import {UserBuilder} from '../utils/builders/user.builder';
@@ -177,7 +177,6 @@ describe('Comment', () => {
 
       const existingComment: Comment = await CommentDatabaseUtils.getCommentByIdOrFail(Number(savedCommentResponse.id));
       expect(savedCommentResponse.id).to.be.be.eql(existingComment.id?.toString());
-      expect(savedCommentResponse.user?.id).to.be.be.eql(existingComment.userId?.toString());
       expect(savedCommentResponse.text).to.be.be.eql(existingComment.text);
       expect(savedCommentResponse.rating).to.be.be.eql(existingComment.rating);
       expect(savedCommentResponse.commentDate).to.be.be.eql(existingComment.commentDate);

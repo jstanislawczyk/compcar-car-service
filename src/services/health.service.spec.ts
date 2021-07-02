@@ -6,7 +6,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
 import {HealthService} from './health.service';
 import {HealthStatus} from '../enums/health-status';
-import {ApplicationHealth} from '../models/types/health/application-health';
+import {ApplicationHealth} from '../models/object-types/health/application-health';
 
 use(sinonChai);
 use(chaiAsPromised);

@@ -2,7 +2,7 @@ import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from 'typeorm';
 import {ObjectType, Field, ID} from 'type-graphql';
 import {Comment} from './comment';
 import {TypeormLoader} from 'type-graphql-dataloader';
-import {UserRole} from '../../enums/user-role';
+import {UserRole} from '../enums/user-role';
 
 @Entity()
 @ObjectType()
@@ -43,10 +43,6 @@ export class User {
     () => Comment,
     (comment: Comment) => comment.user,
   )
-  @TypeormLoader(
-    () => Comment,
-    (comment: Comment) => comment.userId,
-    { selfKey: true },
-  )
+  @TypeormLoader()
   public comments?: Comment[];
 }

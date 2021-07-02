@@ -1,4 +1,4 @@
-import {LoggerLevel} from '../enums/logger-level';
+import {LoggerLevel} from '../models/enums/logger-level';
 import winston, {Logger as WinstonLogger, LoggerOptions} from 'winston';
 
 export class Logger {

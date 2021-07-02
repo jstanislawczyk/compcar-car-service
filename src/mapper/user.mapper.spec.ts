@@ -1,9 +1,9 @@
 import {expect} from 'chai';
 import {DateUtils} from '../../test/utils/common/date.utils';
 import {UserMapper} from './user.mapper';
-import {RegisterInput} from '../inputs/user/register.input';
+import {RegisterInput} from '../models/inputs/user/register.input';
 import {User} from '../models/entities/user';
-import {UserRole} from '../enums/user-role';
+import {UserRole} from '../models/enums/user-role';
 
 context('UserMapper', () => {
 
