@@ -4,7 +4,7 @@ import sinon, {SinonSandbox, SinonStub} from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import {TokenService} from '../services/token.service';
-import {customAuthChecker} from './auth-checker';
+import {authenticationChecker} from './auth-checker';
 import {ResolverData} from 'type-graphql';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
 
@@ -19,7 +19,7 @@ context('AuthChecker', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
-    validateTokenStub = sandbox.stub(TokenService.prototype, 'validateToken');
+    validateTokenStub = sandbox.stub(TokenService.prototype, 'isTokenValid');
   });
 
   afterEach(() => {
@@ -44,7 +44,7 @@ context('AuthChecker', () => {
       validateTokenStub.returns(true);
 
       // Act
-      const validationResult: Promise<boolean> | boolean = customAuthChecker(resolverData, allowedRoles);
+      const validationResult: Promise<boolean> | boolean = authenticationChecker(resolverData, allowedRoles);
 
       // Assert
       expect(validationResult).to.be.true;
@@ -67,7 +67,7 @@ context('AuthChecker', () => {
       validateTokenStub.throws(new Error(errorMessage));
 
       // Act & Assert
-      expect(() => customAuthChecker(resolverData, ['USER'])).to.throw(InvalidTokenError, errorMessage);
+      expect(() => authenticationChecker(resolverData, ['USER'])).to.throw(InvalidTokenError, errorMessage);
     });
 
     it('should get empty string if authorization header is not provided', async () => {
@@ -85,7 +85,7 @@ context('AuthChecker', () => {
       validateTokenStub.throws(new Error(errorMessage));
 
       // Act & Assert
-      expect(() => customAuthChecker(resolverData, allowedRoles)).to.throw(InvalidTokenError, errorMessage);
+      expect(() => authenticationChecker(resolverData, allowedRoles)).to.throw(InvalidTokenError, errorMessage);
       expect(validateTokenStub).to.be.calledOnceWith('', allowedRoles);
     });
   });

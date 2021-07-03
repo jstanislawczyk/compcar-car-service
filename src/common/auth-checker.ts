@@ -4,7 +4,7 @@ import {InvalidTokenError} from '../models/errors/invalid-token.error';
 import {Container} from 'typedi';
 import {TokenService} from '../services/token.service';
 
-export const customAuthChecker: AuthChecker<ExpressContext> = (
+export const authenticationChecker: AuthChecker<ExpressContext> = (
   resolverData: ResolverData,
   roles: string[],
 ): boolean => {
@@ -14,12 +14,10 @@ export const customAuthChecker: AuthChecker<ExpressContext> = (
   try {
     const tokenService: TokenService = Container.get(TokenService);
 
-    tokenService.validateToken(jwtToken, roles);
+    return tokenService.isTokenValid(jwtToken, roles);
   } catch (error) {
     const message: string = error.message;
 
     throw new InvalidTokenError(message);
   }
-
-  return true;
 };

@@ -10,8 +10,6 @@ export class CommentMapper {
       text: createCommentInput.text,
       rating: createCommentInput.rating,
       commentDate: new Date().toISOString(),
-      car: undefined,
-      engine: undefined,
     };
   }
 }

@@ -91,7 +91,7 @@ describe('Comment', () => {
       const createCommentInput: CreateCommentInput = {
         text: 'T',
         rating: 10,
-      } as CreateCommentInput;
+      };
 
       const query: string = `
         mutation {
@@ -134,7 +134,7 @@ describe('Comment', () => {
       const createCommentInput: CreateCommentInput = {
         text: 'Comment text',
         rating: 3,
-      } as CreateCommentInput;
+      };
       const user: User = new UserBuilder()
         .withEmail('test@mail.com')
         .build();

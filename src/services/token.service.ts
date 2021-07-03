@@ -26,9 +26,9 @@ export class TokenService {
     }
   }
 
-  public validateToken(jwtToken: string, allowedRoles: string[]): boolean {
+  public isTokenValid(jwtToken: string, allowedRoles: string[]): boolean {
     const decodedToken: JwtToken = jwt.verify(jwtToken, this.jwtSecret) as JwtToken;
-    const isExistingRole : boolean = Object.values(UserRole).includes(decodedToken.role as UserRole);
+    const isExistingRole: boolean = Object.values(UserRole).includes(decodedToken.role as UserRole);
 
     if (!isExistingRole) {
       throw new InvalidTokenError(`Given role "${decodedToken.role}" is not supported`);

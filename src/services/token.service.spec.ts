@@ -74,7 +74,7 @@ context('TokenService', () => {
       );
 
       // Act
-      const isValidated: boolean = tokenService.validateToken(token, allowedRoles);
+      const isValidated: boolean = tokenService.isTokenValid(token, allowedRoles);
 
       // Assert
       expect(isValidated).to.be.true;
@@ -97,7 +97,7 @@ context('TokenService', () => {
       );
 
       // Act & Assert
-      expect(() => tokenService.validateToken(token, allowedRoles))
+      expect(() => tokenService.isTokenValid(token, allowedRoles))
         .to.throw('jwt expired')
         .and.to.be.an.instanceOf(TokenExpiredError);
     });
@@ -119,7 +119,7 @@ context('TokenService', () => {
       );
 
       // Act & Assert
-      expect(() => tokenService.validateToken(token, allowedRoles))
+      expect(() => tokenService.isTokenValid(token, allowedRoles))
         .to.throw(`Given role "${authenticatedUser.role}" is not supported`)
         .and.to.be.an.instanceOf(InvalidTokenError);
     });
@@ -141,7 +141,7 @@ context('TokenService', () => {
       );
 
       // Act & Assert
-      expect(() => tokenService.validateToken(token, allowedRoles))
+      expect(() => tokenService.isTokenValid(token, allowedRoles))
         .to.throw('User is not required to perform this action')
         .and.to.be.an.instanceOf(InvalidTokenError);
     });
