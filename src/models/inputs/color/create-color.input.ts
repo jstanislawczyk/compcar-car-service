@@ -12,7 +12,7 @@ export class CreateColorInput {
 
   @Field()
   @Matches(
-    /#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/gi,
+    /#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/i,
     { message: 'Given string is not valid hex code' }
   )
   public readonly hexCode: string;

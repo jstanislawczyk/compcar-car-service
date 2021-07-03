@@ -6,6 +6,7 @@ import {ColorRepository} from '../repositories/color.repository';
 import {ColorService} from './color.service';
 import {Color} from '../models/entities/color';
 import {ColorBuilder} from '../../test/utils/builders/color.builder';
+import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -21,6 +22,8 @@ context('ColorService', () => {
 
     colorRepositoryStub = sandbox.createStubInstance(ColorRepository);
     colorService = new ColorService(colorRepositoryStub as unknown as ColorRepository);
+
+    colorRepositoryStub.find.resolves([]);
   });
 
   afterEach(() => {
@@ -77,18 +80,40 @@ context('ColorService', () => {
 
       // Assert
       expect(saveColorResult).to.be.eql(savedColor);
+      expect(colorRepositoryStub.find).to.be.calledOnceWith({
+        select: ['id'],
+        where: [
+          { name: colorToSave.name },
+          { hexCode: colorToSave.hexCode },
+        ],
+      });
       expect(colorRepositoryStub.save).to.be.calledOnceWith(colorToSave);
     });
 
-    it('should throw error', async () => {
-      // Arrange
-      colorRepositoryStub.save.rejects(new Error('Save error'));
+    describe('should throw error', () => {
+      it('if color or hexCode already exists', async () => {
+        // Arrange
+        colorRepositoryStub.find.resolves([new ColorBuilder().build()]);
 
-      // Act
-      const saveColorResult: Promise<Color> = colorService.saveColor(new ColorBuilder().build());
+        // Act
+        const saveColorResult: Promise<Color> = colorService.saveColor(new ColorBuilder().build());
 
-      // Assert
-      await expect(saveColorResult).to.eventually.be.rejectedWith('Save error');
+        // Assert
+        await expect(saveColorResult).to.eventually.be
+          .rejectedWith('Color with given name or hex code already exists')
+          .and.be.an.instanceOf(EntityAlreadyExistsError);
+      });
+
+      it('coming from repository', async () => {
+        // Arrange
+        colorRepositoryStub.save.rejects(new Error('Save error'));
+
+        // Act
+        const saveColorResult: Promise<Color> = colorService.saveColor(new ColorBuilder().build());
+
+        // Assert
+        await expect(saveColorResult).to.eventually.be.rejectedWith('Save error');
+      });
     });
   });
 });

@@ -72,48 +72,6 @@ describe('Color', () => {
   });
 
   describe('createColor', () => {
-    it('should fail validation', async () => {
-      // Arrange
-      const createColorInput: CreateColorInput = {
-        name: 'g',
-        hexCode: 'SomeWrongHexCode',
-      };
-
-      const query: string = `
-        mutation {
-          createColor (
-            createColorInput: {
-              name: "${createColorInput.name}",
-              hexCode: "${createColorInput.hexCode}",
-            }
-          ) {
-            id,
-            name,
-            hexCode,
-          }
-        }
-      `;
-
-      // Act & Assert
-      const response: Response = await request(application.serverInfo.url)
-        .post('/graphql')
-        .send({ query })
-        .expect(200);
-
-      const errorsBody: ResponseError = response.body.errors[0];
-      expect(errorsBody.message).to.be.eql('Argument Validation Error');
-
-      const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-      expect(errors).to.have.lengthOf(2);
-
-      expect(errors[0].property).to.be.eql('name');
-      expect(errors[0].value).to.be.eql('g');
-      expect(errors[0].constraints.minLength).to.be.eql('name must be longer than or equal to 2 characters');
-      expect(errors[1].property).to.be.eql('hexCode');
-      expect(errors[1].value).to.be.eql('SomeWrongHexCode');
-      expect(errors[1].constraints.matches).to.be.eql('Given string is not valid hex code');
-    });
-
     it('should save color', async () => {
       // Arrange
       const createColorInput: CreateColorInput = {
@@ -152,6 +110,172 @@ describe('Color', () => {
       expect(savedColorResponse.id).to.be.be.eql(existingColor.id?.toString());
       expect(savedColorResponse.name).to.be.be.eql(existingColor.name);
       expect(savedColorResponse.hexCode).to.be.be.eql(existingColor.hexCode);
+    });
+
+    it('should save color with full hex code', async () => {
+      // Arrange
+      const createColorInput: CreateColorInput = {
+        name: 'green',
+        hexCode: '#00FF00',
+      };
+
+      const query: string = `
+        mutation {
+          createColor (
+            createColorInput: {
+              name: "${createColorInput.name}",
+              hexCode: "${createColorInput.hexCode}",
+            }
+          ) {
+            id,
+            name,
+            hexCode,
+          }
+        }
+      `;
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
+
+      const savedColorResponse: Color = response.body.data.createColor as Color;
+      expect(Number(savedColorResponse.id)).to.be.above(0);
+      expect(savedColorResponse.name).to.be.eql('green');
+      expect(savedColorResponse.hexCode).to.be.eql('#00FF00');
+      expect(savedColorResponse.paintings).to.be.undefined;
+
+      const existingColor: Color = await ColorDatabaseUtils.getColorByIdOrFail(Number(savedColorResponse.id));
+      expect(savedColorResponse.id).to.be.be.eql(existingColor.id?.toString());
+      expect(savedColorResponse.name).to.be.be.eql(existingColor.name);
+      expect(savedColorResponse.hexCode).to.be.be.eql(existingColor.hexCode);
+    });
+
+    describe('should throw error', () => {
+      it('if validation fails', async () => {
+        // Arrange
+        const createColorInput: CreateColorInput = {
+          name: 'g',
+          hexCode: 'SomeWrongHexCode',
+        };
+
+        const query: string = `
+        mutation {
+          createColor (
+            createColorInput: {
+              name: "${createColorInput.name}",
+              hexCode: "${createColorInput.hexCode}",
+            }
+          ) {
+            id,
+            name,
+            hexCode,
+          }
+        }
+      `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql('Argument Validation Error');
+
+        const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
+        expect(errors).to.have.lengthOf(2);
+
+        expect(errors[0].property).to.be.eql('name');
+        expect(errors[0].value).to.be.eql('g');
+        expect(errors[0].constraints.minLength).to.be.eql('name must be longer than or equal to 2 characters');
+        expect(errors[1].property).to.be.eql('hexCode');
+        expect(errors[1].value).to.be.eql('SomeWrongHexCode');
+        expect(errors[1].constraints.matches).to.be.eql('Given string is not valid hex code');
+      });
+
+      it('if color name already exists', async () => {
+        // Arrange
+        const colorName: string = 'green';
+        const existingColor = new ColorBuilder()
+          .withName(colorName)
+          .withHexCode('#F00')
+          .build();
+        const createColorInput: CreateColorInput = {
+          name: colorName,
+          hexCode: '#0F0',
+        };
+
+        const query: string = `
+          mutation {
+            createColor (
+              createColorInput: {
+                name: "${createColorInput.name}",
+                hexCode: "${createColorInput.hexCode}",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
+            }
+          }
+        `;
+
+        await ColorDatabaseUtils.saveColor(existingColor);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql('Color with given name or hex code already exists');
+        expect(error.extensions.code).to.be.eql('ENTITY_ALREADY_EXISTS');
+      });
+
+      it('if hex code already exists', async () => {
+        // Arrange
+        const hexCode: string = '#F00';
+        const existingColor = new ColorBuilder()
+          .withName('red')
+          .withHexCode(hexCode)
+          .build();
+        const createColorInput: CreateColorInput = {
+          name: 'green',
+          hexCode,
+        };
+
+        const query: string = `
+          mutation {
+            createColor (
+              createColorInput: {
+                name: "${createColorInput.name}",
+                hexCode: "${createColorInput.hexCode}",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
+            }
+          }
+        `;
+
+        await ColorDatabaseUtils.saveColor(existingColor);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        console.log(123123);
+        console.log(response);
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql('Color with given name or hex code already exists');
+        expect(error.extensions.code).to.be.eql('ENTITY_ALREADY_EXISTS');
+      });
     });
   });
 });
