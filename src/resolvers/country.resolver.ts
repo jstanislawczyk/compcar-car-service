@@ -22,9 +22,9 @@ export class CountryResolver {
   ): Promise<Country> {
     Logger.log(`Saving new country with name=${createCountryInput.name}`);
 
-    const color: Country = this.countryMapper.toEntity(createCountryInput);
+    const country: Country = this.countryMapper.toEntity(createCountryInput);
 
-    return await this.countryService.saveCountry(color);
+    return await this.countryService.saveCountry(country);
   }
 
 }

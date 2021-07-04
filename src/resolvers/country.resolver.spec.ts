@@ -36,7 +36,7 @@ context('CountryResolver', () => {
   });
 
   describe('createCountry', () => {
-    it('should create color', async () => {
+    it('should create country', async () => {
       // Arrange
       const mappedCountry: Country = new CountryBuilder().build();
       const savedCountry: Country = new CountryBuilder(true).build();
