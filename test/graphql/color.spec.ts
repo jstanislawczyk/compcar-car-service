@@ -192,7 +192,7 @@ describe('Color', () => {
         expect(errors[0].constraints.minLength).to.be.eql('name must be longer than or equal to 2 characters');
         expect(errors[1].property).to.be.eql('hexCode');
         expect(errors[1].value).to.be.eql('SomeWrongHexCode');
-        expect(errors[1].constraints.matches).to.be.eql('Given string is not valid hex code');
+        expect(errors[1].constraints.isHexColor).to.be.eql('hexCode must be a hexadecimal color');
       });
 
       it('if color name already exists', async () => {

@@ -18,7 +18,7 @@ export class ColorService {
   }
 
   public async saveColor(color: Color): Promise<Color> {
-    const existingColors = await this.colorRepository.find({
+    const existingColors: Color[] = await this.colorRepository.find({
       select: ['id'],
       where: [
         { name: color.name },
