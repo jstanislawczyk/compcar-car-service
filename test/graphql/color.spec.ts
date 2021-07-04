@@ -270,8 +270,6 @@ describe('Color', () => {
           .send({ query })
           .expect(200);
 
-        console.log(123123);
-        console.log(response);
         const error: ResponseError = response.body.errors[0];
         expect(error.message).to.be.eql('Color with given name or hex code already exists');
         expect(error.extensions.code).to.be.eql('ENTITY_ALREADY_EXISTS');
