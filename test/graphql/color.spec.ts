@@ -192,7 +192,7 @@ describe('Color', () => {
         expect(errors[0].constraints.minLength).to.be.eql('name must be longer than or equal to 2 characters');
         expect(errors[1].property).to.be.eql('hexCode');
         expect(errors[1].value).to.be.eql('SomeWrongHexCode');
-        expect(errors[1].constraints.matches).to.be.eql('Given string is not valid hex code');
+        expect(errors[1].constraints.isHexColor).to.be.eql('hexCode must be a hexadecimal color');
       });
 
       it('if color name already exists', async () => {
@@ -270,8 +270,6 @@ describe('Color', () => {
           .send({ query })
           .expect(200);
 
-        console.log(123123);
-        console.log(response);
         const error: ResponseError = response.body.errors[0];
         expect(error.message).to.be.eql('Color with given name or hex code already exists');
         expect(error.extensions.code).to.be.eql('ENTITY_ALREADY_EXISTS');

@@ -1,8 +1,8 @@
 import {InputType, Field} from 'type-graphql';
-import {IsHexColor, IsString, MaxLength, MinLength} from 'class-validator';
+import {IsString, IsUrl, MaxLength, MinLength} from 'class-validator';
 
 @InputType()
-export class CreateColorInput {
+export class CreateCountryInput {
 
   @Field()
   @IsString()
@@ -11,6 +11,6 @@ export class CreateColorInput {
   public readonly name: string;
 
   @Field()
-  @IsHexColor()
-  public readonly hexCode: string;
+  @IsUrl()
+  public readonly flagPhotoUrl: string;
 }
