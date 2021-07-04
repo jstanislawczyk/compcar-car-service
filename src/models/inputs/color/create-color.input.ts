@@ -1,5 +1,5 @@
 import {InputType, Field} from 'type-graphql';
-import {IsHexColor, IsString, Matches, MaxLength, MinLength} from 'class-validator';
+import {IsHexColor, IsString, MaxLength, MinLength} from 'class-validator';
 
 @InputType()
 export class CreateColorInput {
