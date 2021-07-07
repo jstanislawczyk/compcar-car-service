@@ -18,13 +18,19 @@ export class Brand {
   })
   public name: string;
 
+  @Field()
+  @Column({
+    length: 512,
+  })
+  public logoPhotoUrl: string;
+
   @Field(() => Country)
   @ManyToOne(
     () => Country,
     (country: Country) => country.brands,
   )
   @TypeormLoader()
-  public country: Country;
+  public country?: Country;
 
   @Field(() => [Model])
   @OneToMany(

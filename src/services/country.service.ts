@@ -3,6 +3,7 @@ import {InjectRepository} from 'typeorm-typedi-extensions';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
 import {CountryRepository} from "../repositories/country.repository";
 import {Country} from "../models/entities/country";
+import {NotFoundError} from '../models/errors/not-found.error';
 
 @Service()
 export class CountryService {
@@ -11,6 +12,14 @@ export class CountryService {
     @InjectRepository()
     private readonly countryRepository: CountryRepository,
   ) {
+  }
+
+  public async findCountryById(id: number) {
+    try {
+      return await this.countryRepository.findOneOrFail(id);
+    } catch (error) {
+      throw new NotFoundError(`Country with id=${id} not found`);
+    }
   }
 
   public async saveCountry(country: Country): Promise<Country> {
