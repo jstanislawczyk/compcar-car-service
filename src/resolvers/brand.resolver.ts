@@ -17,7 +17,7 @@ export class BrandResolver {
   }
 
   @Mutation(() => Brand)
-  public async createColor(
+  public async createBrand(
     @Arg('countryId') countryId: number,
     @Arg('createBrandInput') createBrandInput: CreateBrandInput,
   ): Promise<Brand> {

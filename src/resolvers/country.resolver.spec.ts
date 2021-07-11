@@ -42,7 +42,7 @@ context('CountryResolver', () => {
       const savedCountry: Country = new CountryBuilder(true).build();
       const createCountryInput: CreateCountryInput = {
         name: 'Poland',
-        flagPhotoUrl: `https://test.url.foo.bar/`,
+        flagPhotoUrl: 'https://test.url.foo.bar/',
       };
 
       countryMapperStub.toEntity.returns(mappedCountry);
@@ -62,7 +62,7 @@ context('CountryResolver', () => {
       const mappedCountry: Country = new CountryBuilder().build();
       const createCountryInput: CreateCountryInput = {
         name: 'Poland',
-        flagPhotoUrl: `https://test.url.foo.bar/`,
+        flagPhotoUrl: 'https://test.url.foo.bar/',
       };
 
       countryMapperStub.toEntity.returns(mappedCountry);

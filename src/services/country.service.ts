@@ -14,7 +14,7 @@ export class CountryService {
   ) {
   }
 
-  public async findCountryById(id: number) {
+  public async findCountryById(id: number): Promise<Country> {
     try {
       return await this.countryRepository.findOneOrFail(id);
     } catch (error) {
