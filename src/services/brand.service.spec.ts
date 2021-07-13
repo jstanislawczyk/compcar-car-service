@@ -7,6 +7,7 @@ import {BrandRepository} from '../repositories/brand.repository';
 import {BrandService} from './brand.service';
 import {Brand} from '../models/entities/brand';
 import {BrandBuilder} from '../../test/utils/builders/brand.builder';
+import {NotFoundError} from '../models/errors/not-found.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -28,6 +29,41 @@ context('BrandService', () => {
 
   afterEach(() => {
     sandbox.restore();
+  });
+
+  describe('findOne', () => {
+    it('should find brand by id', async () => {
+      // Arrange
+      const brandId: number = 1;
+      const existingBrand: Brand = new BrandBuilder()
+          .withId(brandId)
+          .build();
+
+      brandRepositoryStub.findOneOrFail.resolves(existingBrand);
+
+      // Act
+      const returnedBrand: Brand = await brandService.findOne(brandId);
+
+      // Assert
+      expect(returnedBrand).to.be.eql(existingBrand);
+      expect(brandRepositoryStub.findOneOrFail).to.be.calledOnceWith(brandId);
+    });
+
+    it("should throw error if brand doesn't exist", async () => {
+      // Arrange
+      const brandId: number = 1;
+
+      brandRepositoryStub.findOneOrFail.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedBrandResult: Promise<Brand> = brandService.findOne(brandId);
+
+      // Assert
+      await expect(returnedBrandResult).to.eventually
+          .be.rejectedWith(`Brand with id=${brandId} not found`)
+          .and.to.be.an.instanceOf(NotFoundError);
+      expect(brandRepositoryStub.findOneOrFail).to.be.calledOnceWith(brandId);
+    });
   });
 
   describe('saveBrand', () => {

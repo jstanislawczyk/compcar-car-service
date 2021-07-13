@@ -19,4 +19,9 @@ export class BrandBuilder extends Builder<Brand> {
     this.entity.name = name;
     return this;
   }
+
+  public withLogoPhotoUrl(logoPhotoUrl: string): BrandBuilder {
+    this.entity.logoPhotoUrl = logoPhotoUrl;
+    return this;
+  }
 }

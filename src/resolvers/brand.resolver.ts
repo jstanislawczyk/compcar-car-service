@@ -1,4 +1,4 @@
-import {Resolver, Arg, Mutation} from 'type-graphql';
+import {Resolver, Arg, Mutation, Query} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {Brand} from '../models/entities/brand';
@@ -14,6 +14,13 @@ export class BrandResolver {
     private readonly brandCountryFacade: BrandCountryFacade,
     private readonly brandMapper: BrandMapper,
   ) {
+  }
+
+  @Query(() => Brand)
+  public async getBrandById(@Arg('id') id: number): Promise<Brand> {
+    Logger.log(`Fetching brand with id=${id}`);
+
+    return await this.brandCountryFacade.findOne(id);
   }
 
   @Mutation(() => Brand)

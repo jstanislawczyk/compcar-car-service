@@ -12,6 +12,10 @@ export class BrandCountryFacade {
   ) {
   }
 
+  public async findOne(id: number): Promise<Brand> {
+    return this.brandService.findOne(id);
+  }
+
   public async saveBrandWithCountry(brand: Brand, countryId: number): Promise<Brand> {
     brand.country = await this.countryService.findCountryById(countryId);
 

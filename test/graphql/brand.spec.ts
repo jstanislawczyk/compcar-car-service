@@ -23,6 +23,69 @@ describe('Brand', () => {
     await CountryDatabaseUtils.deleteAllCountries();
   });
 
+  describe('getBrandById', () => {
+    it('should get brand by id', async () => {
+      // Arrange
+      const brand: Brand = new BrandBuilder()
+          .withName('Audi')
+          .withLogoPhotoUrl('https://test.logo.url.foo.bar/')
+          .build();
+      const savedBrand: Brand = await BrandDatabaseUtils.saveBrand(brand);
+
+      const query: string = `
+        {
+          getBrandById(id: ${savedBrand.id}) {
+            id,
+            name,
+            logoPhotoUrl,
+          }
+        }
+      `;
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+      const returnedBrandResponse: Brand = response.body.data.getBrandById as Brand;
+      expect(Number(returnedBrandResponse.id)).to.be.above(0);
+      expect(returnedBrandResponse.name).to.be.eql('Audi');
+      expect(returnedBrandResponse.logoPhotoUrl).to.be.eql('https://test.logo.url.foo.bar/');
+      expect(returnedBrandResponse.country).to.be.undefined;
+      expect(returnedBrandResponse.models).to.be.undefined;
+
+      const existingBrand: Brand = await BrandDatabaseUtils.getBrandByIdOrFail(Number(returnedBrandResponse.id));
+      expect(returnedBrandResponse.id).to.be.be.eql(existingBrand.id?.toString());
+      expect(returnedBrandResponse.name).to.be.be.eql(existingBrand.name);
+      expect(returnedBrandResponse.logoPhotoUrl).to.be.be.eql(existingBrand.logoPhotoUrl);
+    });
+
+    it("should throw error if error doesn't exist", async () => {
+      // Arrange
+      const notExistingBrandId: number = 0;
+      const query: string = `
+        {
+          getBrandById(id: ${notExistingBrandId}) {
+            id,
+            name,
+            logoPhotoUrl,
+          }
+        }
+      `;
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+      const error: ResponseError = response.body.errors[0];
+      expect(error.message).to.be.eql(`Brand with id=${notExistingBrandId} not found`);
+      expect(error.extensions.code).to.be.eql('NOT_FOUND');
+    });
+  });
+
   describe('createBrand', () => {
     it('should save brand', async () => {
       // Arrange

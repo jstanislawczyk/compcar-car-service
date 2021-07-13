@@ -35,6 +35,41 @@ context('BrandResolver', () => {
     sandbox.restore();
   });
 
+  describe('getBrandById', () => {
+    it('should find brand by id', async () => {
+      // Arrange
+      const brandId: number = 1;
+      const existingBrand: Brand = new BrandBuilder()
+          .withId(brandId)
+          .build();
+
+      brandCountryFacadeStub.findOne.resolves(existingBrand);
+
+      // Act
+      const returnedBrand: Brand = await brandResolver.getBrandById(brandId);
+
+      // Assert
+      expect(returnedBrand).to.be.eql(existingBrand);
+      expect(brandCountryFacadeStub.findOne).to.be.calledOnceWith(brandId);
+    });
+
+    it("should rethrow error from facade", async () => {
+      // Arrange
+      const brandId: number = 1;
+
+      brandCountryFacadeStub.findOne.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedBrandResult: Promise<Brand> = brandResolver.getBrandById(brandId);
+
+      // Assert
+      await expect(returnedBrandResult).to.eventually
+          .be.rejectedWith('Not Found')
+          .and.to.be.an.instanceOf(Error);
+      expect(brandCountryFacadeStub.findOne).to.be.calledOnceWith(brandId);
+    });
+  });
+
   describe('createBrand', () => {
     it('should create brand', async () => {
       // Arrange
