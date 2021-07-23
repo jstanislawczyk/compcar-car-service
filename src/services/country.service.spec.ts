@@ -7,6 +7,7 @@ import {CountryRepository} from '../repositories/country.repository';
 import {CountryService} from './country.service';
 import {CountryBuilder} from '../../test/utils/builders/country.builder';
 import {Country} from '../models/entities/country';
+import {NotFoundError} from '../models/errors/not-found.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -28,6 +29,38 @@ context('CountryService', () => {
 
   afterEach(() => {
     sandbox.restore();
+  });
+
+  describe('findCountryById', () => {
+    it('should find country', async () => {
+      // Arrange
+      const id: number = 1;
+      const country: Country = new CountryBuilder(true)
+          .withId(id)
+          .build();
+
+      countryRepositoryStub.findOneOrFail.resolves(country);
+
+      // Act
+      const returnedCountry: Country = await countryService.findCountryById(id);
+
+      // Assert
+      expect(returnedCountry).to.be.eql(country);
+      expect(countryRepositoryStub.findOneOrFail).to.be.calledOnceWith(id);
+    });
+
+    it('should throw an error if country was not found', async () => {
+      // Arrange
+      const id: number = 1;
+
+      countryRepositoryStub.findOneOrFail.rejects(new Error('FindOne error'));
+
+      // Act
+      const result: Promise<Country> = countryService.findCountryById(id);
+
+      // Assert
+      await expect(result).to.be.eventually.rejectedWith(NotFoundError, `Country with id=${id} not found`);
+    });
   });
 
   describe('saveCountry', () => {

@@ -92,6 +92,7 @@ context('UserCommentFacade', () => {
     it('should throw error if user is not found', async () => {
       // Arrange
       const userId: number = 1;
+
       userServiceStub.findOneById.rejects(new Error('FindOne error'));
 
       // Act

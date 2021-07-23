@@ -86,49 +86,6 @@ describe('Comment', () => {
   });
 
   describe('createComment', () => {
-    it('should fail validation', async () => {
-      // Arrange
-      const createCommentInput: CreateCommentInput = {
-        text: 'T',
-        rating: 10,
-      };
-
-      const query: string = `
-        mutation {
-          createComment (
-            userId: 1,
-            createCommentInput: {
-              text: "${createCommentInput.text}",
-              rating: ${createCommentInput.rating},
-            }
-          ) {
-            id,
-            text,
-            rating,
-          }
-        }
-      `;
-
-      // Act & Assert
-      const response: Response = await request(application.serverInfo.url)
-        .post('/graphql')
-        .send({ query })
-        .expect(200);
-
-      const errorsBody: ResponseError = response.body.errors[0];
-      expect(errorsBody.message).to.be.eql('Argument Validation Error');
-
-      const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-      expect(errors).to.have.lengthOf(2);
-
-      expect(errors[0].property).to.be.eql('text');
-      expect(errors[0].value).to.be.eql('T');
-      expect(errors[0].constraints.minLength).to.be.eql('text must be longer than or equal to 3 characters');
-      expect(errors[1].property).to.be.eql('rating');
-      expect(errors[1].value).to.be.eql(10);
-      expect(errors[1].constraints.max).to.be.eql('rating must not be greater than 5');
-    });
-
     it('should save comment', async () => {
       // Arrange
       const createCommentInput: CreateCommentInput = {
@@ -180,6 +137,49 @@ describe('Comment', () => {
       expect(savedCommentResponse.text).to.be.be.eql(existingComment.text);
       expect(savedCommentResponse.rating).to.be.be.eql(existingComment.rating);
       expect(savedCommentResponse.commentDate).to.be.be.eql(existingComment.commentDate);
+    });
+
+    it('should fail validation', async () => {
+      // Arrange
+      const createCommentInput: CreateCommentInput = {
+        text: 'T',
+        rating: 10,
+      };
+
+      const query: string = `
+        mutation {
+          createComment (
+            userId: 1,
+            createCommentInput: {
+              text: "${createCommentInput.text}",
+              rating: ${createCommentInput.rating},
+            }
+          ) {
+            id,
+            text,
+            rating,
+          }
+        }
+      `;
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+      const errorsBody: ResponseError = response.body.errors[0];
+      expect(errorsBody.message).to.be.eql('Argument Validation Error');
+
+      const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
+      expect(errors).to.have.lengthOf(2);
+
+      expect(errors[0].property).to.be.eql('text');
+      expect(errors[0].value).to.be.eql('T');
+      expect(errors[0].constraints.minLength).to.be.eql('text must be longer than or equal to 3 characters');
+      expect(errors[1].property).to.be.eql('rating');
+      expect(errors[1].value).to.be.eql(10);
+      expect(errors[1].constraints.max).to.be.eql('rating must not be greater than 5');
     });
   });
 });

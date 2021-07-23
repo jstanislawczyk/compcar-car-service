@@ -2,7 +2,7 @@ import {InputType, Field} from 'type-graphql';
 import {IsString, IsUrl, MaxLength, MinLength} from 'class-validator';
 
 @InputType()
-export class CreateCountryInput {
+export class CreateBrandInput {
 
   @Field()
   @IsString()
@@ -14,5 +14,5 @@ export class CreateCountryInput {
   @MinLength(2)
   @MaxLength(512)
   @IsUrl()
-  public readonly flagPhotoUrl: string;
+  public readonly logoPhotoUrl: string;
 }

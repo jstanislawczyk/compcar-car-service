@@ -161,19 +161,19 @@ describe('Color', () => {
         };
 
         const query: string = `
-        mutation {
-          createColor (
-            createColorInput: {
-              name: "${createColorInput.name}",
-              hexCode: "${createColorInput.hexCode}",
+          mutation {
+            createColor (
+              createColorInput: {
+                name: "${createColorInput.name}",
+                hexCode: "${createColorInput.hexCode}",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
             }
-          ) {
-            id,
-            name,
-            hexCode,
           }
-        }
-      `;
+        `;
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
