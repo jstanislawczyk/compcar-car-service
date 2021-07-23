@@ -7,7 +7,7 @@ import {ColorMapper} from '../mapper/color.mapper';
 import {ColorResolver} from './color.resolver';
 import {ColorBuilder} from '../../test/utils/builders/color.builder';
 import {Color} from '../models/entities/color';
-import {CreateColorInput} from '../models/inputs/color/create-color.input';
+import {ColorCreateInput} from '../models/inputs/color/color-create.input';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -73,7 +73,7 @@ context('ColorResolver', () => {
       // Arrange
       const mappedColor: Color = new ColorBuilder().build();
       const savedColor: Color = new ColorBuilder(true).build();
-      const createColorInput: CreateColorInput = {
+      const colorCreateInput: ColorCreateInput = {
         name: 'green',
         hexCode: '#0F0',
       };
@@ -82,18 +82,18 @@ context('ColorResolver', () => {
       colorServiceStub.saveColor.resolves(savedColor);
 
       // Act
-      const returnedColor: Color = await colorResolver.createColor(createColorInput);
+      const returnedColor: Color = await colorResolver.createColor(colorCreateInput);
 
       // Assert
       expect(returnedColor).to.be.eql(savedColor);
-      expect(colorMapperStub.toEntity).to.be.calledOnceWith(createColorInput);
+      expect(colorMapperStub.toEntity).to.be.calledOnceWith(colorCreateInput);
       expect(colorServiceStub.saveColor).to.be.calledOnceWith(mappedColor);
     });
 
     it('should throw error if color saving fails', async () => {
       // Arrange
       const mappedColor: Color = new ColorBuilder().build();
-      const createColorInput: CreateColorInput = {
+      const colorCreateInput: ColorCreateInput = {
         name: 'green',
         hexCode: '#0F0',
       };
@@ -102,7 +102,7 @@ context('ColorResolver', () => {
       colorServiceStub.saveColor.rejects(new Error('SaveColor error'));
 
       // Act
-      const returnedColorResult: Promise<Color> = colorResolver.createColor(createColorInput);
+      const returnedColorResult: Promise<Color> = colorResolver.createColor(colorCreateInput);
 
       // Assert
       await expect(returnedColorResult).to.eventually.be.rejectedWith('SaveColor error');

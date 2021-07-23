@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {ColorMapper} from './color.mapper';
-import {CreateColorInput} from '../models/inputs/color/create-color.input';
+import {ColorCreateInput} from '../models/inputs/color/color-create.input';
 import {Color} from '../models/entities/color';
 
 context('ColorMapper', () => {
@@ -14,17 +14,17 @@ context('ColorMapper', () => {
   describe('toEntity', () => {
     it('should map to entity', () => {
       // Arrange
-      const createColorInput: CreateColorInput = {
+      const colorCreateInput: ColorCreateInput = {
         name: 'red',
         hexCode: '#F00',
       };
 
       // Act
-      const color: Color = colorMapper.toEntity(createColorInput);
+      const color: Color = colorMapper.toEntity(colorCreateInput);
 
       // Assert
-      expect(color.name).to.be.eql(createColorInput.name);
-      expect(color.hexCode).to.be.eql(createColorInput.hexCode);
+      expect(color.name).to.be.eql(colorCreateInput.name);
+      expect(color.hexCode).to.be.eql(colorCreateInput.hexCode);
       expect(color.id).to.be.undefined;
       expect(color.paintings).to.be.undefined;
     });

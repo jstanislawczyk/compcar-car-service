@@ -6,7 +6,7 @@ import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils
 import {ColorDatabaseUtils} from '../utils/database-utils/color.database-utils';
 import {Color} from '../../src/models/entities/color';
 import {ColorBuilder} from '../utils/builders/color.builder';
-import {CreateColorInput} from '../../src/models/inputs/color/create-color.input';
+import {ColorCreateInput} from '../../src/models/inputs/color/color-create.input';
 import {ResponseError} from '../utils/interfaces/response-error';
 
 describe('Color', () => {
@@ -74,7 +74,7 @@ describe('Color', () => {
   describe('createColor', () => {
     it('should save color', async () => {
       // Arrange
-      const createColorInput: CreateColorInput = {
+      const colorCreateInput: ColorCreateInput = {
         name: 'green',
         hexCode: '#0F0',
       };
@@ -82,9 +82,9 @@ describe('Color', () => {
       const query: string = `
         mutation {
           createColor (
-            createColorInput: {
-              name: "${createColorInput.name}",
-              hexCode: "${createColorInput.hexCode}",
+            colorCreateInput: {
+              name: "${colorCreateInput.name}",
+              hexCode: "${colorCreateInput.hexCode}",
             }
           ) {
             id,
@@ -114,7 +114,7 @@ describe('Color', () => {
 
     it('should save color with full hex code', async () => {
       // Arrange
-      const createColorInput: CreateColorInput = {
+      const colorCreateInput: ColorCreateInput = {
         name: 'green',
         hexCode: '#00FF00',
       };
@@ -122,9 +122,9 @@ describe('Color', () => {
       const query: string = `
         mutation {
           createColor (
-            createColorInput: {
-              name: "${createColorInput.name}",
-              hexCode: "${createColorInput.hexCode}",
+            colorCreateInput: {
+              name: "${colorCreateInput.name}",
+              hexCode: "${colorCreateInput.hexCode}",
             }
           ) {
             id,
@@ -155,7 +155,7 @@ describe('Color', () => {
     describe('should throw error', () => {
       it('if validation fails', async () => {
         // Arrange
-        const createColorInput: CreateColorInput = {
+        const colorCreateInput: ColorCreateInput = {
           name: 'g',
           hexCode: 'SomeWrongHexCode',
         };
@@ -163,9 +163,9 @@ describe('Color', () => {
         const query: string = `
           mutation {
             createColor (
-              createColorInput: {
-                name: "${createColorInput.name}",
-                hexCode: "${createColorInput.hexCode}",
+              colorCreateInput: {
+                name: "${colorCreateInput.name}",
+                hexCode: "${colorCreateInput.hexCode}",
               }
             ) {
               id,
@@ -185,7 +185,7 @@ describe('Color', () => {
         expect(errorsBody.message).to.be.eql('Argument Validation Error');
 
         const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-        expect(errors).to.have.lengthOf(2);
+        expect(errors).to.have.length(2);
 
         expect(errors[0].property).to.be.eql('name');
         expect(errors[0].value).to.be.eql('g');
@@ -202,7 +202,7 @@ describe('Color', () => {
           .withName(colorName)
           .withHexCode('#F00')
           .build();
-        const createColorInput: CreateColorInput = {
+        const colorCreateInput: ColorCreateInput = {
           name: colorName,
           hexCode: '#0F0',
         };
@@ -210,9 +210,9 @@ describe('Color', () => {
         const query: string = `
           mutation {
             createColor (
-              createColorInput: {
-                name: "${createColorInput.name}",
-                hexCode: "${createColorInput.hexCode}",
+              colorCreateInput: {
+                name: "${colorCreateInput.name}",
+                hexCode: "${colorCreateInput.hexCode}",
               }
             ) {
               id,
@@ -242,7 +242,7 @@ describe('Color', () => {
           .withName('red')
           .withHexCode(hexCode)
           .build();
-        const createColorInput: CreateColorInput = {
+        const colorCreateInput: ColorCreateInput = {
           name: 'green',
           hexCode,
         };
@@ -250,9 +250,9 @@ describe('Color', () => {
         const query: string = `
           mutation {
             createColor (
-              createColorInput: {
-                name: "${createColorInput.name}",
-                hexCode: "${createColorInput.hexCode}",
+              colorCreateInput: {
+                name: "${colorCreateInput.name}",
+                hexCode: "${colorCreateInput.hexCode}",
               }
             ) {
               id,

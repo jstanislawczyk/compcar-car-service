@@ -1,7 +1,7 @@
 import {Resolver, Arg, Mutation, Query} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
-import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
+import {CommentCreateInput} from '../models/inputs/comments/comment-create.input';
 import {UserCommentFacade} from '../facades/user-comment.facade';
 import {CommentMapper} from '../mapper/comment.mapper';
 import {Comment} from '../models/entities/comment';
@@ -26,11 +26,11 @@ export class CommentResolver {
   @Mutation(() => Comment)
   public async createComment(
     @Arg('userId') userId: number,
-    @Arg('createCommentInput') createCommentInput: CreateCommentInput,
+    @Arg('commentCreateInput') commentCreateInput: CommentCreateInput,
   ): Promise<Comment> {
     Logger.log(`Saving comment for user with id=${userId}`);
 
-    const comment: Comment = this.commentMapper.toEntity(createCommentInput);
+    const comment: Comment = this.commentMapper.toEntity(commentCreateInput);
 
     return await this.userCommentFacade.saveUserComment(userId, comment);
   }

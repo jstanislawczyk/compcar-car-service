@@ -7,7 +7,7 @@ import {BrandResolver} from './brand.resolver';
 import {BrandCountryFacade} from '../facades/brand-country.facade';
 import {BrandMapper} from '../mapper/brand.mapper';
 import {BrandBuilder} from '../../test/utils/builders/brand.builder';
-import {CreateBrandInput} from '../models/inputs/brand/create-brand.input';
+import {BrandCreateInput} from '../models/inputs/brand/brand-create.input';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -75,7 +75,7 @@ context('BrandResolver', () => {
       // Arrange
       const mappedBrand: Brand = new BrandBuilder().build();
       const savedBrand: Brand = new BrandBuilder(true).build();
-      const createBrandInput: CreateBrandInput = {
+      const brandCreateInput: BrandCreateInput = {
         name: 'Audi',
         logoPhotoUrl: 'https://test.flag.url.foo.bar/',
       };
@@ -84,18 +84,18 @@ context('BrandResolver', () => {
       brandCountryFacadeStub.saveBrandWithCountry.resolves(savedBrand);
 
       // Act
-      const returnedBrand: Brand = await brandResolver.createBrand(1, createBrandInput);
+      const returnedBrand: Brand = await brandResolver.createBrand(1, brandCreateInput);
 
       // Assert
       expect(returnedBrand).to.be.eql(savedBrand);
-      expect(brandMapperStub.toEntity).to.be.calledOnceWith(createBrandInput);
+      expect(brandMapperStub.toEntity).to.be.calledOnceWith(brandCreateInput);
       expect(brandCountryFacadeStub.saveBrandWithCountry).to.be.calledOnceWith(mappedBrand);
     });
 
     it('should throw error if brand saving fails', async () => {
       // Arrange
       const mappedBrand: Brand = new BrandBuilder().build();
-      const createBrandInput: CreateBrandInput = {
+      const brandCreateInput: BrandCreateInput = {
         name: 'Audi',
         logoPhotoUrl: 'https://test.flag.url.foo.bar/',
       };
@@ -104,7 +104,7 @@ context('BrandResolver', () => {
       brandCountryFacadeStub.saveBrandWithCountry.rejects(new Error('SaveBrand error'));
 
       // Act
-      const result: Promise<Brand> = brandResolver.createBrand(1, createBrandInput);
+      const result: Promise<Brand> = brandResolver.createBrand(1, brandCreateInput);
 
       // Assert
       await expect(result).to.eventually.be.rejectedWith('SaveBrand error');

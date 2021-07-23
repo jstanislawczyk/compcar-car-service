@@ -95,18 +95,18 @@ context('BrandCountryFacade', () => {
 
     it('should throw error if country is not found', async () => {
       // Arrange
-      const userId: number = 1;
+      const countryId: number = 1;
 
       countryServiceStub.findCountryById.rejects(new Error('FindOne error'));
 
       // Act
-      const result: Promise<Brand> = brandCountryFacade.saveBrandWithCountry(new BrandBuilder().build(), 1);
+      const result: Promise<Brand> = brandCountryFacade.saveBrandWithCountry(new BrandBuilder().build(), countryId);
 
       // Assert
       await expect(result).to.eventually
           .be.rejectedWith('FindOne error')
           .and.be.instanceOf(Error);
-      expect(countryServiceStub.findCountryById).to.be.calledOnceWith(userId);
+      expect(countryServiceStub.findCountryById).to.be.calledOnceWith(countryId);
       expect(brandServiceStub.saveBrand).to.be.not.called;
     });
 

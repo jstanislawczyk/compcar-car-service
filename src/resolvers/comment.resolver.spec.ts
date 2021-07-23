@@ -6,7 +6,7 @@ import {CommentResolver} from './comment.resolver';
 import {UserCommentFacade} from '../facades/user-comment.facade';
 import {CommentMapper} from '../mapper/comment.mapper';
 import {Comment} from '../models/entities/comment';
-import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
+import {CommentCreateInput} from '../models/inputs/comments/comment-create.input';
 import {CommentBuilder} from '../../test/utils/builders/comment.builder';
 
 use(sinonChai);
@@ -73,7 +73,7 @@ context('CommentResolver', () => {
       const userId: number = 1;
       const mappedComment: Comment = new CommentBuilder().build();
       const savedComment: Comment = new CommentBuilder(true).build();
-      const createCommentInput: CreateCommentInput = {
+      const commentCreateInput: CommentCreateInput = {
         text: 'Comment text',
         rating: 2,
       };
@@ -82,11 +82,11 @@ context('CommentResolver', () => {
       userCommentFacadeStub.saveUserComment.resolves(savedComment);
 
       // Act
-      const returnedComment: Comment = await commentResolver.createComment(userId, createCommentInput);
+      const returnedComment: Comment = await commentResolver.createComment(userId, commentCreateInput);
 
       // Assert
       expect(returnedComment).to.be.eql(savedComment);
-      expect(commentMapperStub.toEntity).to.be.calledOnceWith(createCommentInput);
+      expect(commentMapperStub.toEntity).to.be.calledOnceWith(commentCreateInput);
       expect(userCommentFacadeStub.saveUserComment).to.be.calledOnceWith(userId, mappedComment);
     });
 
@@ -94,7 +94,7 @@ context('CommentResolver', () => {
       // Arrange
       const userId: number = 1;
       const mappedComment: Comment = new CommentBuilder().build();
-      const createCommentInput: CreateCommentInput = {
+      const commentCreateInput: CommentCreateInput = {
         text: 'Comment text',
         rating: 2,
       };
@@ -103,7 +103,7 @@ context('CommentResolver', () => {
       userCommentFacadeStub.saveUserComment.rejects(new Error('SaveUserComment error'));
 
       // Act
-      const returnedCommentResult: Promise<Comment> = commentResolver.createComment(userId, createCommentInput);
+      const returnedCommentResult: Promise<Comment> = commentResolver.createComment(userId, commentCreateInput);
 
       // Assert
       await expect(returnedCommentResult).to.eventually.be.rejectedWith('SaveUserComment error');

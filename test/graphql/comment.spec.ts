@@ -6,7 +6,7 @@ import {Comment} from '../../src/models/entities/comment';
 import {CommentBuilder} from '../utils/builders/comment.builder';
 import {DateUtils} from '../utils/common/date.utils';
 import {ResponseError} from '../utils/interfaces/response-error';
-import {CreateCommentInput} from '../../src/models/inputs/comments/create-comment.input';
+import {CommentCreateInput} from '../../src/models/inputs/comments/comment-create.input';
 import {TestValidationError} from '../utils/interfaces/validation-error';
 import {User} from '../../src/models/entities/user';
 import {UserBuilder} from '../utils/builders/user.builder';
@@ -88,7 +88,7 @@ describe('Comment', () => {
   describe('createComment', () => {
     it('should save comment', async () => {
       // Arrange
-      const createCommentInput: CreateCommentInput = {
+      const commentCreateInput: CommentCreateInput = {
         text: 'Comment text',
         rating: 3,
       };
@@ -101,9 +101,9 @@ describe('Comment', () => {
         mutation {
           createComment (
             userId: ${existingUser.id},
-            createCommentInput: {
-              text: "${createCommentInput.text}",
-              rating: ${createCommentInput.rating},
+            commentCreateInput: {
+              text: "${commentCreateInput.text}",
+              rating: ${commentCreateInput.rating},
             }
           ) {
             id,
@@ -141,7 +141,7 @@ describe('Comment', () => {
 
     it('should fail validation', async () => {
       // Arrange
-      const createCommentInput: CreateCommentInput = {
+      const commentCreateInput: CommentCreateInput = {
         text: 'T',
         rating: 10,
       };
@@ -150,9 +150,9 @@ describe('Comment', () => {
         mutation {
           createComment (
             userId: 1,
-            createCommentInput: {
-              text: "${createCommentInput.text}",
-              rating: ${createCommentInput.rating},
+            commentCreateInput: {
+              text: "${commentCreateInput.text}",
+              rating: ${commentCreateInput.rating},
             }
           ) {
             id,
@@ -172,7 +172,7 @@ describe('Comment', () => {
       expect(errorsBody.message).to.be.eql('Argument Validation Error');
 
       const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-      expect(errors).to.have.lengthOf(2);
+      expect(errors).to.have.length(2);
 
       expect(errors[0].property).to.be.eql('text');
       expect(errors[0].value).to.be.eql('T');

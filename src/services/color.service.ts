@@ -3,6 +3,7 @@ import {InjectRepository} from 'typeorm-typedi-extensions';
 import {ColorRepository} from '../repositories/color.repository';
 import {Color} from '../models/entities/color';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
+import {NotFoundError} from '../models/errors/not-found.error';
 
 @Service()
 export class ColorService {
@@ -15,6 +16,14 @@ export class ColorService {
 
   public findAll(): Promise<Color[]> {
     return this.colorRepository.find();
+  }
+
+  public async findColorById(id: number): Promise<Color> {
+    try {
+      return await this.colorRepository.findOneOrFail(id);
+    } catch (error) {
+      throw new NotFoundError(`Color with id=${id} not found`);
+    }
   }
 
   public async saveColor(color: Color): Promise<Color> {

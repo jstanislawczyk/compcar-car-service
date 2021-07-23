@@ -1,14 +1,14 @@
 import {Service} from 'typedi';
-import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
+import {CommentCreateInput} from '../models/inputs/comments/comment-create.input';
 import {Comment} from '../models/entities/comment';
 
 @Service()
 export class CommentMapper {
 
-  public toEntity(createCommentInput: CreateCommentInput): Comment {
+  public toEntity(commentCreateInput: CommentCreateInput): Comment {
     return {
-      text: createCommentInput.text,
-      rating: createCommentInput.rating,
+      text: commentCreateInput.text,
+      rating: commentCreateInput.rating,
       commentDate: new Date().toISOString(),
     };
   }

@@ -1,14 +1,14 @@
 import {Service} from 'typedi';
 import {Country} from "../models/entities/country";
-import {CreateCountryInput} from "../models/inputs/country/create-country.input";
+import {CountryCreateInput} from "../models/inputs/country/country-create.input";
 
 @Service()
 export class CountryMapper {
 
-  public toEntity(createCommentInput: CreateCountryInput): Country {
+  public toEntity(commentCreateInput: CountryCreateInput): Country {
     return {
-      name: createCommentInput.name,
-      flagPhotoUrl: createCommentInput.flagPhotoUrl,
+      name: commentCreateInput.name,
+      flagPhotoUrl: commentCreateInput.flagPhotoUrl,
     };
   }
 }

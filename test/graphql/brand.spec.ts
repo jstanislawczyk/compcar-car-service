@@ -5,7 +5,7 @@ import {TestValidationError} from '../utils/interfaces/validation-error';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import {ResponseError} from '../utils/interfaces/response-error';
 import {BrandDatabaseUtils} from '../utils/database-utils/brand.database-utils';
-import {CreateBrandInput} from '../../src/models/inputs/brand/create-brand.input';
+import {BrandCreateInput} from '../../src/models/inputs/brand/brand-create.input';
 import {Country} from '../../src/models/entities/country';
 import {CountryBuilder} from '../utils/builders/country.builder';
 import {CountryDatabaseUtils} from '../utils/database-utils/country.database-utils';
@@ -89,7 +89,7 @@ describe('Brand', () => {
   describe('createBrand', () => {
     it('should save brand', async () => {
       // Arrange
-      const createBrandInput: CreateBrandInput = {
+      const brandCreateInput: BrandCreateInput = {
         name: 'Audi',
         logoPhotoUrl: 'https://test.logo.url.foo.bar/',
       };
@@ -100,9 +100,9 @@ describe('Brand', () => {
         mutation {
           createBrand (
             countryId: ${savedCountry.id},
-            createBrandInput: {
-              name: "${createBrandInput.name}",
-              logoPhotoUrl: "${createBrandInput.logoPhotoUrl}",
+            brandCreateInput: {
+              name: "${brandCreateInput.name}",
+              logoPhotoUrl: "${brandCreateInput.logoPhotoUrl}",
             }
           ) {
             id,
@@ -134,7 +134,7 @@ describe('Brand', () => {
     describe('should throw error', () => {
       it('if validation fails', async () => {
         // Arrange
-        const createBrandInput: CreateBrandInput = {
+        const brandCreateInput: BrandCreateInput = {
           name: 'A',
           logoPhotoUrl: 'Wrong url',
         };
@@ -145,9 +145,9 @@ describe('Brand', () => {
           mutation {
             createBrand (
               countryId: ${savedCountry.id},
-              createBrandInput: {
-                name: "${createBrandInput.name}",
-                logoPhotoUrl: "${createBrandInput.logoPhotoUrl}",
+              brandCreateInput: {
+                name: "${brandCreateInput.name}",
+                logoPhotoUrl: "${brandCreateInput.logoPhotoUrl}",
               }
             ) {
               id,
@@ -167,7 +167,7 @@ describe('Brand', () => {
         expect(errorsBody.message).to.be.eql('Argument Validation Error');
 
         const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-        expect(errors).to.have.lengthOf(2);
+        expect(errors).to.have.length(2);
 
         expect(errors[0].property).to.be.eql('name');
         expect(errors[0].value).to.be.eql('A');
@@ -183,7 +183,7 @@ describe('Brand', () => {
         const existingBrand = new BrandBuilder()
             .withName(brandName)
             .build();
-        const createBrandInput: CreateBrandInput = {
+        const brandCreateInput: BrandCreateInput = {
           name: brandName,
           logoPhotoUrl: 'https://test.logo.url.foo.bar/',
         };
@@ -194,9 +194,9 @@ describe('Brand', () => {
           mutation {
             createBrand (
               countryId: ${savedCountry.id},
-              createBrandInput: {
-                name: "${createBrandInput.name}",
-                logoPhotoUrl: "${createBrandInput.logoPhotoUrl}",
+              brandCreateInput: {
+                name: "${brandCreateInput.name}",
+                logoPhotoUrl: "${brandCreateInput.logoPhotoUrl}",
               }
             ) {
               id,
@@ -215,7 +215,7 @@ describe('Brand', () => {
             .expect(200);
 
         const error: ResponseError = response.body.errors[0];
-        expect(error.message).to.be.eql(`Brand with name=${createBrandInput.name} already exists`);
+        expect(error.message).to.be.eql(`Brand with name=${brandCreateInput.name} already exists`);
         expect(error.extensions.code).to.be.eql('ENTITY_ALREADY_EXISTS');
       });
 
@@ -226,7 +226,7 @@ describe('Brand', () => {
         const existingBrand = new BrandBuilder()
             .withName(brandName)
             .build();
-        const createBrandInput: CreateBrandInput = {
+        const brandCreateInput: BrandCreateInput = {
           name: brandName,
           logoPhotoUrl: 'https://test.logo.url.foo.bar/',
         };
@@ -235,9 +235,9 @@ describe('Brand', () => {
           mutation {
             createBrand (
               countryId: ${notExistingCountryId},
-              createBrandInput: {
-                name: "${createBrandInput.name}",
-                logoPhotoUrl: "${createBrandInput.logoPhotoUrl}",
+              brandCreateInput: {
+                name: "${brandCreateInput.name}",
+                logoPhotoUrl: "${brandCreateInput.logoPhotoUrl}",
               }
             ) {
               id,

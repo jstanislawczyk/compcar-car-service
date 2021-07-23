@@ -3,7 +3,7 @@ import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {Brand} from '../models/entities/brand';
 import {BrandCountryFacade} from '../facades/brand-country.facade';
-import {CreateBrandInput} from '../models/inputs/brand/create-brand.input';
+import {BrandCreateInput} from '../models/inputs/brand/brand-create.input';
 import {BrandMapper} from '../mapper/brand.mapper';
 
 @Service()
@@ -26,11 +26,11 @@ export class BrandResolver {
   @Mutation(() => Brand)
   public async createBrand(
     @Arg('countryId') countryId: number,
-    @Arg('createBrandInput') createBrandInput: CreateBrandInput,
+    @Arg('brandCreateInput') brandCreateInput: BrandCreateInput,
   ): Promise<Brand> {
-    Logger.log(`Saving new brand with name=${createBrandInput.name}`);
+    Logger.log(`Saving new brand with name=${brandCreateInput.name}`);
 
-    const brand: Brand = this.brandMapper.toEntity(createBrandInput);
+    const brand: Brand = this.brandMapper.toEntity(brandCreateInput);
 
     return await this.brandCountryFacade.saveBrandWithCountry(brand, countryId);
   }

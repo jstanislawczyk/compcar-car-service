@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {CountryMapper} from './country.mapper';
-import {CreateCountryInput} from '../models/inputs/country/create-country.input';
+import {CountryCreateInput} from '../models/inputs/country/country-create.input';
 import {v4} from 'uuid';
 import {Country} from '../models/entities/country';
 
@@ -15,17 +15,17 @@ context('CountryMapper', () => {
   describe('toEntity', () => {
     it('should map to entity', () => {
       // Arrange
-      const createCountryInput: CreateCountryInput = {
+      const countryCreateInput: CountryCreateInput = {
         name: 'red',
         flagPhotoUrl: `https://test.url.${v4()}.com/`,
       };
 
       // Act
-      const country: Country = countryMapper.toEntity(createCountryInput);
+      const country: Country = countryMapper.toEntity(countryCreateInput);
 
       // Assert
-      expect(country.name).to.be.eql(createCountryInput.name);
-      expect(country.flagPhotoUrl).to.be.eql(createCountryInput.flagPhotoUrl);
+      expect(country.name).to.be.eql(countryCreateInput.name);
+      expect(country.flagPhotoUrl).to.be.eql(countryCreateInput.flagPhotoUrl);
       expect(country.id).to.be.undefined;
       expect(country.brands).to.be.undefined;
     });

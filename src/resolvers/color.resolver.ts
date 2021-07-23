@@ -3,7 +3,7 @@ import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {Color} from '../models/entities/color';
 import {ColorService} from '../services/color.service';
-import {CreateColorInput} from '../models/inputs/color/create-color.input';
+import {ColorCreateInput} from '../models/inputs/color/color-create.input';
 import {ColorMapper} from '../mapper/color.mapper';
 
 @Service()
@@ -25,11 +25,11 @@ export class ColorResolver {
 
   @Mutation(() => Color)
   public async createColor(
-    @Arg('createColorInput') createColorInput: CreateColorInput,
+    @Arg('colorCreateInput') colorCreateInput: ColorCreateInput,
   ): Promise<Color> {
-    Logger.log(`Saving new color with name=${createColorInput.name}`);
+    Logger.log(`Saving new color with name=${colorCreateInput.name}`);
 
-    const color: Color = this.colorMapper.toEntity(createColorInput);
+    const color: Color = this.colorMapper.toEntity(colorCreateInput);
 
     return await this.colorService.saveColor(color);
   }

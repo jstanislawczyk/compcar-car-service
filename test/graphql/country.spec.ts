@@ -5,7 +5,7 @@ import {TestValidationError} from '../utils/interfaces/validation-error';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import {ResponseError} from '../utils/interfaces/response-error';
 import {CountryDatabaseUtils} from '../utils/database-utils/country.database-utils';
-import {CreateCountryInput} from '../../src/models/inputs/country/create-country.input';
+import {CountryCreateInput} from '../../src/models/inputs/country/country-create.input';
 import {Country} from '../../src/models/entities/country';
 import {CountryBuilder} from '../utils/builders/country.builder';
 
@@ -22,7 +22,7 @@ describe('Country', () => {
   describe('createCountry', () => {
     it('should save country', async () => {
       // Arrange
-      const createCountryInput: CreateCountryInput = {
+      const countryCreateInput: CountryCreateInput = {
         name: 'Poland',
         flagPhotoUrl: 'https://test.url.foo.bar/',
       };
@@ -30,9 +30,9 @@ describe('Country', () => {
       const query: string = `
         mutation {
           createCountry (
-            createCountryInput: {
-              name: "${createCountryInput.name}",
-              flagPhotoUrl: "${createCountryInput.flagPhotoUrl}",
+            countryCreateInput: {
+              name: "${countryCreateInput.name}",
+              flagPhotoUrl: "${countryCreateInput.flagPhotoUrl}",
             }
           ) {
             id,
@@ -63,7 +63,7 @@ describe('Country', () => {
     describe('should throw error', () => {
       it('if validation fails', async () => {
         // Arrange
-        const createCountryInput: CreateCountryInput = {
+        const countryCreateInput: CountryCreateInput = {
           name: 'g',
           flagPhotoUrl: 'Wrong url',
         };
@@ -71,9 +71,9 @@ describe('Country', () => {
         const query: string = `
           mutation {
             createCountry (
-              createCountryInput: {
-                name: "${createCountryInput.name}",
-                flagPhotoUrl: "${createCountryInput.flagPhotoUrl}",
+              countryCreateInput: {
+                name: "${countryCreateInput.name}",
+                flagPhotoUrl: "${countryCreateInput.flagPhotoUrl}",
               }
             ) {
               id,
@@ -93,7 +93,7 @@ describe('Country', () => {
         expect(errorsBody.message).to.be.eql('Argument Validation Error');
 
         const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-        expect(errors).to.have.lengthOf(2);
+        expect(errors).to.have.length(2);
 
         expect(errors[0].property).to.be.eql('name');
         expect(errors[0].value).to.be.eql('g');
@@ -109,7 +109,7 @@ describe('Country', () => {
         const existingCountry = new CountryBuilder()
           .withName(countryName)
           .build();
-        const createCountryInput: CreateCountryInput = {
+        const countryCreateInput: CountryCreateInput = {
           name: countryName,
           flagPhotoUrl: 'https://test.url.foo.bar/',
         };
@@ -117,9 +117,9 @@ describe('Country', () => {
         const query: string = `
           mutation {
             createCountry (
-              createCountryInput: {
-                name: "${createCountryInput.name}",
-                flagPhotoUrl: "${createCountryInput.flagPhotoUrl}",
+              countryCreateInput: {
+                name: "${countryCreateInput.name}",
+                flagPhotoUrl: "${countryCreateInput.flagPhotoUrl}",
               }
             ) {
               id,
@@ -138,7 +138,7 @@ describe('Country', () => {
           .expect(200);
 
         const error: ResponseError = response.body.errors[0];
-        expect(error.message).to.be.eql(`Country with name=${createCountryInput.name} already exists`);
+        expect(error.message).to.be.eql(`Country with name=${countryCreateInput.name} already exists`);
         expect(error.extensions.code).to.be.eql('ENTITY_ALREADY_EXISTS');
       });
     });

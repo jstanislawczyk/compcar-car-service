@@ -1,14 +1,14 @@
 import {Service} from 'typedi';
-import {CreateBrandInput} from '../models/inputs/brand/create-brand.input';
+import {BrandCreateInput} from '../models/inputs/brand/brand-create.input';
 import {Brand} from '../models/entities/brand';
 
 @Service()
 export class BrandMapper {
 
-  public toEntity(createBrandInput: CreateBrandInput): Brand {
+  public toEntity(brandCreateInput: BrandCreateInput): Brand {
     return {
-      name: createBrandInput.name,
-      logoPhotoUrl: createBrandInput.logoPhotoUrl,
+      name: brandCreateInput.name,
+      logoPhotoUrl: brandCreateInput.logoPhotoUrl,
     };
   }
 }

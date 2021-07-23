@@ -65,7 +65,7 @@ describe('Security', () => {
       expect(errorsBody.message).to.be.eql('Argument Validation Error');
 
       const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-      expect(errors).to.have.lengthOf(3);
+      expect(errors).to.have.length(3);
 
       expect(errors[0].property).to.be.eql('email');
       expect(errors[0].value).to.be.eql('wrong_mail');

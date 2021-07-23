@@ -13,7 +13,9 @@ export class Painting {
   public id?: number;
 
   @Field()
-  @Column()
+  @Column({
+    type: 'double',
+  })
   public price?: number;
 
   @Field(() => Color)
@@ -22,7 +24,7 @@ export class Painting {
     (color: Color) => color.paintings,
   )
   @TypeormLoader()
-  public color: Color;
+  public color?: Color;
 
   @Field(() => [Car])
   @OneToMany(

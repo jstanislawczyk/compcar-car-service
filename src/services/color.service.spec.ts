@@ -7,6 +7,7 @@ import {ColorService} from './color.service';
 import {Color} from '../models/entities/color';
 import {ColorBuilder} from '../../test/utils/builders/color.builder';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
+import {NotFoundError} from '../models/errors/not-found.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -62,6 +63,41 @@ context('ColorService', () => {
 
       // Assert
       await expect(colorsResult).to.eventually.be.rejectedWith('Find error');
+    });
+  });
+
+  describe('findColorById', () => {
+    it('should find color by id', async () => {
+      // Arrange
+      const colorId: number = 1;
+      const existingColor: Color = new ColorBuilder()
+          .withId(colorId)
+          .build();
+
+      colorRepositoryStub.findOneOrFail.resolves(existingColor);
+
+      // Act
+      const receivedColor: Color = await colorService.findColorById(colorId);
+
+      // Assert
+      expect(receivedColor).to.be.eql(existingColor);
+      expect(colorRepositoryStub.findOneOrFail).to.be.calledOnceWith(colorId);
+    });
+
+    it("should throw error if color doesn't exist", async () => {
+      // Arrange
+      const colorId: number = 1;
+
+      colorRepositoryStub.findOneOrFail.rejects(new Error('Color Not Found'));
+
+      // Act
+      const result: Promise<Color> = colorService.findColorById(colorId);
+
+      // Assert
+      await expect(result).to.be.eventually
+          .rejectedWith(`Color with id=${colorId} not found`)
+          .and.be.instanceOf(NotFoundError);
+      expect(colorRepositoryStub.findOneOrFail).to.be.calledOnceWith(colorId);
     });
   });
 
