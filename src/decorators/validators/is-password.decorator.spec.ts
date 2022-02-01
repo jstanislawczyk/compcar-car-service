@@ -1,26 +1,7 @@
-import {expect, use} from 'chai';
-import sinon, {SinonSandbox, SinonStub} from 'sinon';
+import {expect} from 'chai';
 import {IsPassword} from './is-password.decorator';
-import {IsPasswordValidator} from '../../validators/is-password.validator';
-import * as classValidator from 'class-validator';
-import sinonChai from 'sinon-chai';
-
-use(sinonChai);
 
 context('IsPassword', () => {
-
-  let sandbox: SinonSandbox;
-  let registerDecoratorStub: SinonStub;
-
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-
-    registerDecoratorStub = sandbox.stub(classValidator, 'registerDecorator');
-  });
-
-  afterEach(() => {
-    sandbox.restore();
-  });
 
   it('should return the function that registers the validator decorator', () => {
     // Arrange
@@ -35,11 +16,5 @@ context('IsPassword', () => {
 
     // Assert
     expect(registeredDecorator).to.be.instanceOf(Function);
-    expect(registerDecoratorStub).to.be.calledOnceWith({
-      name: 'IsPassword',
-      propertyName,
-      validator: IsPasswordValidator,
-      target: object.constructor,
-    });
   });
 });

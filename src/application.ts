@@ -1,7 +1,6 @@
 import {Connection, ConnectionOptions, createConnection, useContainer} from 'typeorm';
 import {ApolloServer, ServerInfo} from 'apollo-server';
 import {buildSchema} from 'type-graphql';
-import {Container} from 'typedi';
 import {GraphQLSchema} from 'graphql';
 import {DatabaseConfig} from './config/database.config';
 import {Logger} from './common/logger';
@@ -9,6 +8,7 @@ import {ApolloServerLoaderPlugin} from 'type-graphql-dataloader';
 import {authenticationChecker} from './common/auth-checker';
 import {ExpressContext} from 'apollo-server-express/dist/ApolloServer';
 import config from 'config';
+import {Container} from 'typeorm-typedi-extensions';
 
 export class Application {
 
