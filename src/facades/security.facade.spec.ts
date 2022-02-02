@@ -6,7 +6,7 @@ import {UserService} from '../services/user.service';
 import {SecurityFacade} from './security.facade';
 import {TokenService} from '../services/token.service';
 import {User} from '../models/entities/user';
-import {LoginCredentials} from '../models/common/login-credentials';
+import {LoginCredentials} from '../models/common/security/login-credentials';
 import {AuthenticationError} from 'apollo-server';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
 

@@ -7,7 +7,7 @@ import {SecurityFacade} from '../facades/security.facade';
 import {LoginCredentialsMapper} from '../mapper/login-credentials.mapper';
 import {UserMapper} from '../mapper/user.mapper';
 import {LoginInput} from '../models/inputs/user/login.input';
-import {LoginCredentials} from '../models/common/login-credentials';
+import {LoginCredentials} from '../models/common/security/login-credentials';
 import {User} from '../models/entities/user';
 import {RegisterInput} from '../models/inputs/user/register.input';
 import {UserBuilder} from '../../test/utils/builders/user.builder';

@@ -22,6 +22,12 @@ export class Car {
   })
   public name: string;
 
+  @Field()
+  @Column({
+    length: 256,
+  })
+  public description: string;
+
   @Field(() => Generation)
   @ManyToOne(
     () => Generation,
