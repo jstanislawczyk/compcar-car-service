@@ -1,6 +1,5 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {Brand} from './brand';
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {Generation} from './generation';
 
@@ -17,14 +16,6 @@ export class Model {
     length: 128,
   })
   public name: string;
-
-  @Field(() => Brand)
-  @ManyToOne(
-    () => Brand,
-    (brand: Brand) => brand.models,
-  )
-  @TypeormLoader()
-  public brand: Brand;
 
   @Field(() => [Generation])
   @OneToMany(

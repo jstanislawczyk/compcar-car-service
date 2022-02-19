@@ -7,6 +7,7 @@ import {CarAddon} from './car-addon';
 import {Engine} from './engine';
 import {Painting} from './painting';
 import {Comment} from './comment';
+import {Brand} from './brand';
 
 @Entity()
 @ObjectType()
@@ -67,6 +68,14 @@ export class Car {
   )
   @TypeormLoader()
   public comments?: Comment[];
+
+  @Field(() => Brand)
+  @ManyToOne(
+      () => Brand,
+      (brand: Brand) => brand.models,
+  )
+  @TypeormLoader()
+  public brand: Brand;
 
   @ManyToMany(() => Engine, (engine: Engine) => engine.cars)
   @JoinTable()

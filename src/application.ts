@@ -19,8 +19,8 @@ export class Application {
     const databaseConfig: ConnectionOptions = DatabaseConfig.getDatabaseConnectionConfiguration();
 
     useContainer(Container);
-    const databaseConnection: Connection = await createConnection(databaseConfig);
 
+    const databaseConnection: Connection = await createConnection(databaseConfig);
     const isDev: boolean = config.get('common.isDev');
     const applicationPort: number = config.get('server.port');
     const schema: GraphQLSchema = await buildSchema({
