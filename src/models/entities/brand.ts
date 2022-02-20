@@ -2,7 +2,7 @@ import {Field, ID, ObjectType} from 'type-graphql';
 import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {Country} from './country';
-import {Car} from './car';
+import {Model} from './model';
 
 @Entity()
 @ObjectType()
@@ -32,11 +32,11 @@ export class Brand {
   @TypeormLoader()
   public country?: Country;
 
-  @Field(() => [Car])
+  @Field(() => [Model])
   @OneToMany(
-    () => Car,
-    (car: Car) => car.brand,
+    () => Model,
+    (model: Model) => model.brand,
   )
   @TypeormLoader()
-  public models?: Car[];
+  public models?: Model[];
 }

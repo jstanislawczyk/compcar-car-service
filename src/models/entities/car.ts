@@ -7,7 +7,7 @@ import {CarAddon} from './car-addon';
 import {Engine} from './engine';
 import {Painting} from './painting';
 import {Comment} from './comment';
-import {Brand} from './brand';
+import {BodyStyle} from '../enums/body-style';
 
 @Entity()
 @ObjectType()
@@ -28,6 +28,21 @@ export class Car {
     length: 256,
   })
   public description: string;
+
+  @Field()
+  @Column()
+  public basePrice: number;
+
+  @Field()
+  @Column()
+  public weight: number;
+
+  @Field()
+  @Column({
+    type: 'enum',
+    enum: BodyStyle,
+  })
+  public bodyStyle: BodyStyle;
 
   @Field(() => Generation)
   @ManyToOne(
@@ -69,15 +84,10 @@ export class Car {
   @TypeormLoader()
   public comments?: Comment[];
 
-  @Field(() => Brand)
-  @ManyToOne(
-      () => Brand,
-      (brand: Brand) => brand.models,
-  )
-  @TypeormLoader()
-  public brand: Brand;
-
-  @ManyToMany(() => Engine, (engine: Engine) => engine.cars)
+  @ManyToMany(
+    () => Engine,
+    (engine: Engine) => engine.cars)
   @JoinTable()
   public engines?: Engine[];
+
 }

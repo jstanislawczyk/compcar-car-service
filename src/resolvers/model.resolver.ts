@@ -1,32 +1,32 @@
 import {Resolver, Query, Arg} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
-import {Car} from '../models/entities/car';
-import {CarFacade} from '../facades/car.facade';
-import {CarsOutput} from '../models/object-types/car/cars.output';
+import {ModelFacade} from '../facades/model.facade';
+import {ModelsWithCountOutput} from '../models/object-types/car/models-with-count-output';
 import {PaginationInput} from '../models/inputs/pagination/pagination.input';
 import {PaginationMapper} from '../mapper/pagination.mapper';
 import {PaginationOptions} from '../models/common/filters/paginationOptions';
+import {Model} from '../models/entities/model';
 
 @Service()
-@Resolver(() => Car)
-export class BrandResolver {
+@Resolver(() => Model)
+export class ModelResolver {
 
   constructor(
-    private readonly carFacade: CarFacade,
+    private readonly modelFacade: ModelFacade,
     private readonly paginationMapper: PaginationMapper,
   ) {
   }
 
-  @Query(() => CarsOutput)
-  public async getCarsWithCount(
+  @Query(() => ModelsWithCountOutput)
+  public async getModelsWithCount(
     @Arg('pagination') paginationInput: PaginationInput,
-  ): Promise<CarsOutput> {
-    Logger.log(`Fetching cars with count [page=${paginationInput.pageNumber}, size=${paginationInput.pageSize}]`);
+  ): Promise<ModelsWithCountOutput> {
+    Logger.log(`Fetching car models with count [page=${paginationInput.pageNumber}, size=${paginationInput.pageSize}]`);
 
     const paginationOptions: PaginationOptions = this.paginationMapper.toPaginationOptions(paginationInput);
 
-    return await this.carFacade.findAll(paginationOptions);
+    return await this.modelFacade.findAllWithCount(paginationOptions);
   }
 
 }
