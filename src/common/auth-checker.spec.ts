@@ -39,7 +39,7 @@ context('AuthChecker', () => {
             },
           },
         },
-      } as unknown as ResolverData<ExpressContext>;
+      } as ResolverData<ExpressContext>;
 
       validateTokenStub.returns(true);
 
@@ -62,7 +62,7 @@ context('AuthChecker', () => {
             },
           },
         },
-      } as unknown as ResolverData<ExpressContext>;
+      } as ResolverData<ExpressContext>;
 
       validateTokenStub.throws(new Error(errorMessage));
 
@@ -80,7 +80,7 @@ context('AuthChecker', () => {
             headers: {},
           },
         },
-      } as unknown as ResolverData<ExpressContext>;
+      } as ResolverData<ExpressContext>;
 
       validateTokenStub.throws(new Error(errorMessage));
 

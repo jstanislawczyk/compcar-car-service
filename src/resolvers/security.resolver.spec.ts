@@ -30,11 +30,7 @@ context('SecurityResolver', () => {
     loginCredentialsMapperStub = sandbox.createStubInstance(LoginCredentialsMapper);
     userMapperStub = sandbox.createStubInstance(UserMapper);
 
-    securityResolver = new SecurityResolver(
-      securityFacadeStub as unknown as SecurityFacade,
-      loginCredentialsMapperStub as unknown as LoginCredentialsMapper,
-      userMapperStub as unknown as UserMapper,
-    );
+    securityResolver = new SecurityResolver(securityFacadeStub, loginCredentialsMapperStub, userMapperStub);
   });
 
   afterEach(() => {

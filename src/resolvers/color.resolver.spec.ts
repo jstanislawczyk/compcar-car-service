@@ -25,10 +25,7 @@ context('ColorResolver', () => {
     colorServiceStub = sandbox.createStubInstance(ColorService);
     colorMapperStub = sandbox.createStubInstance(ColorMapper);
 
-    colorResolver = new ColorResolver(
-      colorServiceStub as unknown as ColorService,
-      colorMapperStub as unknown as ColorMapper,
-    );
+    colorResolver = new ColorResolver(colorServiceStub, colorMapperStub);
   });
 
   afterEach(() => {

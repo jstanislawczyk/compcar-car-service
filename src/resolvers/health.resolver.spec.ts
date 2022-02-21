@@ -21,7 +21,7 @@ context('HealthResolver', () => {
 
     healthServiceStub = sandbox.createStubInstance(HealthService);
 
-    healthResolver = new HealthResolver(healthServiceStub as unknown as HealthService);
+    healthResolver = new HealthResolver(healthServiceStub);
   });
 
   afterEach(() => {

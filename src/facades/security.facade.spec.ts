@@ -26,10 +26,7 @@ context('SecurityFacade', () => {
     userServiceStub = sandbox.createStubInstance(UserService);
     tokenServiceStub = sandbox.createStubInstance(TokenService);
 
-    securityFacade = new SecurityFacade(
-      userServiceStub as unknown as UserService,
-      tokenServiceStub as unknown as TokenService,
-    );
+    securityFacade = new SecurityFacade(userServiceStub, tokenServiceStub);
   });
 
   afterEach(() => {

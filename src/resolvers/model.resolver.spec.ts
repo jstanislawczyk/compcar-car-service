@@ -27,10 +27,7 @@ context('ModelResolver', () => {
     modelFacadeStub = sandbox.createStubInstance(ModelFacade);
     paginationMapperStub = sandbox.createStubInstance(PaginationMapper);
 
-    modelResolver = new ModelResolver(
-      modelFacadeStub as ModelFacade,
-      paginationMapperStub as PaginationMapper,
-    );
+    modelResolver = new ModelResolver(modelFacadeStub, paginationMapperStub);
   });
 
   afterEach(() => {

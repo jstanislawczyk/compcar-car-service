@@ -22,7 +22,7 @@ context('ModelService', () => {
     sandbox = sinon.createSandbox();
 
     modelRepositoryStub = sandbox.createStubInstance(ModelRepository);
-    modelService = new ModelService(modelRepositoryStub as unknown as ModelRepository);
+    modelService = new ModelService(modelRepositoryStub);
 
     modelRepositoryStub.findOneOrFail.resolves(new ModelBuilder().build());
   });

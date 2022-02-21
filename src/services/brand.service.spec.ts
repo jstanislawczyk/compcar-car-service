@@ -22,7 +22,7 @@ context('BrandService', () => {
     sandbox = sinon.createSandbox();
 
     brandRepositoryStub = sandbox.createStubInstance(BrandRepository);
-    brandService = new BrandService(brandRepositoryStub as unknown as BrandRepository);
+    brandService = new BrandService(brandRepositoryStub);
 
     brandRepositoryStub.findOne.resolves(undefined);
   });

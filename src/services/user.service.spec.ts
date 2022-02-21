@@ -24,7 +24,7 @@ context('UserService', () => {
     sandbox = sinon.createSandbox();
 
     userRepositoryStub = sandbox.createStubInstance(UserRepository);
-    userService = new UserService(userRepositoryStub as unknown as UserRepository);
+    userService = new UserService(userRepositoryStub);
 
     userRepositoryStub.findOneOrFail.resolves(new UserBuilder().build());
   });

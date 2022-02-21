@@ -24,7 +24,7 @@ context('ModelFacade', () => {
     modelServiceStub = sandbox.createStubInstance(ModelService);
 
     modelFacade = new ModelFacade(
-        modelServiceStub as unknown as ModelService,
+        modelServiceStub,
     );
   });
 
