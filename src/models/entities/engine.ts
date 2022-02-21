@@ -56,6 +56,9 @@ export class Engine {
   @TypeormLoader()
   public comments?: Comment[];
 
-  @ManyToMany(() => Car, (car: Car) => car.engines)
+  @ManyToMany(
+    () => Car,
+    (car: Car) => car.engines,
+  )
   public cars?: Car[];
 }
