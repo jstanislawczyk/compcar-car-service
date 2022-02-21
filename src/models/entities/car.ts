@@ -52,14 +52,6 @@ export class Car {
   @TypeormLoader()
   public generation: Generation;
 
-  @Field(() => Painting)
-  @ManyToOne(
-    () => Painting,
-    (painting: Painting) => painting.cars,
-  )
-  @TypeormLoader()
-  public painting: Painting;
-
   @Field(() => [Photo])
   @OneToMany(
     () => Photo,
@@ -83,6 +75,14 @@ export class Car {
   )
   @TypeormLoader()
   public comments?: Comment[];
+
+  @Field(() => [Painting])
+  @OneToMany(
+    () => Painting,
+    (painting: Painting) => painting.car,
+  )
+  @TypeormLoader()
+  public paintings: Painting[];
 
   @ManyToMany(
     () => Engine,

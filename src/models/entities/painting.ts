@@ -1,5 +1,5 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Color} from './color';
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {Car} from './car';
@@ -24,11 +24,11 @@ export class Painting {
   @TypeormLoader()
   public color: Color;
 
-  @Field(() => [Car])
-  @OneToMany(
+  @Field(() => Car)
+  @ManyToOne(
     () => Car,
-    (car: Car) => car.painting,
+    (car: Car) => car.paintings,
   )
   @TypeormLoader()
-  public cars?: Car[];
+  public car: Car;
 }
