@@ -61,7 +61,7 @@ describe('Brand', () => {
       expect(returnedBrandResponse.logoPhotoUrl).to.be.be.eql(existingBrand.logoPhotoUrl);
     });
 
-    it("should throw error if error doesn't exist", async () => {
+    it("should throw error if brand doesn't exist", async () => {
       // Arrange
       const notExistingBrandId: number = 0;
       const query: string = `
