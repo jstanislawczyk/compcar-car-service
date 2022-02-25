@@ -53,8 +53,8 @@ describe('Model', () => {
           .send({ query })
           .expect(200);
 
-      const returnedModelsWithCountOutput: ModelsWithCountOutput = response.body.data.getModelsWithCount as ModelsWithCountOutput;
-      const models: Model[] = returnedModelsWithCountOutput.models;
+      const returnedModelsWithCount: ModelsWithCountOutput = response.body.data.getModelsWithCount as ModelsWithCountOutput;
+      const models: Model[] = returnedModelsWithCount.models;
 
       expect(Number(models[0].id)).to.be.above(0);
       expect(models[0].name).to.be.eql('A4');
@@ -62,7 +62,57 @@ describe('Model', () => {
       expect(Number(models[1].id)).to.be.above(0);
       expect(models[1].name).to.be.eql('80');
       expect(models[1].description).to.be.eql('Old car');
-      expect(returnedModelsWithCountOutput.count).to.be.eql(2);
+      expect(returnedModelsWithCount.count).to.be.eql(2);
+      expect(returnedModelsWithCount.count).to.be.eql(returnedModelsWithCount.models.length);
+    });
+
+    it('should get paginated models with count', async () => {
+      // Arrange
+      const modelsList: Model[] = [
+        new ModelBuilder().build(),
+        new ModelBuilder()
+            .withName('80')
+            .withDescription('Old car')
+            .build(),
+        new ModelBuilder()
+            .withName('A3')
+            .withDescription('Small car')
+            .build(),
+      ];
+      const query: string = `
+        {
+          getModelsWithCount(
+            pagination: {
+              pageNumber: 2,
+              pageSize: 2,
+            },
+          ) {
+            models {
+              id,
+              name,
+              description,
+            },
+            count,
+          }
+        }
+      `;
+
+      await ModelDatabaseUtils.saveModelsList(modelsList);
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+      const returnedModelsWithCount: ModelsWithCountOutput = response.body.data.getModelsWithCount as ModelsWithCountOutput;
+      const models: Model[] = returnedModelsWithCount.models;
+
+      expect(Number(models[0].id)).to.be.above(0);
+      expect(models[0].name).to.be.eql('A3');
+      expect(models[0].description).to.be.eql('Small car');
+      expect(returnedModelsWithCount.models.length).to.be.eql(1);
+      expect(returnedModelsWithCount.count).to.be.eql(modelsList.length);
     });
   });
 });
