@@ -29,10 +29,18 @@ describe('Model', () => {
       ];
       const query: string = `
         {
-          getModelsWithCount {
-            id,
-            name,
-            description,
+          getModelsWithCount(
+            pagination: {
+              pageNumber: 1,
+              pageSize: 10,
+            },
+          ) {
+            models {
+              id,
+              name,
+              description,
+            },
+            count,
           }
         }
       `;

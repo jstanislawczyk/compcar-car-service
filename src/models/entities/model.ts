@@ -30,7 +30,7 @@ export class Model {
     (brand: Brand) => brand.models,
   )
   @TypeormLoader()
-  public brand: Brand;
+  public brand?: Brand;
 
   @Field(() => [Generation])
   @OneToMany(
