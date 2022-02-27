@@ -44,6 +44,10 @@ export class Car {
   })
   public bodyStyle: BodyStyle;
 
+  @Field()
+  @Column()
+  public isAvailable: boolean;
+
   @Field(() => Generation)
   @ManyToOne(
     () => Generation,
