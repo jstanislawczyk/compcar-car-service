@@ -25,10 +25,7 @@ context('UserCommentFacade', () => {
     userServiceStub = sandbox.createStubInstance(UserService);
     commentServiceStub = sandbox.createStubInstance(CommentService);
 
-    userCommentFacade = new UserCommentFacade(
-      commentServiceStub as unknown as CommentService,
-      userServiceStub as unknown as UserService,
-    );
+    userCommentFacade = new UserCommentFacade(commentServiceStub, userServiceStub);
   });
 
   afterEach(() => {

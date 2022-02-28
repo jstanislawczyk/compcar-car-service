@@ -21,7 +21,7 @@ context('ColorService', () => {
     sandbox = sinon.createSandbox();
 
     colorRepositoryStub = sandbox.createStubInstance(ColorRepository);
-    colorService = new ColorService(colorRepositoryStub as unknown as ColorRepository);
+    colorService = new ColorService(colorRepositoryStub);
 
     colorRepositoryStub.find.resolves([]);
   });

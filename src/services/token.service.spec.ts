@@ -1,10 +1,10 @@
 import {expect} from 'chai';
 import {TokenService} from './token.service';
 import {User} from '../models/entities/user';
-import {LoginCredentials} from '../models/common/login-credentials';
+import {LoginCredentials} from '../models/common/security/login-credentials';
 import {AuthenticationError} from 'apollo-server';
 import {StringUtils} from '../../test/utils/common/string.utils';
-import {JwtToken} from '../models/common/jwt-token';
+import {JwtToken} from '../models/common/security/jwt-token';
 import jwt, {TokenExpiredError} from 'jsonwebtoken';
 import {classToPlain} from 'class-transformer';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';

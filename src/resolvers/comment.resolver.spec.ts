@@ -25,10 +25,7 @@ context('CommentResolver', () => {
     userCommentFacadeStub = sandbox.createStubInstance(UserCommentFacade);
     commentMapperStub = sandbox.createStubInstance(CommentMapper);
 
-    commentResolver = new CommentResolver(
-      userCommentFacadeStub as unknown as UserCommentFacade,
-      commentMapperStub as unknown as CommentMapper,
-    );
+    commentResolver = new CommentResolver(userCommentFacadeStub, commentMapperStub);
   });
 
   afterEach(() => {

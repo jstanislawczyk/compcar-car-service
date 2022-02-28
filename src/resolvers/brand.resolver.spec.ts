@@ -25,10 +25,7 @@ context('BrandResolver', () => {
     brandCountryFacadeStub = sandbox.createStubInstance(BrandCountryFacade);
     brandMapperStub = sandbox.createStubInstance(BrandMapper);
 
-    brandResolver = new BrandResolver(
-      brandCountryFacadeStub as unknown as BrandCountryFacade,
-      brandMapperStub as unknown as BrandMapper,
-    );
+    brandResolver = new BrandResolver(brandCountryFacadeStub, brandMapperStub);
   });
 
   afterEach(() => {
@@ -53,7 +50,7 @@ context('BrandResolver', () => {
       expect(brandCountryFacadeStub.findOne).to.be.calledOnceWith(brandId);
     });
 
-    it("should rethrow error from facade", async () => {
+    it('should rethrow error from facade', async () => {
       // Arrange
       const brandId: number = 1;
 

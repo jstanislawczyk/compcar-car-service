@@ -20,7 +20,7 @@ context('CommentService', () => {
     sandbox = sinon.createSandbox();
 
     commentRepositoryStub = sandbox.createStubInstance(CommentRepository);
-    commentService = new CommentService(commentRepositoryStub as unknown as CommentRepository);
+    commentService = new CommentService(commentRepositoryStub);
   });
 
   afterEach(() => {

@@ -1,7 +1,7 @@
 import {Service} from 'typedi';
 import {UserService} from '../services/user.service';
 import {TokenService} from '../services/token.service';
-import {LoginCredentials} from '../models/common/login-credentials';
+import {LoginCredentials} from '../models/common/security/login-credentials';
 import {User} from '../models/entities/user';
 import {AuthenticationError} from 'apollo-server';
 

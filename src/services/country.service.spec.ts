@@ -22,7 +22,7 @@ context('CountryService', () => {
     sandbox = sinon.createSandbox();
 
     countryRepositoryStub = sandbox.createStubInstance(CountryRepository);
-    countryService = new CountryService(countryRepositoryStub as unknown as CountryRepository);
+    countryService = new CountryService(countryRepositoryStub);
 
     countryRepositoryStub.findOne.resolves(undefined);
   });

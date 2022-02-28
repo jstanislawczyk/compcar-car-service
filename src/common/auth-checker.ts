@@ -15,7 +15,7 @@ export const authenticationChecker: AuthChecker<ExpressContext> = (
     const tokenService: TokenService = Container.get(TokenService);
 
     return tokenService.isTokenValid(jwtToken, roles);
-  } catch (error) {
+  } catch (error: any) {
     const message: string = error.message;
 
     throw new InvalidTokenError(message);

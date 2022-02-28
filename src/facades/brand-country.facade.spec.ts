@@ -26,10 +26,7 @@ context('BrandCountryFacade', () => {
     brandServiceStub = sandbox.createStubInstance(BrandService);
     countryServiceStub = sandbox.createStubInstance(CountryService);
 
-    brandCountryFacade = new BrandCountryFacade(
-      brandServiceStub as unknown as BrandService,
-      countryServiceStub as unknown as CountryService,
-    );
+    brandCountryFacade = new BrandCountryFacade(brandServiceStub, countryServiceStub);
   });
 
   afterEach(() => {
@@ -54,7 +51,7 @@ context('BrandCountryFacade', () => {
       expect(brandServiceStub.findOne).to.be.calledOnceWith(brandId);
     });
 
-    it("should rethrow error from service", async () => {
+    it('should rethrow error from service', async () => {
       // Arrange
       const brandId: number = 1;
 

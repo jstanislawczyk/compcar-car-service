@@ -21,7 +21,7 @@ context('UserResolver', () => {
 
     userServiceStub = sandbox.createStubInstance(UserService);
 
-    userResolver = new UserResolver(userServiceStub as unknown as UserService);
+    userResolver = new UserResolver(userServiceStub);
   });
 
   afterEach(() => {

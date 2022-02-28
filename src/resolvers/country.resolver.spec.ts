@@ -25,10 +25,7 @@ context('CountryResolver', () => {
     countryServiceStub = sandbox.createStubInstance(CountryService);
     countryMapperStub = sandbox.createStubInstance(CountryMapper);
 
-    countryResolver = new CountryResolver(
-      countryServiceStub as unknown as CountryService,
-      countryMapperStub as unknown as CountryMapper,
-    );
+    countryResolver = new CountryResolver(countryServiceStub, countryMapperStub);
   });
 
   afterEach(() => {

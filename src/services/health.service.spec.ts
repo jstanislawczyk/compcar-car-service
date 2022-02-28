@@ -21,7 +21,7 @@ context('HealthService', () => {
     sandbox = sinon.createSandbox();
 
     userRepositoryStub = sandbox.createStubInstance(UserRepository);
-    healthService = new HealthService(userRepositoryStub as unknown as UserRepository);
+    healthService = new HealthService(userRepositoryStub);
 
     userRepositoryStub.findOne.resolves(new UserBuilder().build());
   });

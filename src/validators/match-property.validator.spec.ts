@@ -32,7 +32,7 @@ context('MatchProperty', () => {
           password: repeatPassword,
           repeatPassword,
         },
-      } as unknown as ValidationArguments;
+      } as ValidationArguments;
 
       // Act
       const isValid: boolean = matchPropertyValidator.validate(repeatPassword, validationArguments);
@@ -52,7 +52,7 @@ context('MatchProperty', () => {
           password,
           repeatPassword,
         },
-      } as unknown as ValidationArguments;
+      } as ValidationArguments;
 
       // Act
       const isValid: boolean = matchPropertyValidator.validate(repeatPassword, validationArguments);

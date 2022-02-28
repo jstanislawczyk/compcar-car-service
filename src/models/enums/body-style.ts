@@ -1,4 +1,4 @@
-export enum CarType {
+export enum BodyStyle {
   SEDAN = 'SEDAN',
   KOMBI = 'KOMBI',
   HATCHBACK = 'HATCHBACK',

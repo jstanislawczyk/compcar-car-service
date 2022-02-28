@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {LoginCredentialsMapper} from './login-credentials.mapper';
 import {LoginInput} from '../models/inputs/user/login.input';
-import {LoginCredentials} from '../models/common/login-credentials';
+import {LoginCredentials} from '../models/common/security/login-credentials';
 
 context('LoginCredentialsMapper', () => {
 
