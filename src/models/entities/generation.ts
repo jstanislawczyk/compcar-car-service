@@ -33,7 +33,7 @@ export class Generation {
     (model: Model) => model.generations,
   )
   @TypeormLoader()
-  public model: Model;
+  public model?: Model;
 
   @Field(() => [Car])
   @OneToMany(
