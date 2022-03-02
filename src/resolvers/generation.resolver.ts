@@ -15,7 +15,7 @@ export class GenerationResolver {
 
   @Query(() => Generation)
   public async getGenerationById(@Arg('id') id: number): Promise<Generation> {
-    Logger.log(`Fetching car generation with id=${id}`);
+    Logger.log(`Fetching generation with id=${id}`);
 
     return await this.generationFacade.findGenerationById(id);
   }
