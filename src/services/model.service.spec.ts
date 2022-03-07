@@ -8,6 +8,7 @@ import {ModelBuilder} from '../../test/utils/builders/model.builder';
 import {ModelsWithCountOutput} from '../models/object-types/car/models-with-count-output';
 import {PaginationOptions} from '../models/common/filters/paginationOptions';
 import {Model} from '../models/entities/model';
+import {NotFoundError} from '../models/errors/not-found.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -70,6 +71,41 @@ context('ModelService', () => {
 
       // Assert
       await expect(modelsWithCountOutput).to.eventually.be.rejectedWith('FindAndCount error');
+    });
+  });
+
+  describe('findOne', () => {
+    it('should find model by id', async () => {
+      // Arrange
+      const modelId: number = 1;
+      const existingModel: Model = new ModelBuilder()
+          .withId(modelId)
+          .build();
+
+      modelRepositoryStub.findOneOrFail.resolves(existingModel);
+
+      // Act
+      const returnedModel: Model = await modelService.findOne(modelId);
+
+      // Assert
+      expect(returnedModel).to.be.eql(existingModel);
+      expect(modelRepositoryStub.findOneOrFail).to.be.calledOnceWith(modelId);
+    });
+
+    it("should throw error if model doesn't exist", async () => {
+      // Arrange
+      const modelId: number = 1;
+
+      modelRepositoryStub.findOneOrFail.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedModelResult: Promise<Model> = modelService.findOne(modelId);
+
+      // Assert
+      await expect(returnedModelResult).to.eventually
+          .be.rejectedWith(`Model with id=${modelId} not found`)
+          .and.to.be.an.instanceOf(NotFoundError);
+      expect(modelRepositoryStub.findOneOrFail).to.be.calledOnceWith(modelId);
     });
   });
 });

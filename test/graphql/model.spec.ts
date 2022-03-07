@@ -6,6 +6,7 @@ import {ModelDatabaseUtils} from '../utils/database-utils/model.database-utils';
 import {Model} from '../../src/models/entities/model';
 import {ModelBuilder} from '../utils/builders/model.builder';
 import {ModelsWithCountOutput} from '../../src/models/object-types/car/models-with-count-output';
+import {ResponseError} from '../utils/interfaces/response-error';
 
 describe('Model', () => {
 
@@ -113,6 +114,70 @@ describe('Model', () => {
       expect(models[0].description).to.be.eql('Small car');
       expect(returnedModelsWithCount.models.length).to.be.eql(1);
       expect(returnedModelsWithCount.count).to.be.eql(modelsList.length);
+    });
+  });
+
+  describe('getModelById', () => {
+    it('should get model by id', async () => {
+      // Arrange
+      const model: Model = new ModelBuilder(true)
+          .withName('B6')
+          .withDescription('Test description')
+          .build();
+      const savedModel: Model = await ModelDatabaseUtils.saveModel(model);
+
+      const query: string = `
+        {
+          getModelById(id: ${savedModel.id}) {
+            id,
+            name,
+            description,
+          }
+        }
+      `;
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+      const returnedModelResponse: Model = response.body.data.getModelById as Model;
+      expect(Number(returnedModelResponse.id)).to.be.above(0);
+      expect(returnedModelResponse.name).to.be.eql('B6');
+      expect(returnedModelResponse.description).to.be.eql('Test description');
+      expect(returnedModelResponse.brand).to.be.undefined;
+      expect(returnedModelResponse.generations).to.be.undefined;
+
+      const existingModel: Model = await ModelDatabaseUtils.getModelByIdOrFail(
+          Number(returnedModelResponse.id)
+      );
+      expect(returnedModelResponse.id).to.be.be.eql(existingModel.id?.toString());
+      expect(returnedModelResponse.name).to.be.be.eql(existingModel.name);
+      expect(returnedModelResponse.description).to.be.be.eql(existingModel.description);
+    });
+
+    it("should throw error if model doesn't exist", async () => {
+      // Arrange
+      const notExistingModelId: number = 0;
+      const query: string = `
+        {
+          getModelById(id: ${notExistingModelId}) {
+            id,
+            name,
+          }
+        }
+      `;
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+      const error: ResponseError = response.body.errors[0];
+      expect(error.message).to.be.eql(`Model with id=${notExistingModelId} not found`);
+      expect(error.extensions.code).to.be.eql('NOT_FOUND');
     });
   });
 });

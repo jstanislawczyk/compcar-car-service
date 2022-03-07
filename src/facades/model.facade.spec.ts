@@ -32,7 +32,7 @@ context('ModelFacade', () => {
     sandbox.restore();
   });
 
-  describe('findAllWithCount', () => {
+  describe('findAllModelsWithCount', () => {
     it('should find models with count', async () => {
       // Arrange
       const paginationOptions: PaginationOptions = {
@@ -52,7 +52,7 @@ context('ModelFacade', () => {
       modelServiceStub.findAllWithCount.resolves(existingModelsWithCount);
 
       // Act
-      const modelsWithCountOutput: ModelsWithCountOutput = await modelFacade.findAllWithCount(paginationOptions);
+      const modelsWithCountOutput: ModelsWithCountOutput = await modelFacade.findAllModelsWithCount(paginationOptions);
 
       // Assert
       expect(modelsWithCountOutput).to.be.eql(existingModelsWithCount);
@@ -69,13 +69,48 @@ context('ModelFacade', () => {
       modelServiceStub.findAllWithCount.rejects(new Error('FindAllWithCount Error'));
 
       // Act
-      const modelsWithCountResult: Promise<ModelsWithCountOutput> = modelFacade.findAllWithCount(paginationOptions);
+      const modelsWithCountResult: Promise<ModelsWithCountOutput> = modelFacade.findAllModelsWithCount(paginationOptions);
 
       // Assert
       await expect(modelsWithCountResult).to.eventually
           .be.rejectedWith('FindAllWithCount Error')
           .and.to.be.an.instanceOf(Error);
       expect(modelServiceStub.findAllWithCount).to.be.calledOnceWith(paginationOptions);
+    });
+  });
+
+  describe('findModelById', () => {
+    it('should find model by id', async () => {
+      // Arrange
+      const modelId: number = 1;
+      const existingModel: Model = new ModelBuilder()
+          .withId(modelId)
+          .build();
+
+      modelServiceStub.findOne.resolves(existingModel);
+
+      // Act
+      const returnedModel: Model = await modelFacade.findModelById(modelId);
+
+      // Assert
+      expect(returnedModel).to.be.eql(existingModel);
+      expect(modelServiceStub.findOne).to.be.calledOnceWith(modelId);
+    });
+
+    it('should rethrow error from model service', async () => {
+      // Arrange
+      const modelId: number = 1;
+
+      modelServiceStub.findOne.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedModelResult: Promise<Model> = modelFacade.findModelById(modelId);
+
+      // Assert
+      await expect(returnedModelResult).to.eventually
+          .be.rejectedWith('Not Found')
+          .and.to.be.an.instanceOf(Error);
+      expect(modelServiceStub.findOne).to.be.calledOnceWith(modelId);
     });
   });
 });

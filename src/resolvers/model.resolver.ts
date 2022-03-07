@@ -26,7 +26,13 @@ export class ModelResolver {
 
     const paginationOptions: PaginationOptions = this.paginationMapper.toPaginationOptions(paginationInput);
 
-    return await this.modelFacade.findAllWithCount(paginationOptions);
+    return await this.modelFacade.findAllModelsWithCount(paginationOptions);
   }
 
+  @Query(() => Model)
+  public async getModelById(@Arg('id') id: number): Promise<Model> {
+    Logger.log(`Fetching model with id=${id}`);
+
+    return await this.modelFacade.findModelById(id);
+  }
 }

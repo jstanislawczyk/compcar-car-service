@@ -4,6 +4,7 @@ import {InjectRepository} from 'typeorm-typedi-extensions';
 import {PaginationOptions} from '../models/common/filters/paginationOptions';
 import {ModelRepository} from '../repositories/model.repository';
 import {Model} from '../models/entities/model';
+import {NotFoundError} from '../models/errors/not-found.error';
 
 @Service()
 export class ModelService {
@@ -24,5 +25,13 @@ export class ModelService {
         models: carsWithCount[0],
         count: carsWithCount[1],
       }));
+  }
+
+  public async findOne(id: number): Promise<Model> {
+    try {
+      return await this.modelRepository.findOneOrFail(id);
+    } catch (error) {
+      throw new NotFoundError(`Model with id=${id} not found`);
+    }
   }
 }
