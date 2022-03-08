@@ -22,6 +22,7 @@ describe('Generation', () => {
       // Arrange
       const generation: Generation = new GenerationBuilder(true)
           .withName('B6')
+          .withDescription('Test description')
           .withStartYear('2001')
           .withEndYear('2006')
           .build();
@@ -32,6 +33,7 @@ describe('Generation', () => {
           getGenerationById(id: ${savedGeneration.id}) {
             id,
             name,
+            description,
             startYear,
             endYear,
           }
@@ -47,6 +49,7 @@ describe('Generation', () => {
       const returnedGenerationResponse: Generation = response.body.data.getGenerationById as Generation;
       expect(Number(returnedGenerationResponse.id)).to.be.above(0);
       expect(returnedGenerationResponse.name).to.be.eql('B6');
+      expect(returnedGenerationResponse.description).to.be.eql('Test description');
       expect(returnedGenerationResponse.startYear).to.be.eql('2001');
       expect(returnedGenerationResponse.endYear).to.be.eql('2006');
       expect(returnedGenerationResponse.model).to.be.undefined;
@@ -58,6 +61,7 @@ describe('Generation', () => {
       );
       expect(returnedGenerationResponse.id).to.be.be.eql(existingGeneration.id?.toString());
       expect(returnedGenerationResponse.name).to.be.be.eql(existingGeneration.name);
+      expect(returnedGenerationResponse.description).to.be.be.eql(existingGeneration.description);
       expect(returnedGenerationResponse.startYear).to.be.be.eql(existingGeneration.startYear);
       expect(returnedGenerationResponse.endYear).to.be.be.eql(existingGeneration.endYear);
     });

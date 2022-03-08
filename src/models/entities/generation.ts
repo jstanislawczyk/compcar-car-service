@@ -20,6 +20,12 @@ export class Generation {
   public name: string;
 
   @Field()
+  @Column({
+    length: 256,
+  })
+  public description: string;
+
+  @Field()
   @Column()
   public startYear: string;
 

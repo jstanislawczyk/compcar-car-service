@@ -20,6 +20,11 @@ export class GenerationBuilder extends Builder<Generation> {
     return this;
   }
 
+  public withDescription(description: string): GenerationBuilder {
+    this.entity.description = description;
+    return this;
+  }
+
   public withStartYear(startYear: string): GenerationBuilder {
     this.entity.startYear = startYear;
     return this;
