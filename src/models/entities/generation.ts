@@ -3,6 +3,7 @@ import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'type
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {Model} from './model';
 import {Car} from './car';
+import {Comment} from './comment';
 
 @Entity()
 @ObjectType()
@@ -19,6 +20,12 @@ export class Generation {
   public name: string;
 
   @Field()
+  @Column({
+    length: 256,
+  })
+  public description: string;
+
+  @Field()
   @Column()
   public startYear: string;
 
@@ -32,7 +39,7 @@ export class Generation {
     (model: Model) => model.generations,
   )
   @TypeormLoader()
-  public model: Model;
+  public model?: Model;
 
   @Field(() => [Car])
   @OneToMany(
@@ -41,4 +48,12 @@ export class Generation {
   )
   @TypeormLoader()
   public cars?: Car[];
+
+  @Field(() => [Comment])
+  @OneToMany(
+    () => Comment,
+    (comment: Comment) => comment.generation,
+  )
+  @TypeormLoader()
+  public comments?: Comment[];
 }

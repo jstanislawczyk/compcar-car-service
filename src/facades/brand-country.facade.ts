@@ -12,7 +12,7 @@ export class BrandCountryFacade {
   ) {
   }
 
-  public async findOne(id: number): Promise<Brand> {
+  public findOne(id: number): Promise<Brand> {
     return this.brandService.findOne(id);
   }
 

@@ -1,4 +1,5 @@
 export abstract class Builder<T> {
+
   protected entity: T;
 
   protected constructor(entity: T) {

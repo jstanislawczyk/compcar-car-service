@@ -6,7 +6,6 @@ import {Photo} from './photo';
 import {CarAddon} from './car-addon';
 import {Engine} from './engine';
 import {Painting} from './painting';
-import {Comment} from './comment';
 import {BodyStyle} from '../enums/body-style';
 
 @Entity()
@@ -72,14 +71,6 @@ export class Car {
   @TypeormLoader()
   public carAddons?: CarAddon[];
 
-  @Field(() => [Comment])
-  @OneToMany(
-    () => Comment,
-    (comment: Comment) => comment.car,
-  )
-  @TypeormLoader()
-  public comments?: Comment[];
-
   @Field(() => [Painting])
   @OneToMany(
     () => Painting,
@@ -93,5 +84,4 @@ export class Car {
     (engine: Engine) => engine.cars)
   @JoinTable()
   public engines?: Engine[];
-
 }
