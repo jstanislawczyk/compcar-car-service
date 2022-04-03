@@ -25,14 +25,6 @@ export class Generation {
   })
   public description: string;
 
-  @Field()
-  @Column()
-  public startYear: string;
-
-  @Field()
-  @Column()
-  public endYear?: string;
-
   @Field(() => Model)
   @ManyToOne(
     () => Model,

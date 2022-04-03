@@ -34,6 +34,14 @@ export class Car {
 
   @Field()
   @Column()
+  public startYear: string;
+
+  @Field()
+  @Column()
+  public endYear?: string;
+
+  @Field()
+  @Column()
   public weight: number;
 
   @Field()
