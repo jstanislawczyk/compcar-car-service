@@ -24,14 +24,4 @@ export class GenerationBuilder extends Builder<Generation> {
     this.entity.description = description;
     return this;
   }
-
-  public withStartYear(startYear: string): GenerationBuilder {
-    this.entity.startYear = startYear;
-    return this;
-  }
-
-  public withEndYear(endYear: string): GenerationBuilder {
-    this.entity.endYear = endYear;
-    return this;
-  }
 }

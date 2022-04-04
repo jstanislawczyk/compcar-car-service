@@ -34,6 +34,14 @@ export class Car {
 
   @Field()
   @Column()
+  public startYear: string;
+
+  @Field()
+  @Column()
+  public endYear?: string;
+
+  @Field()
+  @Column()
   public weight: number;
 
   @Field()
@@ -42,10 +50,6 @@ export class Car {
     enum: BodyStyle,
   })
   public bodyStyle: BodyStyle;
-
-  @Field()
-  @Column()
-  public isAvailable: boolean;
 
   @Field(() => Generation)
   @ManyToOne(
