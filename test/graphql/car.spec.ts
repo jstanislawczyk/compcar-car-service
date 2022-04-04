@@ -41,7 +41,7 @@ describe('Car', () => {
             startYear,
             endYear,
             weight,
-            bodyStyle
+            bodyStyle,
           }
         }
       `;
