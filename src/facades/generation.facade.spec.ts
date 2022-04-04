@@ -10,7 +10,7 @@ import {Generation} from '../models/entities/generation';
 use(sinonChai);
 use(chaiAsPromised);
 
-context('GenerationCountryFacade', () => {
+context('GenerationFacade', () => {
 
   let sandbox: SinonSandbox;
   let generationServiceStub: SinonStubbedInstance<GenerationService>;

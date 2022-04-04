@@ -57,7 +57,7 @@ export class Car {
     (generation: Generation) => generation.cars,
   )
   @TypeormLoader()
-  public generation: Generation;
+  public generation?: Generation;
 
   @Field(() => [Photo])
   @OneToMany(
@@ -81,7 +81,7 @@ export class Car {
     (painting: Painting) => painting.car,
   )
   @TypeormLoader()
-  public paintings: Painting[];
+  public paintings?: Painting[];
 
   @ManyToMany(
     () => Engine,
