@@ -64,8 +64,8 @@ describe('Car', () => {
       expect(returnedCarResponse.paintings).to.be.undefined;
       expect(returnedCarResponse.generation).to.be.undefined;
       expect(returnedCarResponse.carAddons).to.be.undefined;
+      expect(returnedCarResponse.carEngines).to.be.undefined;
       expect(returnedCarResponse.photos).to.be.undefined;
-      expect(returnedCarResponse.engines).to.be.undefined;
 
       const existingCar: Car = await CarDatabaseUtils.getCarByIdOrFail(
         Number(returnedCarResponse.id)

@@ -1,12 +1,12 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {Generation} from './generation';
 import {Photo} from './photo';
 import {CarAddon} from './car-addon';
-import {Engine} from './engine';
 import {Painting} from './painting';
 import {BodyStyle} from '../enums/body-style';
+import {CarEngine} from './car-engine';
 
 @Entity()
 @ObjectType()
@@ -75,6 +75,14 @@ export class Car {
   @TypeormLoader()
   public carAddons?: CarAddon[];
 
+  @Field(() => [CarEngine])
+  @OneToMany(
+    () => CarEngine,
+    (carEngine: CarEngine) => carEngine.car,
+  )
+  @TypeormLoader()
+  public carEngines?: CarEngine[];
+
   @Field(() => [Painting])
   @OneToMany(
     () => Painting,
@@ -82,10 +90,4 @@ export class Car {
   )
   @TypeormLoader()
   public paintings?: Painting[];
-
-  @ManyToMany(
-    () => Engine,
-    (engine: Engine) => engine.cars)
-  @JoinTable()
-  public engines?: Engine[];
 }
