@@ -22,7 +22,7 @@ export class Logger {
         new winston.transports.Console({
           format: winston.format.combine(
             winston.format.label({
-              label: '[GraphQlTraining]',
+              label: '[CompcarService]',
             }),
             winston.format.printf(({ label, message }) =>
               `${label} ${message}`
