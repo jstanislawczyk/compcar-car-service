@@ -27,13 +27,13 @@ export class Engine {
   @Column()
   public fuelCapacity: number;
 
-  @Field(() => Float)
+  @Field()
   @Column({
     type: 'double',
   })
   public averageFuelConsumption: number;
 
-  @Field(() => Float)
+  @Field()
   @Column({
     type: 'double',
   })
