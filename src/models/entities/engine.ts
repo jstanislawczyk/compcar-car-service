@@ -1,4 +1,4 @@
-import {Field, ID, ObjectType} from 'type-graphql';
+import {Field, Float, ID, ObjectType} from 'type-graphql';
 import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {FuelType} from '../enums/fuel-type';
 import {Comment} from './comment';
@@ -25,14 +25,18 @@ export class Engine {
 
   @Field()
   @Column()
-  public capacity: number;
+  public fuelCapacity: number;
 
-  @Field()
-  @Column()
+  @Field(() => Float)
+  @Column({
+    type: 'double',
+  })
   public averageFuelConsumption: number;
 
-  @Field()
-  @Column()
+  @Field(() => Float)
+  @Column({
+    type: 'double',
+  })
   public acceleration: number;
 
   @Field()
