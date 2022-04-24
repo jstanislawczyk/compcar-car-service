@@ -25,14 +25,18 @@ export class Engine {
 
   @Field()
   @Column()
-  public capacity: number;
+  public fuelCapacity: number;
 
   @Field()
-  @Column()
+  @Column({
+    type: 'double',
+  })
   public averageFuelConsumption: number;
 
   @Field()
-  @Column()
+  @Column({
+    type: 'double',
+  })
   public acceleration: number;
 
   @Field()
