@@ -3,6 +3,8 @@ import {InjectRepository} from 'typeorm-typedi-extensions';
 import {ColorRepository} from '../repositories/color.repository';
 import {Color} from '../models/entities/color';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
+import {ColorUpdate} from '../models/common/update/color-update';
+import {NotFoundError} from '../models/errors/not-found.error';
 
 @Service()
 export class ColorService {
@@ -18,7 +20,6 @@ export class ColorService {
   }
 
   public async saveColor(color: Color): Promise<Color> {
-    color.hexCode = this.getSanitizedHexCode(color.hexCode);
     const existingColors: Color[] = await this.colorRepository.find({
       select: ['id'],
       where: [
@@ -34,20 +35,21 @@ export class ColorService {
     return this.colorRepository.save(color);
   }
 
-  private getSanitizedHexCode(hexCode: string): string {
-    hexCode = hexCode.toUpperCase();
+  public async updateColor(colorUpdate: ColorUpdate): Promise<Color> {
+    const existingColor: Color | undefined = await this.colorRepository.findOne(colorUpdate.id);
 
-    if (this.isLongHexCodeThatCanBeShorter(hexCode)) {
-      hexCode = `#${hexCode.charAt(1)}${hexCode.charAt(3)}${hexCode.charAt(5)}`;
+    if (existingColor === undefined) {
+      throw new NotFoundError(`Color with id=${colorUpdate.id} not found`);
     }
 
-    return hexCode;
-  }
+    if (colorUpdate.name) {
+      existingColor.name = colorUpdate.name;
+    }
 
-  private isLongHexCodeThatCanBeShorter(hexCode: string): boolean {
-    return hexCode.length === 7 &&
-      hexCode.charAt(1) === hexCode.charAt(2) &&
-      hexCode.charAt(3) === hexCode.charAt(4) &&
-      hexCode.charAt(5) === hexCode.charAt(6);
+    if (colorUpdate.hexCode) {
+      existingColor.hexCode = colorUpdate.hexCode;
+    }
+
+    return this.colorRepository.save(existingColor);
   }
 }
