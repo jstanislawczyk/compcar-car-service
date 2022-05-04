@@ -18,6 +18,7 @@ export class ColorService {
   }
 
   public async saveColor(color: Color): Promise<Color> {
+    color.hexCode = this.getSanitizedHexCode(color.hexCode);
     const existingColors: Color[] = await this.colorRepository.find({
       select: ['id'],
       where: [
@@ -31,5 +32,22 @@ export class ColorService {
     }
 
     return this.colorRepository.save(color);
+  }
+
+  private getSanitizedHexCode(hexCode: string): string {
+    hexCode = hexCode.toUpperCase();
+
+    if (this.isLongHexCodeThatCanBeShorter(hexCode)) {
+      hexCode = `#${hexCode.charAt(1)}${hexCode.charAt(3)}${hexCode.charAt(5)}`;
+    }
+
+    return hexCode;
+  }
+
+  private isLongHexCodeThatCanBeShorter(hexCode: string): boolean {
+    return hexCode.length === 7 &&
+      hexCode.charAt(1) === hexCode.charAt(2) &&
+      hexCode.charAt(3) === hexCode.charAt(4) &&
+      hexCode.charAt(5) === hexCode.charAt(6);
   }
 }

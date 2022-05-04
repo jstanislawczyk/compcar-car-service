@@ -72,84 +72,86 @@ describe('Color', () => {
   });
 
   describe('createColor', () => {
-    it('should save color', async () => {
-      // Arrange
-      const createColorInput: CreateColorInput = {
-        name: 'green',
-        hexCode: '#0F0',
-      };
+    describe('should save color', () => {
+      it('with 3 digit hex code', async () => {
+        // Arrange
+        const createColorInput: CreateColorInput = {
+          name: 'green',
+          hexCode: '#0F0',
+        };
 
-      const query: string = `
-        mutation {
-          createColor (
-            createColorInput: {
-              name: "${createColorInput.name}",
-              hexCode: "${createColorInput.hexCode}",
+        const query: string = `
+          mutation {
+            createColor (
+              createColorInput: {
+                name: "${createColorInput.name}",
+                hexCode: "${createColorInput.hexCode}",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
             }
-          ) {
-            id,
-            name,
-            hexCode,
           }
-        }
-      `;
+        `;
 
-      // Act & Assert
-      const response: Response = await request(application.serverInfo.url)
-        .post('/graphql')
-        .send({ query })
-        .expect(200);
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+            .post('/graphql')
+            .send({ query })
+            .expect(200);
 
-      const savedColorResponse: Color = response.body.data.createColor as Color;
-      expect(Number(savedColorResponse.id)).to.be.above(0);
-      expect(savedColorResponse.name).to.be.eql('green');
-      expect(savedColorResponse.hexCode).to.be.eql('#0F0');
-      expect(savedColorResponse.paintings).to.be.undefined;
+        const savedColorResponse: Color = response.body.data.createColor as Color;
+        expect(Number(savedColorResponse.id)).to.be.above(0);
+        expect(savedColorResponse.name).to.be.eql('green');
+        expect(savedColorResponse.hexCode).to.be.eql('#0F0');
+        expect(savedColorResponse.paintings).to.be.undefined;
 
-      const existingColor: Color = await ColorDatabaseUtils.getColorByIdOrFail(Number(savedColorResponse.id));
-      expect(savedColorResponse.id).to.be.be.eql(existingColor.id?.toString());
-      expect(savedColorResponse.name).to.be.be.eql(existingColor.name);
-      expect(savedColorResponse.hexCode).to.be.be.eql(existingColor.hexCode);
-    });
+        const existingColor: Color = await ColorDatabaseUtils.getColorByIdOrFail(Number(savedColorResponse.id));
+        expect(savedColorResponse.id).to.be.be.eql(existingColor.id?.toString());
+        expect(savedColorResponse.name).to.be.be.eql(existingColor.name);
+        expect(savedColorResponse.hexCode).to.be.be.eql(existingColor.hexCode);
+      });
 
-    it('should save color with full hex code', async () => {
-      // Arrange
-      const createColorInput: CreateColorInput = {
-        name: 'green',
-        hexCode: '#00FF00',
-      };
+      it('with 6 digit hex code', async () => {
+        // Arrange
+        const createColorInput: CreateColorInput = {
+          name: 'green',
+          hexCode: '#00fF00',
+        };
 
-      const query: string = `
-        mutation {
-          createColor (
-            createColorInput: {
-              name: "${createColorInput.name}",
-              hexCode: "${createColorInput.hexCode}",
+        const query: string = `
+          mutation {
+            createColor (
+              createColorInput: {
+                name: "${createColorInput.name}",
+                hexCode: "${createColorInput.hexCode}",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
             }
-          ) {
-            id,
-            name,
-            hexCode,
           }
-        }
-      `;
+        `;
 
-      // Act & Assert
-      const response: Response = await request(application.serverInfo.url)
-        .post('/graphql')
-        .send({ query })
-        .expect(200);
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+            .post('/graphql')
+            .send({ query })
+            .expect(200);
 
-      const savedColorResponse: Color = response.body.data.createColor as Color;
-      expect(Number(savedColorResponse.id)).to.be.above(0);
-      expect(savedColorResponse.name).to.be.eql('green');
-      expect(savedColorResponse.hexCode).to.be.eql('#00FF00');
-      expect(savedColorResponse.paintings).to.be.undefined;
+        const savedColorResponse: Color = response.body.data.createColor as Color;
+        expect(Number(savedColorResponse.id)).to.be.above(0);
+        expect(savedColorResponse.name).to.be.eql('green');
+        expect(savedColorResponse.hexCode).to.be.eql('#0F0');
+        expect(savedColorResponse.paintings).to.be.undefined;
 
-      const existingColor: Color = await ColorDatabaseUtils.getColorByIdOrFail(Number(savedColorResponse.id));
-      expect(savedColorResponse.id).to.be.be.eql(existingColor.id?.toString());
-      expect(savedColorResponse.name).to.be.be.eql(existingColor.name);
-      expect(savedColorResponse.hexCode).to.be.be.eql(existingColor.hexCode);
+        const existingColor: Color = await ColorDatabaseUtils.getColorByIdOrFail(Number(savedColorResponse.id));
+        expect(savedColorResponse.id).to.be.be.eql(existingColor.id?.toString());
+        expect(savedColorResponse.name).to.be.be.eql(existingColor.name);
+        expect(savedColorResponse.hexCode).to.be.be.eql(existingColor.hexCode);
+      });
     });
 
     describe('should throw error', () => {

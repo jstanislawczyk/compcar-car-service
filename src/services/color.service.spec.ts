@@ -66,28 +66,132 @@ context('ColorService', () => {
   });
 
   describe('saveColor', () => {
-    it('should save color', async () => {
-      // Arrange
-      const colorToSave: Color = new ColorBuilder().build();
-      const savedColor: Color = new ColorBuilder()
-        .withId(1)
-        .build();
+    describe('should save color', () => {
+      it('with 3 digit hexCode', async () => {
+        // Arrange
+        const hexCode: string = '#F00';
+        const colorToSave: Color = new ColorBuilder()
+            .withHexCode(hexCode)
+            .build();
+        const savedColor: Color = new ColorBuilder()
+            .withId(1)
+            .build();
 
-      colorRepositoryStub.save.resolves(savedColor);
+        colorRepositoryStub.save.resolves(savedColor);
 
-      // Act
-      const saveColorResult: Color = await colorService.saveColor(colorToSave);
+        // Act
+        const saveColorResult: Color = await colorService.saveColor(colorToSave);
 
-      // Assert
-      expect(saveColorResult).to.be.eql(savedColor);
-      expect(colorRepositoryStub.find).to.be.calledOnceWith({
-        select: ['id'],
-        where: [
-          { name: colorToSave.name },
-          { hexCode: colorToSave.hexCode },
-        ],
+        // Assert
+        expect(saveColorResult).to.be.eql(savedColor);
+        expect(colorRepositoryStub.find).to.be.calledOnceWith({
+          select: ['id'],
+          where: [
+            { name: colorToSave.name },
+            { hexCode: colorToSave.hexCode },
+          ],
+        });
+        expect(colorRepositoryStub.save).to.be.calledOnceWith({
+          name: colorToSave.name,
+          hexCode: colorToSave.hexCode,
+        });
       });
-      expect(colorRepositoryStub.save).to.be.calledOnceWith(colorToSave);
+
+      it('with 6 digit hexCode that can be shorter', async () => {
+        // Arrange
+        const hexCode: string = '#FF0000';
+        const colorToSave: Color = new ColorBuilder()
+            .withHexCode(hexCode)
+            .build();
+        const savedColor: Color = new ColorBuilder()
+            .withId(1)
+            .build();
+
+        colorRepositoryStub.save.resolves(savedColor);
+
+        // Act
+        const saveColorResult: Color = await colorService.saveColor(colorToSave);
+
+        // Assert
+        const expectedHexCode: string = '#F00';
+
+        expect(saveColorResult).to.be.eql(savedColor);
+        expect(colorRepositoryStub.find).to.be.calledOnceWith({
+          select: ['id'],
+          where: [
+            { name: colorToSave.name },
+            { hexCode: expectedHexCode },
+          ],
+        });
+        expect(colorRepositoryStub.save).to.be.calledOnceWith({
+          name: colorToSave.name,
+          hexCode: expectedHexCode,
+        });
+      });
+
+      it("with 6 digit hexCode that can't be shorter", async () => {
+        // Arrange
+        const hexCode: string = '#FF1234';
+        const colorToSave: Color = new ColorBuilder()
+            .withHexCode(hexCode)
+            .build();
+        const savedColor: Color = new ColorBuilder()
+            .withId(1)
+            .build();
+
+        colorRepositoryStub.save.resolves(savedColor);
+
+        // Act
+        const saveColorResult: Color = await colorService.saveColor(colorToSave);
+
+        // Assert
+        const expectedHexCode: string = '#FF1234';
+
+        expect(saveColorResult).to.be.eql(savedColor);
+        expect(colorRepositoryStub.find).to.be.calledOnceWith({
+          select: ['id'],
+          where: [
+            { name: colorToSave.name },
+            { hexCode: colorToSave.hexCode },
+          ],
+        });
+        expect(colorRepositoryStub.save).to.be.calledOnceWith({
+          name: colorToSave.name,
+          hexCode: expectedHexCode,
+        });
+      });
+
+      it('with uppercase hexCode', async () => {
+        // Arrange
+        const hexCode: string = '#Ffcc12';
+        const colorToSave: Color = new ColorBuilder()
+            .withHexCode(hexCode)
+            .build();
+        const savedColor: Color = new ColorBuilder()
+            .withId(1)
+            .build();
+
+        colorRepositoryStub.save.resolves(savedColor);
+
+        // Act
+        const saveColorResult: Color = await colorService.saveColor(colorToSave);
+
+        // Assert
+        const expectedHexCode: string = '#FFCC12';
+
+        expect(saveColorResult).to.be.eql(savedColor);
+        expect(colorRepositoryStub.find).to.be.calledOnceWith({
+          select: ['id'],
+          where: [
+            { name: colorToSave.name },
+            { hexCode: expectedHexCode },
+          ],
+        });
+        expect(colorRepositoryStub.save).to.be.calledOnceWith({
+          name: colorToSave.name,
+          hexCode: expectedHexCode,
+        });
+      });
     });
 
     describe('should throw error', () => {
