@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {ModelResolver} from './model.resolver';
 import {ModelFacade} from '../facades/model.facade';
 import {PaginationMapper} from '../mapper/pagination.mapper';
-import {PaginationOptions} from '../models/common/filters/paginationOptions';
+import {PaginationOptions} from '../models/common/filters/pagination-options';
 import {PaginationInput} from '../models/inputs/pagination/pagination.input';
 import {Model} from '../models/entities/model';
 import {ModelBuilder} from '../../test/utils/builders/model.builder';

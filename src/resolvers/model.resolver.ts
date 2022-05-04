@@ -5,7 +5,7 @@ import {ModelFacade} from '../facades/model.facade';
 import {ModelsWithCountOutput} from '../models/object-types/car/models-with-count-output';
 import {PaginationInput} from '../models/inputs/pagination/pagination.input';
 import {PaginationMapper} from '../mapper/pagination.mapper';
-import {PaginationOptions} from '../models/common/filters/paginationOptions';
+import {PaginationOptions} from '../models/common/filters/pagination-options';
 import {Model} from '../models/entities/model';
 
 @Service()
