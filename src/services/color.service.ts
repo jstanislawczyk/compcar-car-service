@@ -46,14 +46,6 @@ export class ColorService {
       existingColor.hexCode = colorUpdate.hexCode;
     }
 
-    try {
-      return await this.colorRepository.save(existingColor);
-    } catch (error: any) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new DuplicateEntryError(error.message);
-      } else {
-        throw error;
-      }
-    }
+    return await this.saveColor(existingColor);
   }
 }
