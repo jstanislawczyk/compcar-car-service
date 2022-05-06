@@ -2,9 +2,9 @@ import {Service} from 'typedi';
 import {InjectRepository} from 'typeorm-typedi-extensions';
 import {ColorRepository} from '../repositories/color.repository';
 import {Color} from '../models/entities/color';
-import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
 import {ColorUpdate} from '../models/common/update/color-update';
 import {NotFoundError} from '../models/errors/not-found.error';
+import {DuplicateEntryError} from '../models/errors/duplicate-entry.error';
 
 @Service()
 export class ColorService {
@@ -20,19 +20,15 @@ export class ColorService {
   }
 
   public async saveColor(color: Color): Promise<Color> {
-    const existingColors: Color[] = await this.colorRepository.find({
-      select: ['id'],
-      where: [
-        { name: color.name },
-        { hexCode: color.hexCode },
-      ],
-    });
-
-    if (existingColors.length > 0) {
-      throw new EntityAlreadyExistsError('Color with given name or hex code already exists');
+    try {
+      return await this.colorRepository.save(color);
+    } catch (error: any) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new DuplicateEntryError(error.message);
+      } else {
+        throw error;
+      }
     }
-
-    return this.colorRepository.save(color);
   }
 
   public async updateColor(colorUpdate: ColorUpdate): Promise<Color> {
@@ -50,6 +46,14 @@ export class ColorService {
       existingColor.hexCode = colorUpdate.hexCode;
     }
 
-    return this.colorRepository.save(existingColor);
+    try {
+      return await this.colorRepository.save(existingColor);
+    } catch (error: any) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new DuplicateEntryError(error.message);
+      } else {
+        throw error;
+      }
+    }
   }
 }

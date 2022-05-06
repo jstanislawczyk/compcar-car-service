@@ -1,4 +1,4 @@
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, Index, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {Field, ID, ObjectType} from 'type-graphql';
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {Painting} from './painting';
@@ -15,11 +15,17 @@ export class Color {
   @Column({
     length: 64,
   })
+  @Index({
+    unique: true,
+  })
   public name: string;
 
   @Field()
   @Column({
     length: 8,
+  })
+  @Index({
+    unique: true,
   })
   public hexCode: string;
 
