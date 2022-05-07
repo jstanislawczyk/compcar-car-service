@@ -1,5 +1,5 @@
 import {Field, ID, ObjectType} from 'type-graphql';
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, Index, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {CarAddon} from './car-addon';
 
@@ -14,6 +14,9 @@ export class Addon {
   @Field()
   @Column({
     length: 128,
+  })
+  @Index({
+    unique: true,
   })
   public name: string;
 
