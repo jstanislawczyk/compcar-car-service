@@ -7,10 +7,10 @@ import {ColorUpdate} from '../models/common/update/color-update';
 @Service()
 export class ColorMapper {
 
-  public toEntity(createCommentInput: CreateColorInput): Color {
+  public toEntity(createColorInput: CreateColorInput): Color {
     return {
-      name: createCommentInput.name,
-      hexCode: this.getSanitizedHexCode(createCommentInput.hexCode),
+      name: createColorInput.name,
+      hexCode: this.getSanitizedHexCode(createColorInput.hexCode),
     };
   }
 

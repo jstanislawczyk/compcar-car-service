@@ -20,7 +20,7 @@ export class ColorResolver {
 
   @Query(() => [Color])
   public async getColors(): Promise<Color[]> {
-    Logger.log('Fetching all comments');
+    Logger.log('Fetching all colors');
 
     return await this.colorService.findAll();
   }
