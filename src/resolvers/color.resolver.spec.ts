@@ -8,6 +8,8 @@ import {ColorResolver} from './color.resolver';
 import {ColorBuilder} from '../../test/utils/builders/color.builder';
 import {Color} from '../models/entities/color';
 import {CreateColorInput} from '../models/inputs/color/create-color.input';
+import {UpdateColorInput} from '../models/inputs/color/update-color.input';
+import {ColorUpdate} from '../models/common/update/color-update';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -103,6 +105,57 @@ context('ColorResolver', () => {
 
       // Assert
       await expect(returnedColorResult).to.eventually.be.rejectedWith('SaveColor error');
+    });
+  });
+
+  describe('updateColor', () => {
+    it('should update color', async () => {
+      // Arrange
+      const name: string = 'NewColor';
+      const hexCode: string = '#F00';
+      const mappedColorUpdate: ColorUpdate = {
+        id: 1,
+        name,
+        hexCode,
+      };
+      const updatedColor: Color = new ColorBuilder(true)
+          .withName('NewColor')
+          .build();
+      const updateColorInput: UpdateColorInput = {
+        id: mappedColorUpdate.id,
+        name: mappedColorUpdate.name,
+        hexCode: mappedColorUpdate.hexCode,
+      };
+
+      colorMapperStub.toUpdateModel.returns(mappedColorUpdate);
+      colorServiceStub.updateColor.resolves(updatedColor);
+
+      // Act
+      const returnedColor: Color = await colorResolver.updateColor(updateColorInput);
+
+      // Assert
+      expect(returnedColor).to.be.eql(updatedColor);
+      expect(colorMapperStub.toUpdateModel).to.be.calledOnceWith(updateColorInput);
+      expect(colorServiceStub.updateColor).to.be.calledOnceWith(mappedColorUpdate);
+    });
+
+    it('should throw error if color updating fails', async () => {
+      // Arrange
+      const mappedColorUpdate: ColorUpdate = {
+        id: 1,
+      };
+      const updateColorInput: UpdateColorInput = {
+        id: 1,
+      };
+
+      colorMapperStub.toUpdateModel.returns(mappedColorUpdate);
+      colorServiceStub.updateColor.rejects(new Error('UpdateColor error'));
+
+      // Act
+      const returnedColorResult: Promise<Color> = colorResolver.updateColor(updateColorInput);
+
+      // Assert
+      await expect(returnedColorResult).to.eventually.be.rejectedWith('UpdateColor error');
     });
   });
 });

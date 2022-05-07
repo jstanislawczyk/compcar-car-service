@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {PaginationMapper} from './pagination.mapper';
 import {PaginationInput} from '../models/inputs/pagination/pagination.input';
-import {PaginationOptions} from '../models/common/filters/paginationOptions';
+import {PaginationOptions} from '../models/common/filters/pagination-options';
 
 context('PaginationMapper', () => {
 

@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {ModelFacade} from './model.facade';
 import {ModelService} from '../services/model.service';
 import {ModelsWithCountOutput} from '../models/object-types/car/models-with-count-output';
-import {PaginationOptions} from '../models/common/filters/paginationOptions';
+import {PaginationOptions} from '../models/common/filters/pagination-options';
 import {Model} from '../models/entities/model';
 import {ModelBuilder} from '../../test/utils/builders/model.builder';
 

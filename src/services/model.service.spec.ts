@@ -6,7 +6,7 @@ import {ModelRepository} from '../repositories/model.repository';
 import {ModelService} from './model.service';
 import {ModelBuilder} from '../../test/utils/builders/model.builder';
 import {ModelsWithCountOutput} from '../models/object-types/car/models-with-count-output';
-import {PaginationOptions} from '../models/common/filters/paginationOptions';
+import {PaginationOptions} from '../models/common/filters/pagination-options';
 import {Model} from '../models/entities/model';
 import {NotFoundError} from '../models/errors/not-found.error';
 

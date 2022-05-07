@@ -6,7 +6,9 @@ import {ColorRepository} from '../repositories/color.repository';
 import {ColorService} from './color.service';
 import {Color} from '../models/entities/color';
 import {ColorBuilder} from '../../test/utils/builders/color.builder';
-import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
+import {NotFoundError} from '../models/errors/not-found.error';
+import {ColorUpdate} from '../models/common/update/color-update';
+import {DuplicateEntryError} from '../models/errors/duplicate-entry.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -68,10 +70,13 @@ context('ColorService', () => {
   describe('saveColor', () => {
     it('should save color', async () => {
       // Arrange
-      const colorToSave: Color = new ColorBuilder().build();
+      const hexCode: string = '#F00';
+      const colorToSave: Color = new ColorBuilder()
+          .withHexCode(hexCode)
+          .build();
       const savedColor: Color = new ColorBuilder()
-        .withId(1)
-        .build();
+          .withId(1)
+          .build();
 
       colorRepositoryStub.save.resolves(savedColor);
 
@@ -80,28 +85,29 @@ context('ColorService', () => {
 
       // Assert
       expect(saveColorResult).to.be.eql(savedColor);
-      expect(colorRepositoryStub.find).to.be.calledOnceWith({
-        select: ['id'],
-        where: [
-          { name: colorToSave.name },
-          { hexCode: colorToSave.hexCode },
-        ],
+      expect(colorRepositoryStub.save).to.be.calledOnceWith({
+        name: colorToSave.name,
+        hexCode: colorToSave.hexCode,
       });
-      expect(colorRepositoryStub.save).to.be.calledOnceWith(colorToSave);
     });
 
     describe('should throw error', () => {
-      it('if color or hexCode already exists', async () => {
+      it('duplicated entry error', async () => {
         // Arrange
-        colorRepositoryStub.find.resolves([new ColorBuilder().build()]);
+        const errorMessage: string = `Duplicate entry 'red' for key 'color.IDX_123'`;
+
+        colorRepositoryStub.save.rejects({
+          code: 'ER_DUP_ENTRY',
+          message: errorMessage,
+        });
 
         // Act
         const saveColorResult: Promise<Color> = colorService.saveColor(new ColorBuilder().build());
 
         // Assert
         await expect(saveColorResult).to.eventually.be
-          .rejectedWith('Color with given name or hex code already exists')
-          .and.be.an.instanceOf(EntityAlreadyExistsError);
+          .rejectedWith("Value 'red' already exists")
+          .and.be.an.instanceOf(DuplicateEntryError);
       });
 
       it('coming from repository', async () => {
@@ -112,7 +118,175 @@ context('ColorService', () => {
         const saveColorResult: Promise<Color> = colorService.saveColor(new ColorBuilder().build());
 
         // Assert
-        await expect(saveColorResult).to.eventually.be.rejectedWith('Save error');
+        await expect(saveColorResult).to.eventually.be
+            .rejectedWith('Save error')
+            .and.be.an.instanceOf(Error);
+      });
+    });
+  });
+
+  describe('updateColor', () => {
+    describe('should update color', () => {
+      it('with all properties', async () => {
+        // Arrange
+        const id: number = 1;
+        const newName: string = 'NewName';
+        const newHexCode: string = '#F00';
+        const colorUpdate: ColorUpdate = {
+          id,
+          name: newName,
+          hexCode: newHexCode,
+        };
+        const existingColor: Color = new ColorBuilder()
+            .withId(id)
+            .withName('OldName')
+            .withHexCode('#FFF')
+            .build();
+        const updatedColor: Color = new ColorBuilder()
+            .withId(id)
+            .withName(newName)
+            .withHexCode(newHexCode)
+            .build();
+
+        colorRepositoryStub.findOne.resolves(existingColor);
+        colorRepositoryStub.save.resolves(updatedColor);
+
+        // Act
+        const returnedColor: Color = await colorService.updateColor(colorUpdate);
+
+        // Assert
+        expect(returnedColor).to.be.eql(updatedColor);
+        expect(colorRepositoryStub.findOne).to.be.calledOnceWith(colorUpdate.id);
+        expect(colorRepositoryStub.save).to.be.calledOnceWith({
+          id: existingColor.id,
+          name: newName,
+          hexCode: newHexCode,
+        });
+      });
+
+      it('with single optional property', async () => {
+        // Arrange
+        const id: number = 1;
+        const newName: string = 'NewName';
+        const colorUpdate: ColorUpdate = {
+          id,
+          name: newName,
+        };
+        const existingColor: Color = new ColorBuilder()
+            .withId(id)
+            .withName('OldName')
+            .withHexCode('#FFF')
+            .build();
+        const updatedColor: Color = new ColorBuilder()
+            .withId(id)
+            .withName(newName)
+            .withHexCode(existingColor.hexCode)
+            .build();
+
+        colorRepositoryStub.findOne.resolves(existingColor);
+        colorRepositoryStub.save.resolves(updatedColor);
+
+        // Act
+        const returnedColor: Color = await colorService.updateColor(colorUpdate);
+
+        // Assert
+        expect(returnedColor).to.be.eql(updatedColor);
+        expect(colorRepositoryStub.findOne).to.be.calledOnceWith(colorUpdate.id);
+        expect(colorRepositoryStub.save).to.be.calledOnceWith({
+          id: existingColor.id,
+          name: newName,
+          hexCode: existingColor.hexCode,
+        });
+      });
+
+      it('with required properties only', async () => {
+        // Arrange
+        const id: number = 1;
+        const colorUpdate: ColorUpdate = {
+          id,
+        };
+        const existingColor: Color = new ColorBuilder()
+            .withId(id)
+            .withName('ColorName')
+            .withHexCode('#F00')
+            .build();
+        const updatedColor: Color = new ColorBuilder()
+            .withId(id)
+            .build();
+
+        colorRepositoryStub.findOne.resolves(existingColor);
+        colorRepositoryStub.save.resolves(updatedColor);
+
+        // Act
+        const returnedColor: Color = await colorService.updateColor(colorUpdate);
+
+        // Assert
+        expect(returnedColor).to.be.eql(updatedColor);
+        expect(colorRepositoryStub.findOne).to.be.calledOnceWith(colorUpdate.id);
+        expect(colorRepositoryStub.save).to.be.calledOnceWith({
+          id: existingColor.id,
+          name: existingColor.name,
+          hexCode: existingColor.hexCode,
+        });
+      });
+    });
+
+    describe('should throw error', () => {
+      it("if color doesn't exist", async () => {
+        // Arrange
+        const colorUpdate: ColorUpdate = {
+          id: 1,
+        };
+
+        colorRepositoryStub.findOne.resolves(undefined);
+
+        // Act
+        const updateColorResult: Promise<Color> = colorService.updateColor(colorUpdate);
+
+        // Assert
+        await expect(updateColorResult).to.eventually.be
+            .rejectedWith(`Color with id=${colorUpdate.id} not found`)
+            .and.be.an.instanceOf(NotFoundError);
+      });
+
+      it('duplicated entry error', async () => {
+        // Arrange
+        const errorMessage: string = `Duplicate entry 'red' for key 'color.IDX_123'`;
+        const colorUpdate: ColorUpdate = {
+          id: 1,
+        };
+
+        colorRepositoryStub.findOne.resolves(new ColorBuilder().build());
+        colorRepositoryStub.save.rejects({
+          code: 'ER_DUP_ENTRY',
+          message: errorMessage,
+        });
+
+        // Act
+        const updateColorResult: Promise<Color> = colorService.updateColor(colorUpdate);
+
+        // Assert
+        await expect(updateColorResult).to.eventually.be
+          .rejectedWith("Value 'red' already exists")
+          .and.be.an.instanceOf(DuplicateEntryError);
+      });
+
+      it('coming from ColorRepository save method', async () => {
+        // Arrange
+        const colorUpdate: ColorUpdate = {
+          id: 1,
+        };
+
+        colorRepositoryStub.findOne.resolves(new ColorBuilder().build());
+        colorRepositoryStub.save.rejects(new Error('Save error'));
+
+        // Act
+        const updateColorResult: Promise<Color> = colorService.updateColor(colorUpdate);
+
+        // Assert
+        await expect(updateColorResult).to.eventually.be
+            .rejectedWith('Save error')
+            .and.be.an.instanceOf(Error);
       });
     });
   });

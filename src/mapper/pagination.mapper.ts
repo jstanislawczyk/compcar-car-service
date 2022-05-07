@@ -1,5 +1,5 @@
 import {Service} from 'typedi';
-import {PaginationOptions} from '../models/common/filters/paginationOptions';
+import {PaginationOptions} from '../models/common/filters/pagination-options';
 import {PaginationInput} from '../models/inputs/pagination/pagination.input';
 
 @Service()

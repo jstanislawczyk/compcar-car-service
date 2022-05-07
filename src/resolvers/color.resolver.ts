@@ -5,6 +5,8 @@ import {Color} from '../models/entities/color';
 import {ColorService} from '../services/color.service';
 import {CreateColorInput} from '../models/inputs/color/create-color.input';
 import {ColorMapper} from '../mapper/color.mapper';
+import {UpdateColorInput} from '../models/inputs/color/update-color.input';
+import {ColorUpdate} from '../models/common/update/color-update';
 
 @Service()
 @Resolver(() => Color)
@@ -34,4 +36,14 @@ export class ColorResolver {
     return await this.colorService.saveColor(color);
   }
 
+  @Mutation(() => Color)
+  public async updateColor(
+    @Arg('updateColorInput') updateColorInput: UpdateColorInput,
+  ): Promise<Color> {
+    Logger.log(`Updating color with id=${updateColorInput.id}`);
+
+    const color: ColorUpdate = this.colorMapper.toUpdateModel(updateColorInput);
+
+    return await this.colorService.updateColor(color);
+  }
 }
