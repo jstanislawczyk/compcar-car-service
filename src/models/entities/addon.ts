@@ -24,7 +24,7 @@ export class Addon {
   @Column({
     length: 256,
   })
-  public description?: string;
+  public description: string;
 
   @Field(() => [CarAddon])
   @OneToMany(
