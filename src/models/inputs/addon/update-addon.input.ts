@@ -8,13 +8,17 @@ export class UpdateAddonInput {
   @IsNumber()
   public readonly id: number;
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   @IsString()
   @MinLength(2)
   @MaxLength(64)
   public readonly name?: string;
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   @IsString()
   @MinLength(2)
   @MaxLength(64)

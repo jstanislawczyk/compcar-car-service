@@ -40,7 +40,7 @@ context('AddonResolver', () => {
       const savedAddons: Addon[] = [
         new AddonBuilder().build(),
         new AddonBuilder(true)
-          .withName('blue')
+          .withName('Air conditioner')
           .withDescription('Test description')
           .build(),
       ];
@@ -73,7 +73,7 @@ context('AddonResolver', () => {
       const mappedAddon: Addon = new AddonBuilder().build();
       const savedAddon: Addon = new AddonBuilder(true).build();
       const createAddonInput: CreateAddonInput = {
-        name: 'green',
+        name: 'Air conditioner',
         description: 'Test description',
       };
 
@@ -93,7 +93,7 @@ context('AddonResolver', () => {
       // Arrange
       const mappedAddon: Addon = new AddonBuilder().build();
       const createAddonInput: CreateAddonInput = {
-        name: 'green',
+        name: 'Air conditioner',
         description: 'Test description',
       };
 

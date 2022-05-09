@@ -38,7 +38,7 @@ context('AddonService', () => {
       const addonsList: Addon[] = [
         new AddonBuilder(true).build(),
         new AddonBuilder(true)
-          .withName('blue')
+          .withName('Air conditioner')
           .withDescription('Test description')
           .build(),
       ];
