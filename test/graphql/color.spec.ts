@@ -276,6 +276,54 @@ describe('Color', () => {
 
   describe('updateColor', () => {
     describe('should update color', () => {
+      it('all properties', async () => {
+        // Arrange
+        const existingColor: Color = new ColorBuilder()
+          .withName('blue')
+          .withHexCode('#00F')
+          .build();
+        const updateColorInput: UpdateColorInput = {
+          id: 1,
+          name: 'green',
+          hexCode: '#0F0',
+        };
+
+        await ColorDatabaseUtils.saveColor(existingColor);
+
+        const query: string = `
+          mutation {
+            updateColor (
+              updateColorInput: {
+                id: ${existingColor.id},
+                name: "${updateColorInput.name}",
+                hexCode: "${updateColorInput.hexCode}",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const savedColorResponse: Color = response.body.data.updateColor as Color;
+        expect(Number(savedColorResponse.id)).to.be.above(0);
+        expect(savedColorResponse.name).to.be.eql('green');
+        expect(savedColorResponse.hexCode).to.be.eql('#0F0');
+        expect(savedColorResponse.paintings).to.be.undefined;
+
+        const existingColorAfterUpdate: Color = await ColorDatabaseUtils.getColorByIdOrFail(Number(existingColor.id));
+        expect(savedColorResponse.id).to.be.be.eql(existingColorAfterUpdate.id?.toString());
+        expect(savedColorResponse.name).to.be.be.eql(existingColorAfterUpdate.name);
+        expect(savedColorResponse.hexCode).to.be.be.eql(existingColorAfterUpdate.hexCode);
+      });
+
       it('with 3 digit hex code', async () => {
         // Arrange
         const existingColor: Color = new ColorBuilder()
