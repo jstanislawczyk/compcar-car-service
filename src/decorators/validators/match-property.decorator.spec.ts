@@ -12,7 +12,7 @@ context('MatchProperty', () => {
     };
 
     // Act
-    const registeredDecorator: (object: any, propertyName: string) => void = MatchProperty(matchProperty);
+    const registeredDecorator: (object: Record<string, any>, propertyName: string) => void = MatchProperty(matchProperty);
     registeredDecorator(object, propertyName);
 
     // Assert

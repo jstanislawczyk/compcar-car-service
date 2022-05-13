@@ -11,7 +11,7 @@ context('IsPassword', () => {
     };
 
     // Act
-    const registeredDecorator: (object: any, propertyName: string) => void = IsPassword();
+    const registeredDecorator: (object: Record<string, any>, propertyName: string) => void = IsPassword();
     registeredDecorator(object, propertyName);
 
     // Assert
