@@ -7,12 +7,12 @@ export class CreateAddonInput {
   @Field()
   @IsString()
   @MinLength(2)
-  @MaxLength(64)
+  @MaxLength(128)
   public readonly name: string;
 
   @Field()
   @IsString()
   @MinLength(2)
-  @MaxLength(64)
+  @MaxLength(256)
   public readonly description: string;
 }
