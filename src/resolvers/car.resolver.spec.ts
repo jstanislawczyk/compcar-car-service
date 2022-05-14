@@ -31,6 +31,44 @@ context('CarResolver', () => {
   describe('getCarById', () => {
     it('should find car by id', async () => {
       // Arrange
+      const firstCar: Car = new CarBuilder()
+        .withId(1)
+        .withName('First car')
+        .build();
+      const secondCar: Car = new CarBuilder()
+        .withId(2)
+        .withName('Second car')
+        .build();
+      const existingCars: Car[] = [firstCar, secondCar];
+
+      carFacadeStub.findAllCars.resolves(existingCars);
+
+      // Act
+      const returnedCars: Car[] = await carResolver.getAllCars();
+
+      // Assert
+      expect(returnedCars).to.be.eql(existingCars);
+      expect(carFacadeStub.findAllCars).to.be.calledOnce;
+    });
+
+    it('should rethrow error from facade', async () => {
+      // Arrange
+      carFacadeStub.findAllCars.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedCarsResult: Promise<Car[]> = carResolver.getAllCars();
+
+      // Assert
+      await expect(returnedCarsResult).to.eventually
+        .be.rejectedWith('Not Found')
+        .and.to.be.an.instanceOf(Error);
+      expect(carFacadeStub.findAllCars).to.be.calledOnce;
+    });
+  });
+
+  describe('getCarById', () => {
+    it('should find car by id', async () => {
+      // Arrange
       const carId: number = 1;
       const existingCar: Car = new CarBuilder()
           .withId(carId)

@@ -18,15 +18,107 @@ describe('Car', () => {
     await CarDatabaseUtils.deleteAllCars();
   });
 
+
   describe('getCarById', () => {
+    it('should get cars list', async () => {
+      // Arrange
+      const firstCar: Car = new CarBuilder()
+        .withName('B7')
+        .withDescription('First description')
+        .withBasePrice(40000)
+        .withStartYear(2012)
+        .withEndYear(2019)
+        .withWeight(1300)
+        .withBodyStyle(BodyStyle.SEDAN)
+        .build();
+      const secondCar: Car = new CarBuilder()
+        .withName('B6')
+        .withDescription('Second description')
+        .withBasePrice(20000)
+        .withStartYear(2002)
+        .withEndYear(2006)
+        .withWeight(1200)
+        .withBodyStyle(BodyStyle.KOMBI)
+        .build();
+      const savedCars: Car[] = await CarDatabaseUtils.saveCarsList([firstCar, secondCar]);
+      const query: string = `
+        {
+          getAllCars {
+            id,
+            name,
+            description,
+            basePrice,
+            startYear,
+            endYear,
+            weight,
+            bodyStyle,
+          }
+        }
+      `;
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
+
+      const returnedCarResponse: Car[] = response.body.data.getAllCars as Car[];
+      expect(Number(returnedCarResponse[0].id)).to.eql(savedCars[0].id);
+      expect(returnedCarResponse[0].name).to.be.eql('B7');
+      expect(returnedCarResponse[0].description).to.be.eql('First description');
+      expect(returnedCarResponse[0].basePrice).to.be.eql(40000);
+      expect(returnedCarResponse[0].weight).to.be.eql(1300);
+      expect(returnedCarResponse[0].bodyStyle).to.be.eql(BodyStyle.SEDAN);
+      expect(returnedCarResponse[0].startYear).to.be.eql(2012);
+      expect(returnedCarResponse[0].endYear).to.be.eql(2019);
+      expect(returnedCarResponse[0].paintings).to.be.undefined;
+      expect(returnedCarResponse[0].generation).to.be.undefined;
+      expect(returnedCarResponse[0].carAddons).to.be.undefined;
+      expect(returnedCarResponse[0].carEngines).to.be.undefined;
+      expect(returnedCarResponse[0].photos).to.be.undefined;
+      expect(Number(returnedCarResponse[1].id)).to.eql(savedCars[1].id);
+      expect(returnedCarResponse[1].name).to.be.eql('B6');
+      expect(returnedCarResponse[1].description).to.be.eql('Second description');
+      expect(returnedCarResponse[1].basePrice).to.be.eql(20000);
+      expect(returnedCarResponse[1].weight).to.be.eql(1200);
+      expect(returnedCarResponse[1].bodyStyle).to.be.eql(BodyStyle.KOMBI);
+      expect(returnedCarResponse[1].startYear).to.be.eql(2002);
+      expect(returnedCarResponse[1].endYear).to.be.eql(2006);
+      expect(returnedCarResponse[1].paintings).to.be.undefined;
+      expect(returnedCarResponse[1].generation).to.be.undefined;
+      expect(returnedCarResponse[1].carAddons).to.be.undefined;
+      expect(returnedCarResponse[1].carEngines).to.be.undefined;
+      expect(returnedCarResponse[1].photos).to.be.undefined;
+
+      const existingCars: Car[] = await CarDatabaseUtils.getAllCars();
+      expect(returnedCarResponse[0].id).to.be.be.eql(existingCars[0].id?.toString());
+      expect(returnedCarResponse[0].name).to.be.be.eql(existingCars[0].name);
+      expect(returnedCarResponse[0].description).to.be.be.eql(existingCars[0].description);
+      expect(returnedCarResponse[0].basePrice).to.be.eql(existingCars[0].basePrice);
+      expect(returnedCarResponse[0].weight).to.be.eql(existingCars[0].weight);
+      expect(returnedCarResponse[0].bodyStyle).to.be.eql(existingCars[0].bodyStyle);
+      expect(returnedCarResponse[0].startYear).to.be.eql(existingCars[0].startYear);
+      expect(returnedCarResponse[0].endYear).to.be.eql(existingCars[0].endYear);
+      expect(returnedCarResponse[1].id).to.be.be.eql(existingCars[1].id?.toString());
+      expect(returnedCarResponse[1].name).to.be.be.eql(existingCars[1].name);
+      expect(returnedCarResponse[1].description).to.be.be.eql(existingCars[1].description);
+      expect(returnedCarResponse[1].basePrice).to.be.eql(existingCars[1].basePrice);
+      expect(returnedCarResponse[1].weight).to.be.eql(existingCars[1].weight);
+      expect(returnedCarResponse[1].bodyStyle).to.be.eql(existingCars[1].bodyStyle);
+      expect(returnedCarResponse[1].startYear).to.be.eql(existingCars[1].startYear);
+      expect(returnedCarResponse[1].endYear).to.be.eql(existingCars[1].endYear);
+    });
+  });
+
+  describe('getAllCars', () => {
     it('should get car by id', async () => {
       // Arrange
       const car: Car = new CarBuilder(true)
           .withName('B6')
           .withDescription('Test description')
           .withBasePrice(20000)
-          .withStartYear('2012')
-          .withEndYear('2019')
+          .withStartYear(2012)
+          .withEndYear(2019)
           .withWeight(1200)
           .withBodyStyle(BodyStyle.KOMBI)
           .build();
@@ -59,8 +151,8 @@ describe('Car', () => {
       expect(returnedCarResponse.basePrice).to.be.eql(20000);
       expect(returnedCarResponse.weight).to.be.eql(1200);
       expect(returnedCarResponse.bodyStyle).to.be.eql(BodyStyle.KOMBI);
-      expect(returnedCarResponse.startYear).to.be.eql('2012');
-      expect(returnedCarResponse.endYear).to.be.eql('2019');
+      expect(returnedCarResponse.startYear).to.be.eql(2012);
+      expect(returnedCarResponse.endYear).to.be.eql(2019);
       expect(returnedCarResponse.paintings).to.be.undefined;
       expect(returnedCarResponse.generation).to.be.undefined;
       expect(returnedCarResponse.carAddons).to.be.undefined;

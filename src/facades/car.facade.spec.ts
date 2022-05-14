@@ -28,6 +28,44 @@ context('CarFacade', () => {
     sandbox.restore();
   });
 
+  describe('findAllCars', () => {
+    it('should find all cars', async () => {
+      // Arrange
+      const firstCar: Car = new CarBuilder()
+        .withId(1)
+        .withName('First car')
+        .build();
+      const secondCar: Car = new CarBuilder()
+        .withId(2)
+        .withName('Second car')
+        .build();
+      const existingCars: Car[] = [firstCar, secondCar];
+
+      carServiceStub.findAll.resolves(existingCars);
+
+      // Act
+      const returnedCars: Car[] = await carFacade.findAllCars();
+
+      // Assert
+      expect(returnedCars).to.be.eql(existingCars);
+      expect(carServiceStub.findAll).to.be.calledOnce;
+    });
+
+    it('should rethrow error from car service', async () => {
+      // Arrange
+      carServiceStub.findAll.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedCarsResult: Promise<Car[]> = carFacade.findAllCars();
+
+      // Assert
+      await expect(returnedCarsResult).to.eventually
+        .be.rejectedWith('Not Found')
+        .and.to.be.an.instanceOf(Error);
+      expect(carServiceStub.findAll).to.be.calledOnceWith();
+    });
+  });
+
   describe('findCarById', () => {
     it('should find car by id', async () => {
       // Arrange

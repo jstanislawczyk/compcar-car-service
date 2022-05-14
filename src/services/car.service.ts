@@ -13,6 +13,10 @@ export class CarService {
   ) {
   }
 
+  public findAll(): Promise<Car[]> {
+    return this.carRepository.find();
+  }
+
   public async findOne(id: number): Promise<Car> {
     try {
       return await this.carRepository.findOneOrFail(id);

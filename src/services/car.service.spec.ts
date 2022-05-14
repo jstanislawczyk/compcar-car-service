@@ -30,6 +30,45 @@ context('CarService', () => {
     sandbox.restore();
   });
 
+
+  describe('findAll', () => {
+    it('should find cars', async () => {
+      // Arrange
+      const firstCar: Car = new CarBuilder()
+        .withId(1)
+        .withName('First car')
+        .build();
+      const secondCar: Car = new CarBuilder()
+        .withId(2)
+        .withName('Second car')
+        .build();
+      const existingCars: Car[] = [firstCar, secondCar];
+
+      carRepositoryStub.find.resolves(existingCars);
+
+      // Act
+      const returnedCars: Car[] = await carService.findAll();
+
+      // Assert
+      expect(returnedCars).to.be.eql(existingCars);
+      expect(carRepositoryStub.find).to.be.calledOnce;
+    });
+
+    it('should rethrow error from repository', async () => {
+      // Arrange
+      carRepositoryStub.find.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedCarsResult: Promise<Car[]> = carService.findAll();
+
+      // Assert
+      await expect(returnedCarsResult).to.eventually
+        .be.rejectedWith('Not Found')
+        .and.to.be.an.instanceOf(Error);
+      expect(carRepositoryStub.find).to.be.calledOnce;
+    });
+  });
+
   describe('findOne', () => {
     it('should find car by id', async () => {
       // Arrange

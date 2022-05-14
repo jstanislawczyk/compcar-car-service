@@ -10,6 +10,10 @@ export class CarFacade {
   ) {
   }
 
+  public findAllCars(): Promise<Car[]> {
+    return this.carService.findAll();
+  }
+
   public findCarById(id: number): Promise<Car> {
     return this.carService.findOne(id);
   }
