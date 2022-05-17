@@ -6,6 +6,7 @@ import {Car} from '../models/entities/car';
 import {CarResolver} from './car.resolver';
 import {CarFacade} from '../facades/car.facade';
 import {CarBuilder} from '../../test/utils/builders/car.builder';
+import {CarMapper} from '../mapper/car.mapper';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -14,6 +15,7 @@ context('CarResolver', () => {
 
   let sandbox: SinonSandbox;
   let carFacadeStub: SinonStubbedInstance<CarFacade>;
+  let carMapperStub: SinonStubbedInstance<CarMapper>;
   let carResolver: CarResolver;
 
   beforeEach(() => {
@@ -21,7 +23,7 @@ context('CarResolver', () => {
 
     carFacadeStub = sandbox.createStubInstance(CarFacade);
 
-    carResolver = new CarResolver(carFacadeStub);
+    carResolver = new CarResolver(carFacadeStub, carMapperStub);
   });
 
   afterEach(() => {

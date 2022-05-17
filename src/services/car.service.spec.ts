@@ -103,4 +103,39 @@ context('CarService', () => {
       expect(carRepositoryStub.findOneOrFail).to.be.calledOnceWith(carId);
     });
   });
+
+  describe('saveCar', () => {
+    it('should save car', async () => {
+      // Arrange
+      const newCar: Car = new CarBuilder().build();
+      const savedCar: Car = new CarBuilder()
+        .withId(1)
+        .build();
+
+      carRepositoryStub.save.resolves(savedCar);
+
+      // Act
+      const returnedCar: Car = await carService.saveCar(newCar);
+
+      // Assert
+      expect(returnedCar).to.be.eql(savedCar);
+      expect(carRepositoryStub.save).to.be.calledOnceWith(newCar);
+    });
+
+    it('should rethrow error from repository', async () => {
+      // Arrange
+      const newCar: Car = new CarBuilder().build();
+
+      carRepositoryStub.save.rejects(new Error('Save error'));
+
+      // Act
+      const returnedCarResult: Promise<Car> = carService.saveCar(newCar);
+
+      // Assert
+      await expect(returnedCarResult).to.eventually
+        .be.rejectedWith('Save error')
+        .and.to.be.an.instanceOf(Error);
+      expect(carRepositoryStub.save).to.be.calledOnceWith(newCar);
+    });
+  });
 });

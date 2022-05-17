@@ -24,4 +24,8 @@ export class CarService {
       throw new NotFoundError(`Car with id=${id} not found`);
     }
   }
+
+  public saveCar(car: Car): Promise<Car> {
+    return this.carRepository.save(car);
+  }
 }

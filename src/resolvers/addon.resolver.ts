@@ -6,7 +6,7 @@ import {AddonService} from '../services/addon.service';
 import {CreateAddonInput} from '../models/inputs/addon/create-addon.input';
 import {AddonMapper} from '../mapper/addon.mapper';
 import {UpdateAddonInput} from '../models/inputs/addon/update-addon.input';
-import {AddonUpdate} from '../models/common/update/addon-update';
+import {AddonUpdate} from '../models/common/update/addon.update';
 
 @Service()
 @Resolver(() => Addon)

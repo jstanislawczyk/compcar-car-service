@@ -4,6 +4,8 @@ import {Logger} from '../common/logger';
 import {Car} from '../models/entities/car';
 import {CarFacade} from '../facades/car.facade';
 import {CreateCarInput} from '../models/inputs/car/create-car.input';
+import {CarCreate} from '../models/common/create/car.create';
+import {CarMapper} from '../mapper/car.mapper';
 
 @Service()
 @Resolver(() => Car)
@@ -11,6 +13,7 @@ export class CarResolver {
 
   constructor(
     private readonly carFacade: CarFacade,
+    private readonly carMapper: CarMapper,
   ) {
   }
 
@@ -32,8 +35,8 @@ export class CarResolver {
   public async createCar(
     @Arg('createCarInput') createCarInput: CreateCarInput,
   ): Promise<Car> {
-    return {
-      id: 1,
-    } as Car;
+    const carCreate: CarCreate = this.carMapper.toCreateModel(createCarInput);
+
+    return this.carFacade.saveCar(carCreate);
   }
 }
