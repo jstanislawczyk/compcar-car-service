@@ -4,6 +4,7 @@ import {Car} from '../models/entities/car';
 import {CarCreate} from '../models/common/create/car.create';
 import {GenerationService} from '../services/generation.service';
 import {Generation} from '../models/entities/generation';
+import {PhotoService} from '../services/photo.service';
 import {Photo} from '../models/entities/photo';
 
 @Service()
@@ -12,6 +13,7 @@ export class CarFacade {
   constructor(
     private readonly carService: CarService,
     private readonly generationService: GenerationService,
+    private readonly photoService: PhotoService,
   ) {
   }
 
@@ -23,14 +25,18 @@ export class CarFacade {
     return this.carService.findOne(id);
   }
 
-  public async saveCar(carCreate: CarCreate): Promise<Car> {
+  public async createCar(carCreate: CarCreate): Promise<Car> {
     const car: Car = await this.buildCar(carCreate);
-    const generation: Generation = await this.generationService.findOne(carCreate.generationId);
 
     return this.carService.saveCar(car);
   }
 
   private async buildCar(carCreate: CarCreate): Promise<Car> {
+    const generation: Generation = await this.generationService.findOne(carCreate.generationId);
+    const photos: Photo[] | undefined = carCreate.photosIds && carCreate.photosIds.length > 0
+      ? await this.photoService.findRelatedPhotosByIds(carCreate.photosIds)
+      : undefined;
+
     return {
       description: carCreate.description,
       name: carCreate.name,
@@ -39,13 +45,8 @@ export class CarFacade {
       endYear: carCreate.endYear,
       weight: carCreate.weight,
       bodyStyle: carCreate.bodyStyle,
-      photos: await this.getPhotos(carCreate.photosIds),
+      generation,
+      photos,
     };
-  }
-
-  private async getPhotos(photosIds?: number[]): Promise<Photo[] | undefined> {
-    if (!photosIds) {
-      return undefined;
-    }
   }
 }
