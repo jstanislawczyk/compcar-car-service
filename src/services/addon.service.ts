@@ -4,7 +4,7 @@ import {AddonRepository} from "../repositories/addon.repository";
 import {Addon} from "../models/entities/addon";
 import {NotFoundError} from '../models/errors/not-found.error';
 import {DuplicateEntryError} from '../models/errors/duplicate-entry.error';
-import {AddonUpdate} from '../models/common/update/addon-update';
+import {AddonUpdate} from '../models/common/update/addon.update';
 
 @Service()
 export class AddonService {

@@ -6,7 +6,7 @@ import {ColorService} from '../services/color.service';
 import {CreateColorInput} from '../models/inputs/color/create-color.input';
 import {ColorMapper} from '../mapper/color.mapper';
 import {UpdateColorInput} from '../models/inputs/color/update-color.input';
-import {ColorUpdate} from '../models/common/update/color-update';
+import {ColorUpdate} from '../models/common/update/color.update';
 
 @Service()
 @Resolver(() => Color)
