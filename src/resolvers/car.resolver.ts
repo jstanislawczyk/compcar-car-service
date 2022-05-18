@@ -18,7 +18,7 @@ export class CarResolver {
   }
 
   @Query(() => [Car])
-  public async getAllCars(): Promise<Car[]> {
+  public async getCars(): Promise<Car[]> {
     Logger.log('Fetching all cars');
 
     return await this.carFacade.findAllCars();
@@ -37,6 +37,6 @@ export class CarResolver {
   ): Promise<Car> {
     const carCreate: CarCreate = this.carMapper.toCreateModel(createCarInput);
 
-    return this.carFacade.saveCar(carCreate);
+    return this.carFacade.createCar(carCreate);
   }
 }

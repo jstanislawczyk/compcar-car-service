@@ -30,7 +30,7 @@ context('CarResolver', () => {
     sandbox.restore();
   });
 
-  describe('getCarById', () => {
+  describe('getCars', () => {
     it('should find car by id', async () => {
       // Arrange
       const firstCar: Car = new CarBuilder()
@@ -46,7 +46,7 @@ context('CarResolver', () => {
       carFacadeStub.findAllCars.resolves(existingCars);
 
       // Act
-      const returnedCars: Car[] = await carResolver.getAllCars();
+      const returnedCars: Car[] = await carResolver.getCars();
 
       // Assert
       expect(returnedCars).to.be.eql(existingCars);
@@ -58,7 +58,7 @@ context('CarResolver', () => {
       carFacadeStub.findAllCars.rejects(new Error('Not Found'));
 
       // Act
-      const returnedCarsResult: Promise<Car[]> = carResolver.getAllCars();
+      const returnedCarsResult: Promise<Car[]> = carResolver.getCars();
 
       // Assert
       await expect(returnedCarsResult).to.eventually
