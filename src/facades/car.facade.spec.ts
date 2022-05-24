@@ -6,6 +6,14 @@ import {CarFacade} from './car.facade';
 import {CarService} from '../services/car.service';
 import {CarBuilder} from '../../test/utils/builders/car.builder';
 import {Car} from '../models/entities/car';
+import {GenerationService} from '../services/generation.service';
+import {PhotoService} from '../services/photo.service';
+import {CarCreate} from '../models/common/create/car.create';
+import {BodyStyle} from '../models/enums/body-style';
+import {Generation} from '../models/entities/generation';
+import {GenerationBuilder} from '../../test/utils/builders/generation.builder';
+import {Photo} from '../models/entities/photo';
+import {PhotoBuilder} from '../../test/utils/builders/photo.builder';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -14,14 +22,18 @@ context('CarFacade', () => {
 
   let sandbox: SinonSandbox;
   let carServiceStub: SinonStubbedInstance<CarService>;
+  let generationServiceStub: SinonStubbedInstance<GenerationService>;
+  let photoServiceStub: SinonStubbedInstance<PhotoService>;
   let carFacade: CarFacade;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
     carServiceStub = sandbox.createStubInstance(CarService);
+    generationServiceStub = sandbox.createStubInstance(GenerationService);
+    photoServiceStub = sandbox.createStubInstance(PhotoService);
 
-    carFacade = new CarFacade(carServiceStub);
+    carFacade = new CarFacade(carServiceStub, generationServiceStub, photoServiceStub);
   });
 
   afterEach(() => {
@@ -98,6 +110,96 @@ context('CarFacade', () => {
           .be.rejectedWith('Not Found')
           .and.to.be.an.instanceOf(Error);
       expect(carServiceStub.findOne).to.be.calledOnceWith(carId);
+    });
+  });
+
+  describe('createCar', () => {
+    it('should create car with mandatory properties only', async () => {
+      // Arrange
+      const generationId: number = 1;
+      const generation: Generation = new GenerationBuilder(true)
+        .withId(generationId)
+        .build();
+      const carCreate: CarCreate = {
+        name: 'Audi',
+        description: 'Test car',
+        basePrice: 10000,
+        bodyStyle: BodyStyle.KOMBI,
+        startYear: 2010,
+        weight: 1600,
+        generationId,
+      };
+      const existingCar: Car =  new CarBuilder(true).build();
+
+      generationServiceStub.findOne.resolves(generation);
+      carServiceStub.saveCar.resolves(existingCar);
+
+      // Act
+      const returnedCar: Car = await carFacade.createCar(carCreate);
+
+      // Assert
+      expect(returnedCar).to.be.eql(existingCar);
+      expect(carServiceStub.saveCar).to.be.calledOnceWith({
+        description: carCreate.description,
+        name: carCreate.name,
+        basePrice: carCreate.basePrice,
+        startYear: carCreate.startYear,
+        endYear: carCreate.endYear,
+        weight: carCreate.weight,
+        bodyStyle: carCreate.bodyStyle,
+        generation,
+        photos: undefined,
+      });
+      expect(generationServiceStub.findOne).to.be.calledOnceWith(generationId);
+      expect(photoServiceStub.findRelatedPhotosByIds).to.be.not.called;
+    });
+
+    it('should create car with all properties', async () => {
+      // Arrange
+      const generationId: number = 1;
+      const generation: Generation = new GenerationBuilder(true)
+        .withId(generationId)
+        .build();
+      const firstPhoto: Photo = new PhotoBuilder(true).build();
+      const secondPhoto: Photo = new PhotoBuilder(true)
+        .withUrl('Second url')
+        .build();
+      const photos: Photo[] = [firstPhoto, secondPhoto];
+      const photosIds: number[] = photos.map((photo: Photo) => photo.id as number);
+      const carCreate: CarCreate = {
+        name: 'Audi',
+        description: 'Test car',
+        basePrice: 10000,
+        bodyStyle: BodyStyle.KOMBI,
+        startYear: 2010,
+        weight: 1600,
+        generationId,
+        photosIds,
+      };
+      const existingCar: Car =  new CarBuilder(true).build();
+
+      generationServiceStub.findOne.resolves(generation);
+      photoServiceStub.findRelatedPhotosByIds.resolves(photos);
+      carServiceStub.saveCar.resolves(existingCar);
+
+      // Act
+      const returnedCar: Car = await carFacade.createCar(carCreate);
+
+      // Assert
+      expect(returnedCar).to.be.eql(existingCar);
+      expect(carServiceStub.saveCar).to.be.calledOnceWith({
+        description: carCreate.description,
+        name: carCreate.name,
+        basePrice: carCreate.basePrice,
+        startYear: carCreate.startYear,
+        endYear: carCreate.endYear,
+        weight: carCreate.weight,
+        bodyStyle: carCreate.bodyStyle,
+        generation,
+        photos,
+      });
+      expect(generationServiceStub.findOne).to.be.calledOnceWith(generationId);
+      expect(photoServiceStub.findRelatedPhotosByIds).to.be.calledOnceWith(photosIds);
     });
   });
 });

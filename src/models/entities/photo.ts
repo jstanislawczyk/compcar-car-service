@@ -29,5 +29,5 @@ export class Photo {
     (car: Car) => car.photos,
   )
   @TypeormLoader()
-  public car: Car;
+  public car?: Car;
 }
