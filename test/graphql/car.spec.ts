@@ -18,8 +18,7 @@ describe('Car', () => {
     await CarDatabaseUtils.deleteAllCars();
   });
 
-
-  describe('getCarById', () => {
+  describe('getCars', () => {
     it('should get cars list', async () => {
       // Arrange
       const firstCar: Car = new CarBuilder()
@@ -43,7 +42,7 @@ describe('Car', () => {
       const savedCars: Car[] = await CarDatabaseUtils.saveCarsList([firstCar, secondCar]);
       const query: string = `
         {
-          getAllCars {
+          getCars {
             id,
             name,
             description,
@@ -62,7 +61,7 @@ describe('Car', () => {
         .send({ query })
         .expect(200);
 
-      const returnedCarResponse: Car[] = response.body.data.getAllCars as Car[];
+      const returnedCarResponse: Car[] = response.body.data.getCars as Car[];
       expect(Number(returnedCarResponse[0].id)).to.eql(savedCars[0].id);
       expect(returnedCarResponse[0].name).to.be.eql('B7');
       expect(returnedCarResponse[0].description).to.be.eql('First description');
@@ -110,7 +109,7 @@ describe('Car', () => {
     });
   });
 
-  describe('getAllCars', () => {
+  describe('getCarById', () => {
     it('should get car by id', async () => {
       // Arrange
       const car: Car = new CarBuilder(true)

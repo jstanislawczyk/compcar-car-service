@@ -129,7 +129,7 @@ context('CarFacade', () => {
         weight: 1600,
         generationId,
       };
-      const existingCar: Car =  new CarBuilder(true).build();
+      const existingCar: Car = new CarBuilder(true).build();
 
       generationServiceStub.findOne.resolves(generation);
       carServiceStub.saveCar.resolves(existingCar);
@@ -176,7 +176,7 @@ context('CarFacade', () => {
         generationId,
         photosIds,
       };
-      const existingCar: Car =  new CarBuilder(true).build();
+      const existingCar: Car = new CarBuilder(true).build();
 
       generationServiceStub.findOne.resolves(generation);
       photoServiceStub.findRelatedPhotosByIds.resolves(photos);
@@ -200,6 +200,104 @@ context('CarFacade', () => {
       });
       expect(generationServiceStub.findOne).to.be.calledOnceWith(generationId);
       expect(photoServiceStub.findRelatedPhotosByIds).to.be.calledOnceWith(photosIds);
+    });
+
+    describe('error handling', () => {
+      it('should rethrow error from GenerationService findOne method', async () => {
+        // Arrange
+        const generationId: number = 1;
+        const carCreate: CarCreate = {
+          name: 'Audi',
+          description: 'Test car',
+          basePrice: 10000,
+          bodyStyle: BodyStyle.KOMBI,
+          startYear: 2010,
+          weight: 1600,
+          generationId,
+        };
+
+        generationServiceStub.findOne.rejects(new Error('Find error'));
+
+        // Act
+        const returnedCarResult: Promise<Car> = carFacade.createCar(carCreate);
+
+        // Assert
+        await expect(returnedCarResult).to.eventually
+          .be.rejectedWith('Find error')
+          .and.to.be.an.instanceOf(Error);
+        expect(generationServiceStub.findOne).to.be.calledOnce;
+        expect(photoServiceStub.findRelatedPhotosByIds).to.be.not.called;
+        expect(carServiceStub.saveCar).to.be.not.called;
+      });
+
+      it('should rethrow error from PhotoService findRelatedPhotosByIds method', async () => {
+        // Arrange
+        const generationId: number = 1;
+        const generation: Generation = new GenerationBuilder(true)
+          .withId(generationId)
+          .build();
+        const firstPhoto: Photo = new PhotoBuilder(true).build();
+        const secondPhoto: Photo = new PhotoBuilder(true)
+          .withUrl('Second url')
+          .build();
+        const photos: Photo[] = [firstPhoto, secondPhoto];
+        const photosIds: number[] = photos.map((photo: Photo) => photo.id as number);
+        const carCreate: CarCreate = {
+          name: 'Audi',
+          description: 'Test car',
+          basePrice: 10000,
+          bodyStyle: BodyStyle.KOMBI,
+          startYear: 2010,
+          weight: 1600,
+          generationId,
+          photosIds,
+        };
+
+        generationServiceStub.findOne.resolves(generation);
+        photoServiceStub.findRelatedPhotosByIds.rejects(new Error('Find error'));
+
+        // Act
+        const returnedCarResult: Promise<Car> = carFacade.createCar(carCreate);
+
+        // Assert
+        await expect(returnedCarResult).to.eventually
+          .be.rejectedWith('Find error')
+          .and.to.be.an.instanceOf(Error);
+        expect(carServiceStub.saveCar).to.be.not.called;
+        expect(generationServiceStub.findOne).to.be.calledOnce;
+        expect(photoServiceStub.findRelatedPhotosByIds).to.be.calledOnce;
+      });
+
+      it('should rethrow error from CarService saveCar method', async () => {
+        // Arrange
+        const generationId: number = 1;
+        const generation: Generation = new GenerationBuilder(true)
+          .withId(generationId)
+          .build();
+        const carCreate: CarCreate = {
+          name: 'Audi',
+          description: 'Test car',
+          basePrice: 10000,
+          bodyStyle: BodyStyle.KOMBI,
+          startYear: 2010,
+          weight: 1600,
+          generationId,
+        };
+
+        generationServiceStub.findOne.resolves(generation);
+        carServiceStub.saveCar.rejects(new Error('SaveCar error'));
+
+        // Act
+        const returnedCarResult: Promise<Car> = carFacade.createCar(carCreate);
+
+        // Assert
+        await expect(returnedCarResult).to.eventually
+          .be.rejectedWith('SaveCar error')
+          .and.to.be.an.instanceOf(Error);
+        expect(carServiceStub.saveCar).to.be.calledOnce;
+        expect(generationServiceStub.findOne).to.be.calledOnce;
+        expect(photoServiceStub.findRelatedPhotosByIds).to.be.not.called;
+      });
     });
   });
 });

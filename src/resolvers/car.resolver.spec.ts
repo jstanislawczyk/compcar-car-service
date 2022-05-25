@@ -7,6 +7,9 @@ import {CarResolver} from './car.resolver';
 import {CarFacade} from '../facades/car.facade';
 import {CarBuilder} from '../../test/utils/builders/car.builder';
 import {CarMapper} from '../mapper/car.mapper';
+import {CreateCarInput} from '../models/inputs/car/create-car.input';
+import {CarCreate} from '../models/common/create/car.create';
+import {BodyStyle} from '../models/enums/body-style';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -22,6 +25,7 @@ context('CarResolver', () => {
     sandbox = sinon.createSandbox();
 
     carFacadeStub = sandbox.createStubInstance(CarFacade);
+    carMapperStub = sandbox.createStubInstance(CarMapper);
 
     carResolver = new CarResolver(carFacadeStub, carMapperStub);
   });
@@ -100,6 +104,93 @@ context('CarResolver', () => {
           .be.rejectedWith('Not Found')
           .and.to.be.an.instanceOf(Error);
       expect(carFacadeStub.findCarById).to.be.calledOnceWith(carId);
+    });
+  });
+
+  describe('createCar', () => {
+    it('should create car', async () => {
+      // Arrange
+      const carCreate: CarCreate = {
+        name: 'New Car',
+        description: 'Test description',
+        basePrice: 10000,
+        bodyStyle: BodyStyle.KOMBI,
+        startYear: 2020,
+        endYear: 2021,
+        weight: 1000,
+        generationId: 1,
+        carEnginesIds: [1, 2],
+        carAddonsIds: [3, 4],
+        paintingIds: [5, 6],
+        photosIds: [7, 8],
+      };
+      const createCarInput: CreateCarInput = {
+        name: 'New Car',
+        description: 'Test description',
+        basePrice: 10000,
+        bodyStyle: BodyStyle.KOMBI,
+        startYear: 2020,
+        endYear: 2021,
+        weight: 1000,
+        generationId: 1,
+        carEnginesIds: [1, 2],
+        carAddonsIds: [3, 4],
+        paintingIds: [5, 6],
+        photosIds: [7, 8],
+      };
+      const savedCar: Car = new CarBuilder(true).build();
+
+      carMapperStub.toCreateModel.returns(carCreate);
+      carFacadeStub.createCar.resolves(savedCar);
+
+      // Act
+      const returnedCar: Car = await carResolver.createCar(createCarInput);
+
+      // Assert
+      expect(returnedCar).to.be.eql(savedCar);
+      expect(carMapperStub.toCreateModel).to.be.calledOnceWith(createCarInput);
+      expect(carFacadeStub.createCar).to.be.calledOnceWith(carCreate);
+    });
+
+    it('should throw error if car saving fails', async () => {
+      // Arrange
+      const carCreate: CarCreate = {
+        name: 'New Car',
+        description: 'Test description',
+        basePrice: 10000,
+        bodyStyle: BodyStyle.KOMBI,
+        startYear: 2020,
+        endYear: 2021,
+        weight: 1000,
+        generationId: 1,
+        carEnginesIds: [1, 2],
+        carAddonsIds: [3, 4],
+        paintingIds: [5, 6],
+        photosIds: [7, 8],
+      };
+      const createCarInput: CreateCarInput = {
+        name: 'New Car',
+        description: 'Test description',
+        basePrice: 10000,
+        bodyStyle: BodyStyle.KOMBI,
+        startYear: 2020,
+        endYear: 2021,
+        weight: 1000,
+        generationId: 1,
+        carEnginesIds: [1, 2],
+        carAddonsIds: [3, 4],
+        paintingIds: [5, 6],
+        photosIds: [7, 8],
+      };
+
+      carMapperStub.toCreateModel.returns(carCreate);
+      carFacadeStub.createCar.rejects(new Error('CreateCar error'));
+
+      // Act
+      const returnedCarResult: Promise<Car> = carResolver.createCar(createCarInput);
+
+      // Assert
+      await expect(returnedCarResult).to.eventually.be.rejectedWith('CreateCar error');
     });
   });
 });
