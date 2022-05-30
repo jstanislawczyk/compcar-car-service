@@ -5,10 +5,12 @@ import {CountryDatabaseUtils} from './country.database-utils';
 import {BrandDatabaseUtils} from './brand.database-utils';
 import {ModelDatabaseUtils} from './model.database-utils';
 import {GenerationDatabaseUtils} from './generation.database-utils';
+import {CarDatabaseUtils} from './car.database-utils';
 
 export class CommonDatabaseUtils {
 
   public static async deleteAllEntities(): Promise<void> {
+    await CarDatabaseUtils.deleteAllCars();
     await GenerationDatabaseUtils.deleteAllGenerations();
     await ModelDatabaseUtils.deleteAllModels();
     await CommentDatabaseUtils.deleteAllComments();
