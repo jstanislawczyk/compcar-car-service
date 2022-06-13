@@ -13,7 +13,7 @@ export class PhotoService {
   ) {
   }
 
-  public async findRelatedPhotosByIds(photoIds: number[]): Promise<Photo[] | undefined> {
+  public async findRelatedPhotosByIds(photoIds: number[]): Promise<Photo[]> {
     const photos: Photo[] = await this.photoRepository.findByIds(photoIds);
     const notFoundPhotosIds: number[] = photos
       .map((photo: Photo) => photo.id as number)
@@ -21,7 +21,6 @@ export class PhotoService {
 
     if (notFoundPhotosIds.length > 0) {
       const formattedIds: string = notFoundPhotosIds.join(', ');
-
       throw new NotFoundError(`Photos with ids=[${formattedIds}] not found`);
     }
 
