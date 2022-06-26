@@ -20,4 +20,8 @@ export class EngineService {
       throw new NotFoundError(`Engine with id=${id} not found`);
     }
   }
+
+  public async findByIds(ids: number[]): Promise<Engine[]> {
+    return this.engineRepository.findByIds(ids);
+  }
 }

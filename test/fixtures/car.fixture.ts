@@ -5,7 +5,7 @@ export const car: Car = {
   name: 'B6',
   description: 'Test description',
   basePrice: 10000,
-  startYear: '2010',
+  startYear: 2010,
   weight: 1000,
   bodyStyle: BodyStyle.SEDAN,
 };
@@ -13,5 +13,5 @@ export const car: Car = {
 export const fullCar: Car = {
   ...car,
   id: 1,
-  endYear: '2015',
+  endYear: 2015,
 };

@@ -2,7 +2,7 @@ import {Service} from 'typedi';
 import {InjectRepository} from 'typeorm-typedi-extensions';
 import {ColorRepository} from '../repositories/color.repository';
 import {Color} from '../models/entities/color';
-import {ColorUpdate} from '../models/common/update/color-update';
+import {ColorUpdate} from '../models/common/update/color.update';
 import {NotFoundError} from '../models/errors/not-found.error';
 import {DuplicateEntryError} from '../models/errors/duplicate-entry.error';
 

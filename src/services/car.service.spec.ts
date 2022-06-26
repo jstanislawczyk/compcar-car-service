@@ -30,6 +30,45 @@ context('CarService', () => {
     sandbox.restore();
   });
 
+
+  describe('findAll', () => {
+    it('should find cars', async () => {
+      // Arrange
+      const firstCar: Car = new CarBuilder()
+        .withId(1)
+        .withName('First car')
+        .build();
+      const secondCar: Car = new CarBuilder()
+        .withId(2)
+        .withName('Second car')
+        .build();
+      const existingCars: Car[] = [firstCar, secondCar];
+
+      carRepositoryStub.find.resolves(existingCars);
+
+      // Act
+      const returnedCars: Car[] = await carService.findAll();
+
+      // Assert
+      expect(returnedCars).to.be.eql(existingCars);
+      expect(carRepositoryStub.find).to.be.calledOnce;
+    });
+
+    it('should rethrow error from repository', async () => {
+      // Arrange
+      carRepositoryStub.find.rejects(new Error('Not Found'));
+
+      // Act
+      const returnedCarsResult: Promise<Car[]> = carService.findAll();
+
+      // Assert
+      await expect(returnedCarsResult).to.eventually
+        .be.rejectedWith('Not Found')
+        .and.to.be.an.instanceOf(Error);
+      expect(carRepositoryStub.find).to.be.calledOnce;
+    });
+  });
+
   describe('findOne', () => {
     it('should find car by id', async () => {
       // Arrange
@@ -62,6 +101,41 @@ context('CarService', () => {
           .be.rejectedWith(`Car with id=${carId} not found`)
           .and.to.be.an.instanceOf(NotFoundError);
       expect(carRepositoryStub.findOneOrFail).to.be.calledOnceWith(carId);
+    });
+  });
+
+  describe('saveCar', () => {
+    it('should save car', async () => {
+      // Arrange
+      const newCar: Car = new CarBuilder().build();
+      const savedCar: Car = new CarBuilder()
+        .withId(1)
+        .build();
+
+      carRepositoryStub.save.resolves(savedCar);
+
+      // Act
+      const returnedCar: Car = await carService.saveCar(newCar);
+
+      // Assert
+      expect(returnedCar).to.be.eql(savedCar);
+      expect(carRepositoryStub.save).to.be.calledOnceWith(newCar);
+    });
+
+    it('should rethrow error from repository', async () => {
+      // Arrange
+      const newCar: Car = new CarBuilder().build();
+
+      carRepositoryStub.save.rejects(new Error('Save error'));
+
+      // Act
+      const returnedCarResult: Promise<Car> = carService.saveCar(newCar);
+
+      // Assert
+      await expect(returnedCarResult).to.eventually
+        .be.rejectedWith('Save error')
+        .and.to.be.an.instanceOf(Error);
+      expect(carRepositoryStub.save).to.be.calledOnceWith(newCar);
     });
   });
 });

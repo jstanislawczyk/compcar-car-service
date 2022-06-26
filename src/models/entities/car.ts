@@ -34,11 +34,15 @@ export class Car {
 
   @Field()
   @Column()
-  public startYear: string;
+  public startYear: number;
 
-  @Field()
-  @Column()
-  public endYear?: string;
+  @Field({
+    nullable: true,
+  })
+  @Column({
+    nullable: true,
+  })
+  public endYear?: number;
 
   @Field()
   @Column()

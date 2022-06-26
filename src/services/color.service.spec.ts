@@ -7,7 +7,7 @@ import {ColorService} from './color.service';
 import {Color} from '../models/entities/color';
 import {ColorBuilder} from '../../test/utils/builders/color.builder';
 import {NotFoundError} from '../models/errors/not-found.error';
-import {ColorUpdate} from '../models/common/update/color-update';
+import {ColorUpdate} from '../models/common/update/color.update';
 import {DuplicateEntryError} from '../models/errors/duplicate-entry.error';
 
 use(sinonChai);

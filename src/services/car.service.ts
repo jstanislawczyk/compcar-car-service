@@ -13,11 +13,19 @@ export class CarService {
   ) {
   }
 
+  public findAll(): Promise<Car[]> {
+    return this.carRepository.find();
+  }
+
   public async findOne(id: number): Promise<Car> {
     try {
       return await this.carRepository.findOneOrFail(id);
     } catch (error) {
       throw new NotFoundError(`Car with id=${id} not found`);
     }
+  }
+
+  public saveCar(car: Car): Promise<Car> {
+    return this.carRepository.save(car);
   }
 }

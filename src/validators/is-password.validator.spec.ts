@@ -32,7 +32,7 @@ context('IsPasswordValidator', () => {
       expect(isValid).to.be.true;
     });
 
-    it('should return false for password with letters only', () => {
+    it('should return false for password only with letters', () => {
       // Arrange
       const validPassword: string = 'qwertyuio';
 
@@ -43,7 +43,7 @@ context('IsPasswordValidator', () => {
       expect(isValid).to.be.false;
     });
 
-    it('should return false for password with numbers only', () => {
+    it('should return false for password only with numbers', () => {
       // Arrange
       const validPassword: string = '123456789';
 
@@ -54,7 +54,7 @@ context('IsPasswordValidator', () => {
       expect(isValid).to.be.false;
     });
 
-    it('should return false for password with special characters only', () => {
+    it('should return false for password only with special character', () => {
       // Arrange
       const validPassword: string = '!@#$%^&*(';
 

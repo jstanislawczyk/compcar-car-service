@@ -9,7 +9,7 @@ import {ColorBuilder} from '../../test/utils/builders/color.builder';
 import {Color} from '../models/entities/color';
 import {CreateColorInput} from '../models/inputs/color/create-color.input';
 import {UpdateColorInput} from '../models/inputs/color/update-color.input';
-import {ColorUpdate} from '../models/common/update/color-update';
+import {ColorUpdate} from '../models/common/update/color.update';
 
 use(sinonChai);
 use(chaiAsPromised);

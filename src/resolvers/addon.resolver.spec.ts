@@ -9,7 +9,7 @@ import {AddonBuilder} from '../../test/utils/builders/addon.builder';
 import {Addon} from '../models/entities/addon';
 import {CreateAddonInput} from '../models/inputs/addon/create-addon.input';
 import {UpdateAddonInput} from '../models/inputs/addon/update-addon.input';
-import {AddonUpdate} from '../models/common/update/addon-update';
+import {AddonUpdate} from '../models/common/update/addon.update';
 
 use(sinonChai);
 use(chaiAsPromised);

@@ -2,7 +2,7 @@ import {Service} from 'typedi';
 import {CreateColorInput} from '../models/inputs/color/create-color.input';
 import {Color} from '../models/entities/color';
 import {UpdateColorInput} from '../models/inputs/color/update-color.input';
-import {ColorUpdate} from '../models/common/update/color-update';
+import {ColorUpdate} from '../models/common/update/color.update';
 
 @Service()
 export class ColorMapper {

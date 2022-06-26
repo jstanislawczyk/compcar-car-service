@@ -3,7 +3,7 @@ import {ColorMapper} from './color.mapper';
 import {CreateColorInput} from '../models/inputs/color/create-color.input';
 import {Color} from '../models/entities/color';
 import {UpdateColorInput} from '../models/inputs/color/update-color.input';
-import {ColorUpdate} from '../models/common/update/color-update';
+import {ColorUpdate} from '../models/common/update/color.update';
 
 context('ColorMapper', () => {
 

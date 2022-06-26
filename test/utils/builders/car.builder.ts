@@ -26,12 +26,12 @@ export class CarBuilder extends Builder<Car> {
     return this;
   }
 
-  public withEndYear(endYear: string): CarBuilder {
+  public withEndYear(endYear: number): CarBuilder {
     this.entity.endYear = endYear;
     return this;
   }
 
-  public withStartYear(startYear: string): CarBuilder {
+  public withStartYear(startYear: number): CarBuilder {
     this.entity.startYear = startYear;
     return this;
   }
