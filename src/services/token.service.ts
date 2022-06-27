@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import config from 'config';
 import {User} from '../models/entities/user';
 import {JwtToken} from '../models/common/security/jwt-token';
-import {classToPlain} from 'class-transformer';
+import {instanceToPlain} from 'class-transformer';
 import {LoginCredentials} from '../models/common/security/login-credentials';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
 import {UserRole} from '../models/enums/user-role';
@@ -35,7 +35,7 @@ export class TokenService {
     }
 
     if (allowedRoles.length > 0 && !allowedRoles.includes(decodedToken.role)) {
-      throw new InvalidTokenError('User is not required to perform this action');
+      throw new InvalidTokenError(`User with role=${decodedToken.role} is not allowed to perform this action`);
     }
 
     return true;
@@ -45,7 +45,7 @@ export class TokenService {
     const jwtToken: JwtToken = new JwtToken(user);
 
     return jwt.sign(
-      classToPlain(jwtToken),
+      instanceToPlain(jwtToken),
       this.jwtSecret,
       {
         expiresIn: this.jwtTtlSeconds,

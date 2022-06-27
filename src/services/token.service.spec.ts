@@ -6,7 +6,7 @@ import {AuthenticationError} from 'apollo-server';
 import {StringUtils} from '../../test/utils/common/string.utils';
 import {JwtToken} from '../models/common/security/jwt-token';
 import jwt, {TokenExpiredError} from 'jsonwebtoken';
-import {classToPlain} from 'class-transformer';
+import {instanceToPlain} from 'class-transformer';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
 import {UserRole} from '../models/enums/user-role';
@@ -66,7 +66,7 @@ context('TokenService', () => {
       const allowedRoles: UserRole[] = [UserRole.ADMIN];
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
       const token: string = jwt.sign(
-        classToPlain(jwtToken),
+        instanceToPlain(jwtToken),
         jwtSecret,
         {
           expiresIn: 100000,
@@ -89,7 +89,7 @@ context('TokenService', () => {
         .build();
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
       const token: string = jwt.sign(
-        classToPlain(jwtToken),
+        instanceToPlain(jwtToken),
         jwtSecret,
         {
           expiresIn: -10000,
@@ -111,7 +111,7 @@ context('TokenService', () => {
       const allowedRoles: UserRole[] = [UserRole.USER];
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
       const token: string = jwt.sign(
-        classToPlain(jwtToken),
+        instanceToPlain(jwtToken),
         jwtSecret,
         {
           expiresIn: 100000,
@@ -126,14 +126,15 @@ context('TokenService', () => {
 
     it('should not validate token if role is not allowed', () => {
       // Arrange
+      const role: UserRole = UserRole.USER;
       const jwtSecret: string = config.get('security.jwt.secret');
       const authenticatedUser: User = new UserBuilder(true)
-        .withRole(UserRole.ADMIN)
+        .withRole(role)
         .build();
-      const allowedRoles: UserRole[] = [UserRole.USER];
+      const allowedRoles: UserRole[] = [UserRole.ADMIN];
       const jwtToken: JwtToken = new JwtToken(authenticatedUser);
       const token: string = jwt.sign(
-        classToPlain(jwtToken),
+        instanceToPlain(jwtToken),
         jwtSecret,
         {
           expiresIn: 100000,
@@ -142,7 +143,7 @@ context('TokenService', () => {
 
       // Act & Assert
       expect(() => tokenService.isTokenValid(token, allowedRoles))
-        .to.throw('User is not required to perform this action')
+        .to.throw(`User with role=${role} is not allowed to perform this action`)
         .and.to.be.an.instanceOf(InvalidTokenError);
     });
   });
