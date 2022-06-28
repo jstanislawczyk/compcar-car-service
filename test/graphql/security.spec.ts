@@ -17,13 +17,13 @@ import bcrypt from 'bcryptjs';
 
 describe('Security', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await UserDatabaseUtils.deleteAllUsers();
-  });
+  beforeEach(async () =>
+    await UserDatabaseUtils.deleteAllUsers()
+  );
 
   describe('register', () => {
     it('should fail validation', async () => {

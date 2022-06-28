@@ -1,10 +1,11 @@
-import {Resolver, Arg, Mutation} from 'type-graphql';
+import {Resolver, Arg, Mutation, Authorized} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {CountryService} from '../services/country.service';
 import {Country} from '../models/entities/country';
 import {CountryMapper} from '../mapper/country.mapper';
 import {CreateCountryInput} from '../models/inputs/country/create-country.input';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 @Resolver(() => Country)
@@ -16,6 +17,7 @@ export class CountryResolver {
   ) {
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Country)
   public async createCountry(
     @Arg('createCountryInput') createCountryInput: CreateCountryInput,

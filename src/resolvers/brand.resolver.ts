@@ -1,10 +1,11 @@
-import {Resolver, Arg, Mutation, Query} from 'type-graphql';
+import {Resolver, Arg, Mutation, Query, Authorized} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {Brand} from '../models/entities/brand';
 import {BrandCountryFacade} from '../facades/brand-country.facade';
 import {CreateBrandInput} from '../models/inputs/brand/create-brand.input';
 import {BrandMapper} from '../mapper/brand.mapper';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 @Resolver(() => Brand)
@@ -23,6 +24,7 @@ export class BrandResolver {
     return await this.brandCountryFacade.findOne(id);
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Brand)
   public async createBrand(
     @Arg('countryId') countryId: number,

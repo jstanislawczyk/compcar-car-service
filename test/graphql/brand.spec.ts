@@ -11,12 +11,14 @@ import {CountryBuilder} from '../utils/builders/country.builder';
 import {CountryDatabaseUtils} from '../utils/database-utils/country.database-utils';
 import {Brand} from '../../src/models/entities/brand';
 import {BrandBuilder} from '../utils/builders/brand.builder';
+import {TokenUtils} from '../utils/common/token.utils';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Brand', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
   beforeEach(async () => {
     await BrandDatabaseUtils.deleteAllBrands();
@@ -27,9 +29,9 @@ describe('Brand', () => {
     it('should get brand by id', async () => {
       // Arrange
       const brand: Brand = new BrandBuilder()
-          .withName('Audi')
-          .withLogoPhotoUrl('https://test.logo.url.foo.bar/')
-          .build();
+        .withName('Audi')
+        .withLogoPhotoUrl('https://test.logo.url.foo.bar/')
+        .build();
       const savedBrand: Brand = await BrandDatabaseUtils.saveBrand(brand);
 
       const query: string = `
@@ -44,9 +46,9 @@ describe('Brand', () => {
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
 
       const returnedBrandResponse: Brand = response.body.data.getBrandById as Brand;
       expect(Number(returnedBrandResponse.id)).to.be.above(0);
@@ -76,9 +78,9 @@ describe('Brand', () => {
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
 
       const error: ResponseError = response.body.errors[0];
       expect(error.message).to.be.eql(`Brand with id=${notExistingBrandId} not found`);
@@ -115,6 +117,7 @@ describe('Brand', () => {
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
         .post('/graphql')
+        .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
         .send({ query })
         .expect(200);
 
@@ -132,6 +135,63 @@ describe('Brand', () => {
     });
 
     describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const query: string = `
+          mutation {
+            createBrand (
+              countryId: 1,
+              createBrandInput: {
+                name: "Audi",
+                logoPhotoUrl: "https://test.logo.url.foo.bar/",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql('jwt must be provided');
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+
+        const query: string = `
+          mutation {
+            createBrand (
+              countryId: 1,
+              createBrandInput: {
+                name: "Audi",
+                logoPhotoUrl: "https://test.logo.url.foo.bar/",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
       it('if validation fails', async () => {
         // Arrange
         const createBrandInput: CreateBrandInput = {
@@ -159,9 +219,10 @@ describe('Brand', () => {
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
-            .post('/graphql')
-            .send({ query })
-            .expect(200);
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
+          .send({ query })
+          .expect(200);
 
         const errorsBody: ResponseError = response.body.errors[0];
         expect(errorsBody.message).to.be.eql('Argument Validation Error');
@@ -181,8 +242,8 @@ describe('Brand', () => {
         // Arrange
         const brandName: string = 'Audi';
         const existingBrand = new BrandBuilder()
-            .withName(brandName)
-            .build();
+          .withName(brandName)
+          .build();
         const createBrandInput: CreateBrandInput = {
           name: brandName,
           logoPhotoUrl: 'https://test.logo.url.foo.bar/',
@@ -210,9 +271,10 @@ describe('Brand', () => {
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
-            .post('/graphql')
-            .send({ query })
-            .expect(200);
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
+          .send({ query })
+          .expect(200);
 
         const error: ResponseError = response.body.errors[0];
         expect(error.message).to.be.eql(`Brand with name=${createBrandInput.name} already exists`);
@@ -224,8 +286,8 @@ describe('Brand', () => {
         const notExistingCountryId: number = 0;
         const brandName: string = 'Audi';
         const existingBrand = new BrandBuilder()
-            .withName(brandName)
-            .build();
+          .withName(brandName)
+          .build();
         const createBrandInput: CreateBrandInput = {
           name: brandName,
           logoPhotoUrl: 'https://test.logo.url.foo.bar/',
@@ -251,9 +313,10 @@ describe('Brand', () => {
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
-            .post('/graphql')
-            .send({ query })
-            .expect(200);
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
+          .send({ query })
+          .expect(200);
 
         const error: ResponseError = response.body.errors[0];
         expect(error.message).to.be.eql(`Country with id=${notExistingCountryId} not found`);

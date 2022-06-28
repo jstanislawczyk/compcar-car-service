@@ -14,13 +14,13 @@ import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Addon', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await AddonDatabaseUtils.deleteAllAddons();
-  });
+  beforeEach(async () =>
+    await AddonDatabaseUtils.deleteAllAddons()
+  );
 
   describe('getAddons', () => {
     it('should get addons', async () => {
@@ -418,7 +418,7 @@ describe('Addon', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
-          .set('Authorization', TokenUtils.getAuthToken(UserRole.USER))
+          .set('Authorization', TokenUtils.getAuthToken(role))
           .send({ query })
           .expect(200);
 

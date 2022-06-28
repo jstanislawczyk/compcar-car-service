@@ -10,13 +10,13 @@ import {FuelType} from '../../src/models/enums/fuel-type';
 
 describe('Engine', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await EngineDatabaseUtils.deleteAllEngines();
-  });
+  beforeEach(async () =>
+    await EngineDatabaseUtils.deleteAllEngines()
+  );
 
   describe('getEngineById', () => {
     it('should get engine by id', async () => {

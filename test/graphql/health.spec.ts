@@ -11,17 +11,17 @@ import sinon from 'sinon';
 
 describe('Health', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await UserDatabaseUtils.deleteAllUsers();
-  });
+  beforeEach(async () =>
+    await UserDatabaseUtils.deleteAllUsers()
+  );
 
-  after(() => {
-    sinon.restore();
-  });
+  after(() =>
+    sinon.restore()
+  );
 
   describe('getApplicationHealth', () => {
     describe(`should get ${HealthStatus.OK} status`, () => {
@@ -81,7 +81,7 @@ describe('Health', () => {
     });
 
     describe(`should get ${HealthStatus.CRITICAL} status`, () => {
-      it('if database entity fetch fails', async () => {
+      it('if database entity fetching fails', async () => {
         // Arrange
         const query: string = `
           {

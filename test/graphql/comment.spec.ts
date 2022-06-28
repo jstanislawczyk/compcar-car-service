@@ -12,12 +12,14 @@ import {User} from '../../src/models/entities/user';
 import {UserBuilder} from '../utils/builders/user.builder';
 import {UserDatabaseUtils} from '../utils/database-utils/user.database-utils';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
+import {TokenUtils} from '../utils/common/token.utils';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Comment', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
   beforeEach(async () => {
     await CommentDatabaseUtils.deleteAllComments();
@@ -121,6 +123,7 @@ describe('Comment', () => {
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
         .post('/graphql')
+        .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
         .send({ query })
         .expect(200);
 
@@ -139,47 +142,107 @@ describe('Comment', () => {
       expect(savedCommentResponse.commentDate).to.be.be.eql(existingComment.commentDate);
     });
 
-    it('should fail validation', async () => {
-      // Arrange
-      const createCommentInput: CreateCommentInput = {
-        text: 'T',
-        rating: 10,
-      };
-
-      const query: string = `
-        mutation {
-          createComment (
-            userId: 1,
-            createCommentInput: {
-              text: "${createCommentInput.text}",
-              rating: ${createCommentInput.rating},
+    describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const query: string = `
+          mutation {
+            createComment (
+              userId: 1,
+              createCommentInput: {
+                text: "Comment text",
+                rating: 3,
+              }
+            ) {
+              id,
             }
-          ) {
-            id,
-            text,
-            rating,
           }
-        }
-      `;
+        `;
 
-      // Act & Assert
-      const response: Response = await request(application.serverInfo.url)
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
           .send({ query })
           .expect(200);
 
-      const errorsBody: ResponseError = response.body.errors[0];
-      expect(errorsBody.message).to.be.eql('Argument Validation Error');
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql('jwt must be provided');
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
 
-      const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-      expect(errors).to.have.lengthOf(2);
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
 
-      expect(errors[0].property).to.be.eql('text');
-      expect(errors[0].value).to.be.eql('T');
-      expect(errors[0].constraints.minLength).to.be.eql('text must be longer than or equal to 3 characters');
-      expect(errors[1].property).to.be.eql('rating');
-      expect(errors[1].value).to.be.eql(10);
-      expect(errors[1].constraints.max).to.be.eql('rating must not be greater than 5');
+        const query: string = `
+          mutation {
+            createComment (
+              userId: 1,
+              createCommentInput: {
+                text: "Comment text",
+                rating: 3,
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('if validation fails', async () => {
+        // Arrange
+        const createCommentInput: CreateCommentInput = {
+          text: 'T',
+          rating: 10,
+        };
+
+        const query: string = `
+          mutation {
+            createComment (
+              userId: 1,
+              createCommentInput: {
+                text: "${createCommentInput.text}",
+                rating: ${createCommentInput.rating},
+              }
+            ) {
+              id,
+              text,
+              rating,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
+          .send({ query })
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql('Argument Validation Error');
+
+        const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
+        expect(errors).to.have.lengthOf(2);
+
+        expect(errors[0].property).to.be.eql('text');
+        expect(errors[0].value).to.be.eql('T');
+        expect(errors[0].constraints.minLength).to.be.eql('text must be longer than or equal to 3 characters');
+        expect(errors[1].property).to.be.eql('rating');
+        expect(errors[1].value).to.be.eql(10);
+        expect(errors[1].constraints.max).to.be.eql('rating must not be greater than 5');
+      });
     });
   });
 });

@@ -9,13 +9,13 @@ import {GenerationBuilder} from '../utils/builders/generation.builder';
 
 describe('Generation', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await GenerationDatabaseUtils.deleteAllGenerations();
-  });
+  beforeEach(async () =>
+    await GenerationDatabaseUtils.deleteAllGenerations()
+  );
 
   describe('getGenerationById', () => {
     it('should get generation by id', async () => {

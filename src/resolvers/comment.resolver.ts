@@ -1,10 +1,11 @@
-import {Resolver, Arg, Mutation, Query} from 'type-graphql';
+import {Resolver, Arg, Mutation, Query, Authorized} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {CreateCommentInput} from '../models/inputs/comments/create-comment.input';
 import {UserCommentFacade} from '../facades/user-comment.facade';
 import {CommentMapper} from '../mapper/comment.mapper';
 import {Comment} from '../models/entities/comment';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 @Resolver(() => Comment)
@@ -23,6 +24,7 @@ export class CommentResolver {
     return await this.userCommentFacade.findAll();
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Comment)
   public async createComment(
     @Arg('userId') userId: number,

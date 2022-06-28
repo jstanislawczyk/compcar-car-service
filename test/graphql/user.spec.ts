@@ -10,13 +10,13 @@ import {UserRole} from '../../src/models/enums/user-role';
 
 describe('User', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await UserDatabaseUtils.deleteAllUsers();
-  });
+  beforeEach(async () =>
+    await UserDatabaseUtils.deleteAllUsers()
+  );
 
   describe('getUsers', () => {
     it('should get users', async () => {
