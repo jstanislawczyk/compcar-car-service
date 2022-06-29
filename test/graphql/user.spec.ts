@@ -7,6 +7,8 @@ import {DateUtils} from '../utils/common/date.utils';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import {UserBuilder} from '../utils/builders/user.builder';
 import {UserRole} from '../../src/models/enums/user-role';
+import {TokenUtils} from '../utils/common/token.utils';
+import {ResponseError} from '../utils/interfaces/response-error';
 
 describe('User', () => {
 
@@ -47,6 +49,7 @@ describe('User', () => {
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
         .post('/graphql')
+        .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
         .send({ query })
         .expect(200);
 
@@ -81,6 +84,52 @@ describe('User', () => {
       expect(returnedUsers[1].password).to.be.be.eql(existingUsers[1].password);
       expect(returnedUsers[1].activated).to.be.be.eql(existingUsers[1].activated);
       expect(returnedUsers[1].role).to.be.be.eql(existingUsers[1].role);
+    });
+
+    describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const query: string = `
+          {
+            getUsers {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql('jwt must be provided');
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it("if token isn't provided", async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+        const query: string = `
+          {
+            getUsers {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
     });
   });
 });
