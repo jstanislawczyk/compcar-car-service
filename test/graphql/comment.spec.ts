@@ -166,7 +166,7 @@ describe('Comment', () => {
           .expect(200);
 
         const error: ResponseError = response.body.errors[0];
-        expect(error.message).to.be.eql('jwt must be provided');
+        expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
         expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
       });
 

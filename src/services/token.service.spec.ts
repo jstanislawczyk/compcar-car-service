@@ -72,79 +72,107 @@ context('TokenService', () => {
           expiresIn: 100000,
         }
       );
+      const fullToken: string = `Bearer ${token}`;
 
       // Act
-      const isValidated: boolean = tokenService.isTokenValid(token, allowedRoles);
+      const isValidated: boolean = tokenService.isTokenValid(fullToken, allowedRoles);
 
       // Assert
       expect(isValidated).to.be.true;
     });
 
-    it('should not validate token if it expires', () => {
-      // Arrange
-      const jwtSecret: string = config.get('security.jwt.secret');
-      const allowedRoles: UserRole[] = [UserRole.ADMIN];
-      const authenticatedUser: User = new UserBuilder(true)
-        .withRole(UserRole.ADMIN)
-        .build();
-      const jwtToken: JwtToken = new JwtToken(authenticatedUser);
-      const token: string = jwt.sign(
-        instanceToPlain(jwtToken),
-        jwtSecret,
-        {
-          expiresIn: -10000,
-        }
-      );
+    describe('should not validate token ', () => {
+      it("if it it doesn't have 'Bearer' prefix", () => {
+        // Arrange
+        const jwtSecret: string = config.get('security.jwt.secret');
+        const allowedRoles: UserRole[] = [UserRole.ADMIN];
+        const authenticatedUser: User = new UserBuilder(true)
+          .withRole(UserRole.ADMIN)
+          .build();
+        const jwtToken: JwtToken = new JwtToken(authenticatedUser);
+        const token: string = jwt.sign(
+          instanceToPlain(jwtToken),
+          jwtSecret,
+          {
+            expiresIn: -10000,
+          }
+        );
 
-      // Act & Assert
-      expect(() => tokenService.isTokenValid(token, allowedRoles))
-        .to.throw('jwt expired')
-        .and.to.be.an.instanceOf(TokenExpiredError);
-    });
+        // Act & Assert
+        expect(() => tokenService.isTokenValid(token, allowedRoles))
+          .to.throw("Given token doesn't match pattern 'Bearer token'")
+          .and.to.be.an.instanceOf(InvalidTokenError);
+      });
 
-    it('should not validate token if is not supported role', () => {
-      // Arrange
-      const jwtSecret: string = config.get('security.jwt.secret');
-      const authenticatedUser: User = new UserBuilder(true)
-        .withRole('NotSupportedRole' as UserRole)
-        .build();
-      const allowedRoles: UserRole[] = [UserRole.USER];
-      const jwtToken: JwtToken = new JwtToken(authenticatedUser);
-      const token: string = jwt.sign(
-        instanceToPlain(jwtToken),
-        jwtSecret,
-        {
-          expiresIn: 100000,
-        }
-      );
+      it('if it expires', () => {
+        // Arrange
+        const jwtSecret: string = config.get('security.jwt.secret');
+        const allowedRoles: UserRole[] = [UserRole.ADMIN];
+        const authenticatedUser: User = new UserBuilder(true)
+          .withRole(UserRole.ADMIN)
+          .build();
+        const jwtToken: JwtToken = new JwtToken(authenticatedUser);
+        const token: string = jwt.sign(
+          instanceToPlain(jwtToken),
+          jwtSecret,
+          {
+            expiresIn: -10000,
+          }
+        );
+        const fullToken: string = `Bearer ${token}`;
 
-      // Act & Assert
-      expect(() => tokenService.isTokenValid(token, allowedRoles))
-        .to.throw(`Given role "${authenticatedUser.role}" is not supported`)
-        .and.to.be.an.instanceOf(InvalidTokenError);
-    });
+        // Act & Assert
+        expect(() => tokenService.isTokenValid(fullToken, allowedRoles))
+          .to.throw('jwt expired')
+          .and.to.be.an.instanceOf(TokenExpiredError);
+      });
 
-    it('should not validate token if role is not allowed', () => {
-      // Arrange
-      const role: UserRole = UserRole.USER;
-      const jwtSecret: string = config.get('security.jwt.secret');
-      const authenticatedUser: User = new UserBuilder(true)
-        .withRole(role)
-        .build();
-      const allowedRoles: UserRole[] = [UserRole.ADMIN];
-      const jwtToken: JwtToken = new JwtToken(authenticatedUser);
-      const token: string = jwt.sign(
-        instanceToPlain(jwtToken),
-        jwtSecret,
-        {
-          expiresIn: 100000,
-        }
-      );
+      it('if is not supported role', () => {
+        // Arrange
+        const jwtSecret: string = config.get('security.jwt.secret');
+        const authenticatedUser: User = new UserBuilder(true)
+          .withRole('NotSupportedRole' as UserRole)
+          .build();
+        const allowedRoles: UserRole[] = [UserRole.USER];
+        const jwtToken: JwtToken = new JwtToken(authenticatedUser);
+        const token: string = jwt.sign(
+          instanceToPlain(jwtToken),
+          jwtSecret,
+          {
+            expiresIn: 100000,
+          }
+        );
+        const fullToken: string = `Bearer ${token}`;
 
-      // Act & Assert
-      expect(() => tokenService.isTokenValid(token, allowedRoles))
-        .to.throw(`User with role=${role} is not allowed to perform this action`)
-        .and.to.be.an.instanceOf(InvalidTokenError);
+        // Act & Assert
+        expect(() => tokenService.isTokenValid(fullToken, allowedRoles))
+          .to.throw(`Given role "${authenticatedUser.role}" is not supported`)
+          .and.to.be.an.instanceOf(InvalidTokenError);
+      });
+
+      it('if role is not allowed', () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+        const jwtSecret: string = config.get('security.jwt.secret');
+        const authenticatedUser: User = new UserBuilder(true)
+          .withRole(role)
+          .build();
+        const allowedRoles: UserRole[] = [UserRole.ADMIN];
+        const jwtToken: JwtToken = new JwtToken(authenticatedUser);
+        const token: string = jwt.sign(
+          instanceToPlain(jwtToken),
+          jwtSecret,
+          {
+            expiresIn: 100000,
+          }
+        );
+        const fullToken: string = `Bearer ${token}`;
+
+        // Act & Assert
+        expect(() => tokenService.isTokenValid(fullToken, allowedRoles))
+          .to.throw(`User with role=${role} is not allowed to perform this action`)
+          .and.to.be.an.instanceOf(InvalidTokenError);
+      });
     });
   });
 });

@@ -17,13 +17,14 @@ export class TokenUtils {
     user.id = userId || NumberUtils.getRandomInteger();
 
     const jwtToken: JwtToken = new JwtToken(user);
-
-    return jwt.sign(
+    const token: string = jwt.sign(
       instanceToPlain(jwtToken),
       this.jwtSecret,
       {
         expiresIn: this.jwtTtlSeconds,
       }
     );
+
+    return `Bearer ${token}`;
   }
 }

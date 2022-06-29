@@ -27,7 +27,14 @@ export class TokenService {
   }
 
   public isTokenValid(jwtToken: string, allowedRoles: string[]): boolean {
-    const decodedToken: JwtToken = jwt.verify(jwtToken, this.jwtSecret) as JwtToken;
+    const isBearerToken: boolean = /^Bearer\s(?:[\w-]*\.){2}[\w-]*$/.test(jwtToken);
+
+    if (!isBearerToken) {
+      throw new InvalidTokenError("Given token doesn't match pattern 'Bearer token'");
+    }
+
+    const sanitizedToken: string = jwtToken.slice(7);
+    const decodedToken: JwtToken = jwt.verify(sanitizedToken, this.jwtSecret) as JwtToken;
     const isExistingRole: boolean = Object.values(UserRole).includes(decodedToken.role as UserRole);
 
     if (!isExistingRole) {
