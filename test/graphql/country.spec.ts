@@ -8,16 +8,18 @@ import {CountryDatabaseUtils} from '../utils/database-utils/country.database-uti
 import {CreateCountryInput} from '../../src/models/inputs/country/create-country.input';
 import {Country} from '../../src/models/entities/country';
 import {CountryBuilder} from '../utils/builders/country.builder';
+import {TokenUtils} from '../utils/common/token.utils';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Country', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await CountryDatabaseUtils.deleteAllCountries();
-  });
+  beforeEach(async () =>
+    await CountryDatabaseUtils.deleteAllCountries()
+  );
 
   describe('createCountry', () => {
     it('should save country', async () => {
@@ -45,6 +47,7 @@ describe('Country', () => {
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
         .post('/graphql')
+        .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
         .send({ query })
         .expect(200);
 
@@ -61,6 +64,60 @@ describe('Country', () => {
     });
 
     describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const query: string = `
+          mutation {
+            createCountry (
+              createCountryInput: {
+                name: "Poland",
+                flagPhotoUrl: "https://test.url.foo.bar/",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+        const query: string = `
+          mutation {
+            createCountry (
+              createCountryInput: {
+                name: "Poland",
+                flagPhotoUrl: "https://test.url.foo.bar/",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
       it('if validation fails', async () => {
         // Arrange
         const createCountryInput: CreateCountryInput = {
@@ -86,6 +143,7 @@ describe('Country', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -134,6 +192,7 @@ describe('Country', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 

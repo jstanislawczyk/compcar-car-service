@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import config from 'config';
 import {User} from '../models/entities/user';
 import {JwtToken} from '../models/common/security/jwt-token';
-import {classToPlain} from 'class-transformer';
+import {instanceToPlain} from 'class-transformer';
 import {LoginCredentials} from '../models/common/security/login-credentials';
 import {InvalidTokenError} from '../models/errors/invalid-token.error';
 import {UserRole} from '../models/enums/user-role';
@@ -27,7 +27,14 @@ export class TokenService {
   }
 
   public isTokenValid(jwtToken: string, allowedRoles: string[]): boolean {
-    const decodedToken: JwtToken = jwt.verify(jwtToken, this.jwtSecret) as JwtToken;
+    const isBearerToken: boolean = /^Bearer\s(?:[\w-]*\.){2}[\w-]*$/.test(jwtToken);
+
+    if (!isBearerToken) {
+      throw new InvalidTokenError("Given token doesn't match pattern 'Bearer token'");
+    }
+
+    const sanitizedToken: string = jwtToken.slice(7);
+    const decodedToken: JwtToken = jwt.verify(sanitizedToken, this.jwtSecret) as JwtToken;
     const isExistingRole: boolean = Object.values(UserRole).includes(decodedToken.role as UserRole);
 
     if (!isExistingRole) {
@@ -35,7 +42,7 @@ export class TokenService {
     }
 
     if (allowedRoles.length > 0 && !allowedRoles.includes(decodedToken.role)) {
-      throw new InvalidTokenError('User is not required to perform this action');
+      throw new InvalidTokenError(`User with role=${decodedToken.role} is not allowed to perform this action`);
     }
 
     return true;
@@ -45,7 +52,7 @@ export class TokenService {
     const jwtToken: JwtToken = new JwtToken(user);
 
     return jwt.sign(
-      classToPlain(jwtToken),
+      instanceToPlain(jwtToken),
       this.jwtSecret,
       {
         expiresIn: this.jwtTtlSeconds,

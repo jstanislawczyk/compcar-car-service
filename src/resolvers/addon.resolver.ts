@@ -1,4 +1,4 @@
-import {Resolver, Arg, Mutation, Query} from 'type-graphql';
+import {Resolver, Arg, Mutation, Query, Authorized} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {Addon} from '../models/entities/addon';
@@ -7,6 +7,7 @@ import {CreateAddonInput} from '../models/inputs/addon/create-addon.input';
 import {AddonMapper} from '../mapper/addon.mapper';
 import {UpdateAddonInput} from '../models/inputs/addon/update-addon.input';
 import {AddonUpdate} from '../models/common/update/addon.update';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 @Resolver(() => Addon)
@@ -25,6 +26,7 @@ export class AddonResolver {
     return await this.addonService.findAll();
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Addon)
   public async createAddon(
     @Arg('createAddonInput') createAddonInput: CreateAddonInput,
@@ -36,6 +38,7 @@ export class AddonResolver {
     return await this.addonService.saveAddon(addon);
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Addon)
   public async updateAddon(
     @Arg('updateAddonInput') updateAddonInput: UpdateAddonInput,

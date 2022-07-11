@@ -9,16 +9,18 @@ import {AddonBuilder} from '../utils/builders/addon.builder';
 import {CreateAddonInput} from '../../src/models/inputs/addon/create-addon.input';
 import {ResponseError} from '../utils/interfaces/response-error';
 import {UpdateAddonInput} from '../../src/models/inputs/addon/update-addon.input';
+import {TokenUtils} from '../utils/common/token.utils';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Addon', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await AddonDatabaseUtils.deleteAllAddons();
-  });
+  beforeEach(async () =>
+    await AddonDatabaseUtils.deleteAllAddons()
+  );
 
   describe('getAddons', () => {
     it('should get addons', async () => {
@@ -97,9 +99,10 @@ describe('Addon', () => {
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+        .post('/graphql')
+        .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
+        .send({ query })
+        .expect(200);
 
       const savedAddonResponse: Addon = response.body.data.createAddon as Addon;
       expect(Number(savedAddonResponse.id)).to.be.above(0);
@@ -114,6 +117,70 @@ describe('Addon', () => {
     });
 
     describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const createAddonInput: CreateAddonInput = {
+          name: 'Addon name',
+          description: 'Another description',
+        };
+
+        const query: string = `
+          mutation {
+            createAddon (
+              createAddonInput: {
+                name: "${createAddonInput.name}",
+                description: "${createAddonInput.description}",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+        const createAddonInput: CreateAddonInput = {
+          name: 'Addon name',
+          description: 'Another description',
+        };
+
+        const query: string = `
+          mutation {
+            createAddon (
+              createAddonInput: {
+                name: "${createAddonInput.name}",
+                description: "${createAddonInput.description}",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.USER))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
       it('if validation fails', async () => {
         // Arrange
         const createAddonInput: CreateAddonInput = {
@@ -137,6 +204,7 @@ describe('Addon', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -184,6 +252,7 @@ describe('Addon', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -210,23 +279,24 @@ describe('Addon', () => {
         await AddonDatabaseUtils.saveAddon(existingAddon);
 
         const query: string = `
-        mutation {
-          updateAddon (
-            updateAddonInput: {
-              id: ${existingAddon.id},
-              description: "${updateAddonInput.description}",
+          mutation {
+            updateAddon (
+              updateAddonInput: {
+                id: ${existingAddon.id},
+                description: "${updateAddonInput.description}",
+              }
+            ) {
+              id,
+              name,
+              description,
             }
-          ) {
-            id,
-            name,
-            description,
           }
-        }
-      `;
+        `;
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -257,24 +327,25 @@ describe('Addon', () => {
         await AddonDatabaseUtils.saveAddon(existingAddon);
 
         const query: string = `
-        mutation {
-          updateAddon (
-            updateAddonInput: {
-              id: ${existingAddon.id},
-              name: "${updateAddonInput.name}",
-              description: "${updateAddonInput.description}",
+          mutation {
+            updateAddon (
+              updateAddonInput: {
+                id: ${existingAddon.id},
+                name: "${updateAddonInput.name}",
+                description: "${updateAddonInput.description}",
+              }
+            ) {
+              id,
+              name,
+              description,
             }
-          ) {
-            id,
-            name,
-            description,
           }
-        }
-      `;
+        `;
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -292,6 +363,70 @@ describe('Addon', () => {
     });
 
     describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const updateAddonInput: UpdateAddonInput = {
+          id: 1,
+          name: 'name',
+        };
+
+        const query: string = `
+          mutation {
+            updateAddon (
+              updateAddonInput: {
+                id: 1,
+                name: "${updateAddonInput.name}",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+        const updateAddonInput: UpdateAddonInput = {
+          id: 1,
+          name: 'name',
+        };
+
+        const query: string = `
+          mutation {
+            updateAddon (
+              updateAddonInput: {
+                id: 1,
+                name: "${updateAddonInput.name}",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
       it('if validation fails', async () => {
         // Arrange
         const updateAddonInput: UpdateAddonInput = {
@@ -317,6 +452,7 @@ describe('Addon', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -368,6 +504,7 @@ describe('Addon', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 

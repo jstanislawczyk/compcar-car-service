@@ -1,4 +1,4 @@
-import {Resolver, Arg, Mutation, Query} from 'type-graphql';
+import {Resolver, Arg, Mutation, Query, Authorized} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {Color} from '../models/entities/color';
@@ -7,6 +7,7 @@ import {CreateColorInput} from '../models/inputs/color/create-color.input';
 import {ColorMapper} from '../mapper/color.mapper';
 import {UpdateColorInput} from '../models/inputs/color/update-color.input';
 import {ColorUpdate} from '../models/common/update/color.update';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 @Resolver(() => Color)
@@ -25,6 +26,7 @@ export class ColorResolver {
     return await this.colorService.findAll();
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Color)
   public async createColor(
     @Arg('createColorInput') createColorInput: CreateColorInput,
@@ -36,6 +38,7 @@ export class ColorResolver {
     return await this.colorService.saveColor(color);
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Color)
   public async updateColor(
     @Arg('updateColorInput') updateColorInput: UpdateColorInput,

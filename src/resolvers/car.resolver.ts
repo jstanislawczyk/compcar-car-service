@@ -1,4 +1,4 @@
-import {Resolver, Query, Arg, Mutation} from 'type-graphql';
+import {Resolver, Query, Arg, Mutation, Authorized} from 'type-graphql';
 import {Service} from 'typedi';
 import {Logger} from '../common/logger';
 import {Car} from '../models/entities/car';
@@ -6,6 +6,7 @@ import {CarFacade} from '../facades/car.facade';
 import {CreateCarInput} from '../models/inputs/car/create-car.input';
 import {CarCreate} from '../models/common/create/car.create';
 import {CarMapper} from '../mapper/car.mapper';
+import {UserRole} from '../models/enums/user-role';
 
 @Service()
 @Resolver(() => Car)
@@ -31,6 +32,7 @@ export class CarResolver {
     return await this.carFacade.findCarById(id);
   }
 
+  @Authorized(UserRole.ADMIN)
   @Mutation(() => Car)
   public async createCar(
     @Arg('createCarInput') createCarInput: CreateCarInput,

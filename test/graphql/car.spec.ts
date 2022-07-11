@@ -12,12 +12,14 @@ import {CreateCarInput} from '../../src/models/inputs/car/create-car.input';
 import {Generation} from '../../src/models/entities/generation';
 import {GenerationBuilder} from '../utils/builders/generation.builder';
 import {GenerationDatabaseUtils} from '../utils/database-utils/generation.database-utils';
+import {TokenUtils} from '../utils/common/token.utils';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Car', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
   beforeEach(async () => {
     await CarDatabaseUtils.deleteAllCars();
@@ -250,6 +252,7 @@ describe('Car', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -283,6 +286,104 @@ describe('Car', () => {
     });
 
     describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const generation: Generation = new GenerationBuilder()
+          .withName('Existing generation')
+          .withDescription('Existing description')
+          .build();
+
+        await GenerationDatabaseUtils.saveGeneration(generation);
+
+        const createCarInput: CreateCarInput = {
+          name: 'New Car',
+          description: 'Test description',
+          basePrice: 10000,
+          bodyStyle: BodyStyle.KOMBI,
+          startYear: 2020,
+          weight: 1000,
+          generationId: Number(generation.id),
+        };
+
+        const query: string = `
+          mutation {
+            createCar (
+              createCarInput: {
+                name: "${createCarInput.name}",
+                description: "${createCarInput.description}",
+                basePrice: ${createCarInput.basePrice},
+                bodyStyle: "${createCarInput.bodyStyle}",
+                startYear: ${createCarInput.startYear},
+                weight: ${createCarInput.weight},
+                generationId: ${createCarInput.generationId},
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+        const generation: Generation = new GenerationBuilder()
+          .withName('Existing generation')
+          .withDescription('Existing description')
+          .build();
+
+        await GenerationDatabaseUtils.saveGeneration(generation);
+
+        const createCarInput: CreateCarInput = {
+          name: 'New Car',
+          description: 'Test description',
+          basePrice: 10000,
+          bodyStyle: BodyStyle.KOMBI,
+          startYear: 2020,
+          weight: 1000,
+          generationId: Number(generation.id),
+        };
+
+        const query: string = `
+          mutation {
+            createCar (
+              createCarInput: {
+                name: "${createCarInput.name}",
+                description: "${createCarInput.description}",
+                basePrice: ${createCarInput.basePrice},
+                bodyStyle: "${createCarInput.bodyStyle}",
+                startYear: ${createCarInput.startYear},
+                weight: ${createCarInput.weight},
+                generationId: ${createCarInput.generationId},
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
       it('if validation fails', async () => {
         // Arrange
         const createCarInput: CreateCarInput = {
@@ -316,6 +417,7 @@ describe('Car', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -366,6 +468,7 @@ describe('Car', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 

@@ -10,13 +10,13 @@ import {ResponseError} from '../utils/interfaces/response-error';
 
 describe('Model', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await ModelDatabaseUtils.deleteAllModels();
-  });
+  beforeEach(async () =>
+    await ModelDatabaseUtils.deleteAllModels()
+  );
 
   describe('getModelsWithCount', () => {
     it('should get models with count', async () => {
@@ -50,9 +50,9 @@ describe('Model', () => {
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
 
       const returnedModelsWithCount: ModelsWithCountOutput = response.body.data.getModelsWithCount as ModelsWithCountOutput;
       const models: Model[] = returnedModelsWithCount.models;
@@ -102,9 +102,9 @@ describe('Model', () => {
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
 
       const returnedModelsWithCount: ModelsWithCountOutput = response.body.data.getModelsWithCount as ModelsWithCountOutput;
       const models: Model[] = returnedModelsWithCount.models;
@@ -121,9 +121,9 @@ describe('Model', () => {
     it('should get model by id', async () => {
       // Arrange
       const model: Model = new ModelBuilder(true)
-          .withName('B6')
-          .withDescription('Test description')
-          .build();
+        .withName('B6')
+        .withDescription('Test description')
+        .build();
       const savedModel: Model = await ModelDatabaseUtils.saveModel(model);
 
       const query: string = `
@@ -150,7 +150,7 @@ describe('Model', () => {
       expect(returnedModelResponse.generations).to.be.undefined;
 
       const existingModel: Model = await ModelDatabaseUtils.getModelByIdOrFail(
-          Number(returnedModelResponse.id)
+        Number(returnedModelResponse.id)
       );
       expect(returnedModelResponse.id).to.be.be.eql(existingModel.id?.toString());
       expect(returnedModelResponse.name).to.be.be.eql(existingModel.name);
@@ -171,9 +171,9 @@ describe('Model', () => {
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
 
       const error: ResponseError = response.body.errors[0];
       expect(error.message).to.be.eql(`Model with id=${notExistingModelId} not found`);

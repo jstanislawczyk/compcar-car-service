@@ -9,16 +9,18 @@ import {ColorBuilder} from '../utils/builders/color.builder';
 import {CreateColorInput} from '../../src/models/inputs/color/create-color.input';
 import {ResponseError} from '../utils/interfaces/response-error';
 import {UpdateColorInput} from '../../src/models/inputs/color/update-color.input';
+import {TokenUtils} from '../utils/common/token.utils';
+import {UserRole} from '../../src/models/enums/user-role';
 
 describe('Color', () => {
 
-  before(async () => {
-    await CommonDatabaseUtils.deleteAllEntities();
-  });
+  before(async () =>
+    await CommonDatabaseUtils.deleteAllEntities()
+  );
 
-  beforeEach(async () => {
-    await ColorDatabaseUtils.deleteAllColors();
-  });
+  beforeEach(async () =>
+    await ColorDatabaseUtils.deleteAllColors()
+  );
 
   describe('getColors', () => {
     it('should get colors', async () => {
@@ -98,9 +100,10 @@ describe('Color', () => {
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
-            .post('/graphql')
-            .send({ query })
-            .expect(200);
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
+          .send({ query })
+          .expect(200);
 
         const savedColorResponse: Color = response.body.data.createColor as Color;
         expect(Number(savedColorResponse.id)).to.be.above(0);
@@ -138,9 +141,10 @@ describe('Color', () => {
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
-            .post('/graphql')
-            .send({ query })
-            .expect(200);
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
+          .send({ query })
+          .expect(200);
 
         const savedColorResponse: Color = response.body.data.createColor as Color;
         expect(Number(savedColorResponse.id)).to.be.above(0);
@@ -156,6 +160,65 @@ describe('Color', () => {
     });
 
     describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const query: string = `
+          mutation {
+            createColor (
+              createColorInput: {
+                name: "green",
+                hexCode: "#0F0",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+
+        const query: string = `
+          mutation {
+            createColor (
+              createColorInput: {
+                name: "green",
+                hexCode: "#0F0",
+              }
+            ) {
+              id,
+              name,
+              hexCode,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
       it('if validation fails', async () => {
         // Arrange
         const createColorInput: CreateColorInput = {
@@ -179,6 +242,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -226,6 +290,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -264,6 +329,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -309,6 +375,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -355,6 +422,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -401,6 +469,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -418,6 +487,61 @@ describe('Color', () => {
     });
 
     describe('should throw error', () => {
+      it("if token isn't provided", async () => {
+        // Arrange
+        const query: string = `
+          mutation {
+            updateColor (
+              updateColorInput: {
+                id: 1,
+                hexCode: "'#00F'",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
+      it('for non admin user', async () => {
+        // Arrange
+        const role: UserRole = UserRole.USER;
+
+        const query: string = `
+          mutation {
+            updateColor (
+              updateColorInput: {
+                id: 1,
+                hexCode: "'#00F'",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(role))
+          .send({ query })
+          .expect(200);
+
+        const error: ResponseError = response.body.errors[0];
+        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
+        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
+      });
+
       it('if validation fails', async () => {
         // Arrange
         const updateColorInput: UpdateColorInput = {
@@ -443,6 +567,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -494,6 +619,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
@@ -536,6 +662,7 @@ describe('Color', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
+          .set('Authorization', TokenUtils.getAuthToken(UserRole.ADMIN))
           .send({ query })
           .expect(200);
 
