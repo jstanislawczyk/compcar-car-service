@@ -5,7 +5,7 @@ import {LoginCredentials} from '../models/common/security/login-credentials';
 import {User} from '../models/entities/user';
 import {AuthenticationError} from 'apollo-server';
 import {EmailService} from '../services/email.service';
-import {Email} from '../models/common/messages/email';
+import {RegistrationConfirmationEmail} from '../models/common/email/registration-confirmation.email';
 
 @Service()
 export class SecurityFacade {
@@ -28,14 +28,11 @@ export class SecurityFacade {
   }
 
   public async registerUser(user: User): Promise<User> {
-    // const savedUser: User = await this.userService.saveUser(user);
-    const email: Email = {
-      message: 'Thank you for registering',
-      subject: 'Email registration',
-      receiverAddress: user.email,
-    };
-    await this.emailService.sendMail(email);
+    const savedUser: User = await this.userService.saveUser(user);
+    const registrationEmail: RegistrationConfirmationEmail = new RegistrationConfirmationEmail(savedUser);
 
-    return user;
+    await this.emailService.sendMail(registrationEmail);
+
+    return savedUser;
   }
 }

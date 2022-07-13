@@ -1,6 +1,6 @@
 import {Service} from 'typedi';
-import {Email} from '../models/common/messages/email';
-import nodemailer, {SentMessageInfo, Transporter} from 'nodemailer';
+import {Email} from '../models/common/email/email';
+import nodemailer, {Transporter} from 'nodemailer';
 import {Options} from 'nodemailer/lib/smtp-transport';
 import config from 'config';
 import {Logger} from '../common/logger';
@@ -39,8 +39,8 @@ export class EmailService {
       from: this.serviceEmail,
       to: email.receiverAddress,
       subject: email.subject,
-      text: email.message,
-      html: "<b>Thank you for registering</b>",
+      text: email.text,
+      html: email.html,
     };
 
     try {
