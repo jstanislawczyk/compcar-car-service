@@ -29,9 +29,9 @@ context('UserService', () => {
     userRepositoryStub.findOneOrFail.resolves(new UserBuilder().build());
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findAll', () => {
     it('should get users list', async () => {

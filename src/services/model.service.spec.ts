@@ -28,9 +28,9 @@ context('ModelService', () => {
     modelRepositoryStub.findOneOrFail.resolves(new ModelBuilder().build());
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findAllWithCount', () => {
     it('should get models list with count', async () => {

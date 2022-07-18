@@ -27,9 +27,9 @@ context('CountryService', () => {
     countryRepositoryStub.findOne.resolves(undefined);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findCountryById', () => {
     it('should find country', async () => {

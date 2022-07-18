@@ -25,9 +25,9 @@ context('CarService', () => {
     photoRepositoryStub.findOne.resolves();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findRelatedPhotosByIds', () => {
     it('should find related photos', async () => {

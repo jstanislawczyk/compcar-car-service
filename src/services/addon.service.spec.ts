@@ -28,9 +28,9 @@ context('AddonService', () => {
     addonRepositoryStub.find.resolves([]);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findAll', () => {
     it('should get addons list', async () => {

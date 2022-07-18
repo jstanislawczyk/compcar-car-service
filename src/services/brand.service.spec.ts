@@ -27,9 +27,9 @@ context('BrandService', () => {
     brandRepositoryStub.findOne.resolves(undefined);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findOne', () => {
     it('should find brand by id', async () => {

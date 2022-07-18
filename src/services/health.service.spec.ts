@@ -26,9 +26,9 @@ context('HealthService', () => {
     userRepositoryStub.findOne.resolves(new UserBuilder().build());
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('getApplicationHealth', () => {
     it(`should get ${HealthStatus.OK} status if all services and databases work`, async () => {

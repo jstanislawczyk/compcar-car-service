@@ -28,9 +28,9 @@ context('ColorService', () => {
     colorRepositoryStub.find.resolves([]);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findAll', () => {
     it('should get colors list', async () => {
