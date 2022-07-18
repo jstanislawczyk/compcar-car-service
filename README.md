@@ -2,7 +2,7 @@
 Service for handling cars, their data and comments 
 
 ## Technologies used
-* Node 14
+* Node 16
 * ApolloServer
 * Typescript
 * TypeGraphQL
