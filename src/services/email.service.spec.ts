@@ -3,11 +3,10 @@ import sinon, {SinonSandbox, SinonStub} from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import {EmailService} from './email.service';
-import {Email} from '../models/common/email/email';
-import {v4} from 'uuid';
 import nodemailer from 'nodemailer';
 import config from 'config';
 import {EmailSendingFailureError} from '../models/errors/email-sending-failure.error';
+import {email} from '../../test/fixtures/email.fixture';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -33,20 +32,12 @@ context('EmailService', () => {
     emailService = new EmailService();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('sendMail', () => {
     it('should send mail', async () => {
-      // Arrange
-      const email: Email = {
-        html: '<p>test</p>',
-        text: 'test',
-        subject: 'Test subject',
-        receiverAddress: `${v4()}@mail.com`,
-      };
-
       // Act
       await emailService.sendMail(email);
 
@@ -62,13 +53,6 @@ context('EmailService', () => {
 
     it('should throw error', async () => {
       // Arrange
-      const email: Email = {
-        html: '<p>test</p>',
-        text: 'test',
-        subject: 'Test subject',
-        receiverAddress: `${v4()}@mail.com`,
-      };
-
       sendMailStub.rejects(new Error('EmailSendingError'));
 
       // Act

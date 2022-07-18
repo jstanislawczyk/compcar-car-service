@@ -9,11 +9,11 @@ import {EmailSendingFailureError} from '../models/errors/email-sending-failure.e
 @Service()
 export class EmailService {
 
-  private readonly mailTransporter: Transporter;
-  private readonly serviceEmail: string;
+  private static mailTransporter: Transporter;
+  private static serviceEmail: string;
 
   constructor() {
-    this.serviceEmail = config.get('email.auth.user');
+    EmailService.serviceEmail = config.get('email.auth.user');
     const host: string = config.get('email.host');
     const port: number = config.get('email.port');
     const transporterOptions: Options = config.get('common.environment') === 'production'
@@ -22,7 +22,7 @@ export class EmailService {
         port,
         secure: config.get('email.secure'),
         auth: {
-          user: this.serviceEmail,
+          user: EmailService.serviceEmail,
           pass: config.get('email.auth.password'),
         },
       }
@@ -31,12 +31,12 @@ export class EmailService {
         port,
       };
 
-    this.mailTransporter = nodemailer.createTransport(transporterOptions);
+    EmailService.mailTransporter = nodemailer.createTransport(transporterOptions);
   }
 
   public async sendMail(email: Email): Promise<void> {
     const mailOptions = {
-      from: this.serviceEmail,
+      from: EmailService.serviceEmail,
       to: email.receiverAddress,
       subject: email.subject,
       text: email.text,
@@ -44,7 +44,7 @@ export class EmailService {
     };
 
     try {
-      await this.mailTransporter.sendMail(mailOptions);
+      await EmailService.mailTransporter.sendMail(mailOptions);
       Logger.log(`Email has been sent to ${email.receiverAddress} address`);
     } catch (error: any) {
       Logger.log(`Failed to send an email to ${email.receiverAddress} address. Reason: ${error.response}`);
