@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  MYSQL_USERNAME: compcar_root
-
 jobs:
   build:
 
@@ -22,7 +19,7 @@ jobs:
       mysql:
         image: mysql:8
         env:
-          MYSQL_USER: $MYSQL_USERNAME
+          MYSQL_USER: compcar_root
           MYSQL_PASSWORD: root
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: compcar
