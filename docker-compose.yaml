@@ -23,6 +23,12 @@ services:
         aliases:
           - mysql
 
+  mailhog:
+    image: 'mailhog/mailhog'
+    ports:
+      - '8025:8025'
+      - '1025:1025'
+
   car-service:
     build:
       context: .
@@ -34,6 +40,7 @@ services:
       - 4000:4000
     depends_on:
       - mysql
+      - mailhog
     networks:
       compcar:
         aliases:

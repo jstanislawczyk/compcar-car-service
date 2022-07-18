@@ -1,9 +1,10 @@
 module.exports = {
     server: {
-        port: process.env.SERVER_PORT || 4000,
+        port: Number(process.env.SERVER_PORT) || 4000,
     },
     common: {
         isDev: process.env.IS_DEV === 'true' || false,
+        environment: process.env.ENVIRONMENT || 'local',
     },
     mysql: {
         url: process.env.MYSQL_URL || 'localhost',
@@ -20,6 +21,15 @@ module.exports = {
         },
         bcrypt: {
             rounds: Number(process.env.BCRYPT_ROUNDS) || 10,
+        },
+    },
+    email: {
+        host: process.env.EMAIL_HOST || 'localhost',
+        port: Number(process.env.EMAIL_PORT) || 1025,
+        secure: process.env.EMAIL_SECURE === 'true' || false,
+        auth: {
+            user: process.env.EMAIL_USER || 'test_email_user@sometestmail.com',
+            password: process.env.EMAIL_PASS || 'pass',
         },
     },
 };

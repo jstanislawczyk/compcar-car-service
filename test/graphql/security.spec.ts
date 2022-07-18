@@ -12,76 +12,47 @@ import {ResponseError} from '../utils/interfaces/response-error';
 import {TestValidationError} from '../utils/interfaces/validation-error';
 import {CommonDatabaseUtils} from '../utils/database-utils/common.database-utils';
 import {UserRole} from '../../src/models/enums/user-role';
+import {EmailService} from '../../src/services/email.service';
 import config from 'config';
 import bcrypt from 'bcryptjs';
+import nodemailer from 'nodemailer';
+import sinon, {SinonSandbox, SinonStub} from 'sinon';
 
 describe('Security', () => {
+
+  let sandbox: SinonSandbox;
+  let emailTransporterStub: SinonStub;
+  let sendMailStub: SinonStub;
 
   before(async () =>
     await CommonDatabaseUtils.deleteAllEntities()
   );
 
-  beforeEach(async () =>
-    await UserDatabaseUtils.deleteAllUsers()
+  beforeEach(async () => {
+    await UserDatabaseUtils.deleteAllUsers();
+
+    sandbox = sinon.createSandbox();
+
+    emailTransporterStub = sandbox.stub(nodemailer, 'createTransport');
+    sendMailStub = sandbox.stub();
+
+    sendMailStub.resolves();
+    emailTransporterStub.returns({
+      sendMail: sendMailStub,
+    });
+
+    if ((EmailService as any).mailTransporter === undefined) {
+      (EmailService as any).mailTransporter = emailTransporterStub;
+    }
+  });
+
+  afterEach(() =>
+    sandbox.restore()
   );
 
   describe('register', () => {
-    it('should fail validation', async () => {
-      // Arrange
-      const registerInput: RegisterInput = {
-        email: 'wrong_mail',
-        password: 'test',
-        passwordRepeat: '123',
-      } as RegisterInput;
-
-      const query: string = `
-        mutation {
-          register (
-            registerInput: {
-              email: "${registerInput.email}",
-              password: "${registerInput.password}",
-              passwordRepeat: "${registerInput.passwordRepeat}",
-            }
-          ) {
-            id,
-            email,
-            registerDate,
-            activated,
-            role,
-          }
-        }
-      `;
-
-      // Act & Assert
-      const response: Response = await request(application.serverInfo.url)
-        .post('/graphql')
-        .send({ query })
-        .expect(200);
-
-      const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
-      expect(savedUsers).to.be.empty;
-
-      const errorsBody: ResponseError = response.body.errors[0];
-      expect(errorsBody.message).to.be.eql('Argument Validation Error');
-
-      const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
-      expect(errors).to.have.lengthOf(3);
-
-      expect(errors[0].property).to.be.eql('email');
-      expect(errors[0].value).to.be.eql('wrong_mail');
-      expect(errors[0].constraints.isEmail).to.be.eql('email must be an email');
-      expect(errors[1].property).to.be.eql('password');
-      expect(errors[1].value).to.be.eql('test');
-      expect(errors[1].constraints.isPassword).to.be.eql(
-        'Password should contain minimum six characters, at least one uppercase letter, one lowercase letter and one number'
-      );
-      expect(errors[2].property).to.be.eql('passwordRepeat');
-      expect(errors[2].value).to.be.eql('123');
-      expect(errors[2].constraints.matchProperty).to.be.eql(`"password" value doesn't match "passwordRepeat" property`);
-    });
-
     describe('should register user', () => {
-      it(`with role ${UserRole.ADMIN} set for first user registered`, async () => {
+      it(`with role ${UserRole.ADMIN} set for first registered user`, async () => {
         // Arrange
         const registerInput: RegisterInput = {
           email: 'test@mail.com',
@@ -111,7 +82,7 @@ describe('Security', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
-          .send({ query })
+          .send({query})
           .expect(200);
 
         const returnedUserBody: User = response.body.data.register as User;
@@ -123,7 +94,7 @@ describe('Security', () => {
         expect(returnedUserBody.role).to.be.eql(UserRole.ADMIN);
 
         const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
-        expect(savedUsers).to.have.length(1);
+        expect(savedUsers).to.be.an('array').length(1);
 
         expect(savedUsers[0].id).to.be.eql(Number(returnedUserBody.id));
         expect(savedUsers[0].email).to.be.eql(returnedUserBody.email);
@@ -165,7 +136,7 @@ describe('Security', () => {
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
-          .send({ query })
+          .send({query})
           .expect(200);
 
         const returnedUserBody: User = response.body.data.register as User;
@@ -180,7 +151,7 @@ describe('Security', () => {
         const registeredUser: User = savedUsers.find((user: User) =>
           user.id === Number(returnedUserBody.id)
         ) as User;
-        expect(savedUsers).to.have.length(2);
+        expect(savedUsers).to.be.an('array').length(2);
 
         expect(registeredUser.id).to.be.eql(Number(returnedUserBody.id));
         expect(registeredUser.email).to.be.eql(returnedUserBody.email);
@@ -191,105 +162,196 @@ describe('Security', () => {
       });
     });
 
-    describe('login', () => {
-      it('should fail authentication for wrong email provided', async () => {
+    describe('should throw error', () => {
+      it('if validation fails', async () => {
         // Arrange
-        const loginInput: LoginInput = {
-          email: 'not_existing@mail.com',
-          password: '1qazXSW@',
-        } as LoginInput;
+        const registerInput: RegisterInput = {
+          email: 'wrong_mail',
+          password: 'test',
+          passwordRepeat: '123',
+        } as RegisterInput;
 
         const query: string = `
-          {
-            login (
-              loginInput: {
-                email: "${loginInput.email}",
-                password: "${loginInput.password}",
+          mutation {
+            register (
+              registerInput: {
+                email: "${registerInput.email}",
+                password: "${registerInput.password}",
+                passwordRepeat: "${registerInput.passwordRepeat}",
               }
-            )
+            ) {
+              id,
+            }
           }
         `;
 
         // Act & Assert
         const response: Response = await request(application.serverInfo.url)
           .post('/graphql')
-          .send({ query })
+          .send({query})
+          .expect(200);
+
+        const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
+        expect(savedUsers).to.be.empty;
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql('Argument Validation Error');
+
+        const errors: TestValidationError[] = errorsBody.extensions.exception.validationErrors;
+        expect(errors).to.be.an('array').lengthOf(3);
+
+        expect(errors[0].property).to.be.eql('email');
+        expect(errors[0].value).to.be.eql('wrong_mail');
+        expect(errors[0].constraints.isEmail).to.be.eql('email must be an email');
+        expect(errors[1].property).to.be.eql('password');
+        expect(errors[1].value).to.be.eql('test');
+        expect(errors[1].constraints.isPassword).to.be.eql(
+          'Password should contain minimum six characters, at least one uppercase letter, one lowercase letter and one number'
+        );
+        expect(errors[2].property).to.be.eql('passwordRepeat');
+        expect(errors[2].value).to.be.eql('123');
+        expect(errors[2].constraints.matchProperty).to.be.eql(`"password" value doesn't match "passwordRepeat" property`);
+      });
+
+      it('if email sending fails', async () => {
+        // Arrange
+        const registerInput: RegisterInput = {
+          email: 'test@mail.com',
+          password: '1qazXSW@',
+          passwordRepeat: '1qazXSW@',
+        } as RegisterInput;
+
+        const query: string = `
+          mutation {
+            register (
+              registerInput: {
+                email: "${registerInput.email}",
+                password: "${registerInput.password}",
+                passwordRepeat: "${registerInput.passwordRepeat}",
+              }
+            ) {
+              id,
+            }
+          }
+        `;
+
+        sendMailStub.rejects();
+        emailTransporterStub.returns({
+          sendMail: sendMailStub,
+        });
+        (EmailService as any).mailTransporter = emailTransporterStub;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({query})
           .expect(200);
 
         const errorsBody: ResponseError = response.body.errors[0];
-        expect(errorsBody.message).to.be.eql('Authentication data are not valid');
-        expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
+        expect(errorsBody.message).to.be.eql(`Failed to send an email to ${registerInput.email} address`);
+        expect(errorsBody.extensions.code).to.be.eql('EMAIL_SENDING_FAILURE');
       });
+    });
+  });
 
-      it('should fail authentication for wrong password provided', async () => {
-        // Arrange
-        const loginInput: LoginInput = {
-          email: 'test@mail.com',
-          password: '1qazXSW@',
-        } as LoginInput;
+  describe('login', () => {
+    it('should fail authentication for wrong email provided', async () => {
+      // Arrange
+      const loginInput: LoginInput = {
+        email: 'not_existing@mail.com',
+        password: '1qazXSW@',
+      } as LoginInput;
 
-        const query: string = `
-          {
-            login (
-              loginInput: {
-                email: "${loginInput.email}",
-                password: "${loginInput.password}",
-              }
-            )
-          }
-        `;
+      const query: string = `
+        {
+          login (
+            loginInput: {
+              email: "${loginInput.email}",
+              password: "${loginInput.password}",
+            }
+          )
+        }
+      `;
 
-        const userToSave: User = new UserBuilder()
-          .withEmail(loginInput.email)
-          .build();
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
 
-        await UserDatabaseUtils.saveUser(userToSave);
+      const errorsBody: ResponseError = response.body.errors[0];
+      expect(errorsBody.message).to.be.eql('Authentication data are not valid');
+      expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
+    });
 
-        // Act & Assert
-        const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+    it('should fail authentication for wrong password provided', async () => {
+      // Arrange
+      const loginInput: LoginInput = {
+        email: 'test@mail.com',
+        password: '1qazXSW@',
+      } as LoginInput;
 
-        const errorsBody: ResponseError = response.body.errors[0];
-        expect(errorsBody.message).to.be.eql('Authentication data are not valid');
-        expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
-      });
+      const query: string = `
+        {
+          login (
+            loginInput: {
+              email: "${loginInput.email}",
+              password: "${loginInput.password}",
+            }
+          )
+        }
+      `;
 
-      it('should authenticate user', async () => {
-        // Arrange
-        const loginInput: LoginInput = {
-          email: 'test@mail.com',
-          password: '1qazXSW@',
-        } as LoginInput;
+      const userToSave: User = new UserBuilder()
+        .withEmail(loginInput.email)
+        .build();
 
-        const query: string = `
-          {
-            login (
-              loginInput: {
-                email: "${loginInput.email}",
-                password: "${loginInput.password}",
-              }
-            )
-          }
-        `;
+      await UserDatabaseUtils.saveUser(userToSave);
 
-        const saltRounds: number = config.get('security.bcrypt.rounds');
-        const userToSave: User = new UserBuilder()
-          .withEmail(loginInput.email)
-          .withPassword(bcrypt.hashSync(loginInput.password, saltRounds))
-          .build();
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
 
-        await UserDatabaseUtils.saveUser(userToSave);
+      const errorsBody: ResponseError = response.body.errors[0];
+      expect(errorsBody.message).to.be.eql('Authentication data are not valid');
+      expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
+    });
 
-        // Act & Assert
-        const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .send({ query })
-          .expect(200);
+    it('should authenticate user', async () => {
+      // Arrange
+      const loginInput: LoginInput = {
+        email: 'test@mail.com',
+        password: '1qazXSW@',
+      } as LoginInput;
 
-        expect(StringUtils.isJwtToken(response.body.data.login)).to.be.true;
-      });
+      const query: string = `
+        {
+          login (
+            loginInput: {
+              email: "${loginInput.email}",
+              password: "${loginInput.password}",
+            }
+          )
+        }
+      `;
+
+      const saltRounds: number = config.get('security.bcrypt.rounds');
+      const userToSave: User = new UserBuilder()
+        .withEmail(loginInput.email)
+        .withPassword(bcrypt.hashSync(loginInput.password, saltRounds))
+        .build();
+
+      await UserDatabaseUtils.saveUser(userToSave);
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
+
+      expect(StringUtils.isJwtToken(response.body.data.login)).to.be.true;
     });
   });
 });

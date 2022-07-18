@@ -26,9 +26,9 @@ context('EngineService', () => {
     engineRepositoryStub.findOne.resolves();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findOne', () => {
     it('should find engine by id', async () => {

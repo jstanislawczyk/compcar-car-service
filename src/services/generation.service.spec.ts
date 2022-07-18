@@ -26,9 +26,9 @@ context('GenerationService', () => {
     generationRepositoryStub.findOne.resolves();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findOne', () => {
     it('should find generation by id', async () => {

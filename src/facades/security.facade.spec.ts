@@ -9,6 +9,8 @@ import {User} from '../models/entities/user';
 import {LoginCredentials} from '../models/common/security/login-credentials';
 import {AuthenticationError} from 'apollo-server';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
+import {EmailService} from '../services/email.service';
+import {RegistrationConfirmationEmail} from '../models/common/email/registration-confirmation.email';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -18,6 +20,7 @@ context('SecurityFacade', () => {
   let sandbox: SinonSandbox;
   let userServiceStub: SinonStubbedInstance<UserService>;
   let tokenServiceStub: SinonStubbedInstance<TokenService>;
+  let emailServiceStub: SinonStubbedInstance<EmailService>;
   let securityFacade: SecurityFacade;
 
   beforeEach(() => {
@@ -25,8 +28,11 @@ context('SecurityFacade', () => {
 
     userServiceStub = sandbox.createStubInstance(UserService);
     tokenServiceStub = sandbox.createStubInstance(TokenService);
+    emailServiceStub = sandbox.createStubInstance(EmailService);
 
-    securityFacade = new SecurityFacade(userServiceStub, tokenServiceStub);
+    emailServiceStub.sendMail.resolves();
+
+    securityFacade = new SecurityFacade(userServiceStub, tokenServiceStub, emailServiceStub);
   });
 
   afterEach(() => {
@@ -83,7 +89,7 @@ context('SecurityFacade', () => {
       };
 
       userServiceStub.findOneByEmail.resolves(new UserBuilder().build());
-      tokenServiceStub.getUserToken.rejects('TokenService Error');
+      tokenServiceStub.getUserToken.throws('TokenService Error');
 
       // Act
       const authenticationTokenResult: Promise<string> = securityFacade.authorizeUser(loginCredentials);
@@ -108,18 +114,38 @@ context('SecurityFacade', () => {
       // Assert
       expect(savedUser).to.be.eql(new UserBuilder(true).build());
       expect(userServiceStub.saveUser).to.be.calledOnceWith(userToSave);
+      expect(emailServiceStub.sendMail).to.be.calledOnceWith(new RegistrationConfirmationEmail(savedUser));
     });
 
-    it('should throw error', async () => {
-      // Arrange
-      userServiceStub.saveUser.rejects(new Error('RegisterUser error'));
+    describe('should throw error', () => {
+      it('from saveUser method', async () => {
+        // Arrange
+        userServiceStub.saveUser.rejects(new Error('RegisterUser error'));
 
-      // Act
-      const userRegisterResult: Promise<User> = securityFacade.registerUser(new UserBuilder().build());
+        // Act
+        const userRegisterResult: Promise<User> = securityFacade.registerUser(new UserBuilder().build());
 
-      // Assert
-      await expect(userRegisterResult).to.eventually.be.rejectedWith('RegisterUser error');
+        // Assert
+        await expect(userRegisterResult).to.eventually.be.rejectedWith('RegisterUser error');
+        expect(userServiceStub.saveUser).to.be.calledOnce;
+        expect(emailServiceStub.sendMail).to.be.not.called;
+      });
+
+      it('from sendMail method', async () => {
+        // Arrange
+        const userToSave: User = new UserBuilder().build();
+
+        userServiceStub.saveUser.resolves(userToSave);
+        emailServiceStub.sendMail.rejects(new Error('EmailSend error'));
+
+        // Act
+        const userRegisterResult: Promise<User> = securityFacade.registerUser(userToSave);
+
+        // Assert
+        await expect(userRegisterResult).to.eventually.be.rejectedWith('EmailSend error');
+        expect(userServiceStub.saveUser).to.be.calledOnce;
+        expect(emailServiceStub.sendMail).to.be.calledOnce;
+      });
     });
   });
-
 });

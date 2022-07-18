@@ -26,9 +26,9 @@ context('CarService', () => {
     carRepositoryStub.findOne.resolves();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
 
   describe('findAll', () => {

@@ -23,9 +23,9 @@ context('CommentService', () => {
     commentService = new CommentService(commentRepositoryStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findAll', () => {
     it('should get users list', async () => {
