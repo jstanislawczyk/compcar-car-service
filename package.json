@@ -23,8 +23,10 @@
     "test:unit:coverage": "export NODE_ENV=test && npm run compile && nyc mocha './build/src/**/*.spec.js' --timeout 5000 --exit",
     "test:unit:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/src/**/*.spec.js' --timeout 5000 --exit",
     "test:unit:windows:coverage": "SET \"NODE_ENV=test\" && npm run compile && nyc mocha './build/src/**/*.spec.js' --timeout 5000 --exit",
-    "test:api": "export NODE_ENV=test && npm run compile && mocha './build/test/graphql/**/*.spec.js' --file './build/test/hooks/application-hook.js' --timeout 20000 --exit",
-    "test:api:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/test/graphql/**/*.spec.js' --file './build/test/hooks/application-hook.js' --timeout 20000 --exit",
+    "test:api": "export NODE_ENV=test && npm run compile && mocha './build/test/graphql/**/*.spec.js' --file './build/test/hooks/application-hook.js' --timeout 10000 --exit",
+    "test:api:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/test/graphql/**/*.spec.js' --file './build/test/hooks/application-hook.js' --timeout 10000 --exit",
+    "test:integration": "export NODE_ENV=test && npm run compile && mocha './build/test/integration/**/*.spec.js' --file './build/test/hooks/application-hook.js' --timeout 20000 --exit",
+    "test:integration:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/test/integration/**/*.spec.js' --file './build/test/hooks/application-hook.js' --timeout 20000 --exit",
     "start:dev": "export IS_DEV=true && nodemon -w src --ext ts --exec ts-node src/index.ts",
     "start:dev:windows": "SET \"IS_DEV=true\" && nodemon -w src --ext ts --exec ts-node src/index.ts",
     "start:prod": "node build/src/index.js"
