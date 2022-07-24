@@ -8,6 +8,9 @@ on:
 
 env:
   MYSQL_USER: compcar_root
+  MYSQL_PASSWORD: root
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_DATABASE: compcar-test
 
 jobs:
   build:
@@ -22,9 +25,9 @@ jobs:
         image: mysql:8
         env:
           MYSQL_USER: $MYSQL_USER
-          MYSQL_PASSWORD: root
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: compcar-test
+          MYSQL_PASSWORD: $MYSQL_PASSWORD
+          MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+          MYSQL_DATABASE: $MYSQL_DATABASE
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
