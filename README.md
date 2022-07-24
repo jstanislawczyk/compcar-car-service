@@ -2,7 +2,7 @@
 Service for handling cars, their data and comments 
 
 ## Technologies used
-* Node 14
+* Node 16
 * ApolloServer
 * Typescript
 * TypeGraphQL
@@ -36,9 +36,9 @@ Service for handling cars, their data and comments
 5. Run unit tests
    * Linux/Mac: `npm run test:unit`
    * Windows: `npm run test:unit:windows`
-6. Run component tests
-    * Linux/Mac: `npm run test:component`
-    * Windows: `npm run test:component:windows`
+6. Run API tests
+    * Linux/Mac: `npm run test:api`
+    * Windows: `npm run test:api:windows`
 7. Run integration tests (they require local environment images started with Docker)
     * Linux/Mac: `npm run test:integration`
     * Windows: `npm run test:integration:windows`

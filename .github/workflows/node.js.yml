@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Compcar-Test-Build
 
 on:
   push:
@@ -6,14 +6,32 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  MYSQL_USER: compcar_root
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_USER: $MYSQL_USER
+          MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: compcar-test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      mailhog:
+        image: mailhog/mailhog:v1.0.1
+        ports:
+          - 1025:1025
 
     steps:
     - uses: actions/checkout@v2
@@ -25,3 +43,5 @@ jobs:
     - run: npm run compile
     - run: npm run lint
     - run: npm run test:unit
+    - run: npm run test:api
+    - run: npm run test:integration
