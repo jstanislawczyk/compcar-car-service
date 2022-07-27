@@ -6,6 +6,8 @@ import {User} from '../models/entities/user';
 import {AuthenticationError} from 'apollo-server';
 import {EmailService} from '../services/email.service';
 import {RegistrationConfirmationEmail} from '../models/common/email/registration-confirmation.email';
+import {InactiveAccountError} from '../models/errors/inactive-account.error';
+import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
 
 @Service()
 export class SecurityFacade {
@@ -18,18 +20,26 @@ export class SecurityFacade {
   }
 
   public async authorizeUser(loginCredentials: LoginCredentials): Promise<string> {
-    try {
-      const user: User = await this.userService.findOneByEmail(loginCredentials.email);
+    const user: User | undefined = await this.userService.findOneByEmail(loginCredentials.email);
 
-      return this.tokenService.getUserToken(loginCredentials, user);
-    } catch (error) {
-      throw new AuthenticationError('Authentication data are not valid');
+    if (user === undefined) {
+      throw new AuthenticationError('Credentials are incorrect');
     }
+
+    if (!user.activated) {
+      throw new InactiveAccountError('User account is inactive. Please confirm email');
+    }
+
+    return this.tokenService.getUserToken(loginCredentials, user);
   }
 
   public async registerUser(user: User): Promise<User> {
     const savedUser: User = await this.userService.saveUser(user);
-    const registrationEmail: RegistrationConfirmationEmail = new RegistrationConfirmationEmail(savedUser);
+    const registrationConfirmation: RegistrationConfirmation =
+      await this.userService.createUserRegistrationConfirmation(savedUser);
+    const registrationEmail: RegistrationConfirmationEmail = new RegistrationConfirmationEmail(
+      savedUser, registrationConfirmation,
+    );
 
     await this.emailService.sendMail(registrationEmail);
 

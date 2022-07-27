@@ -22,6 +22,7 @@ module.exports = {
         bcrypt: {
             rounds: Number(process.env.BCRYPT_ROUNDS) || 10,
         },
+        emailConfirmationTimeoutMin: Number(process.env.EMAIL_CONFIRMATION_TIMEOUT_MIN) || 60,
     },
     email: {
         host: process.env.EMAIL_HOST || 'localhost',
@@ -31,5 +32,10 @@ module.exports = {
             user: process.env.EMAIL_USER || 'test_email_user@sometestmail.com',
             password: process.env.EMAIL_PASS || 'pass',
         },
+    },
+    services: {
+      frontend: {
+          url: process.env.SERVICE_FRONTEND_URL || 'localhost:8080',
+      },
     },
 };

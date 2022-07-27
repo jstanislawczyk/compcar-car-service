@@ -1,8 +1,9 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn} from 'typeorm';
 import {ObjectType, Field, ID} from 'type-graphql';
 import {Comment} from './comment';
 import {TypeormLoader} from 'type-graphql-dataloader';
 import {UserRole} from '../enums/user-role';
+import {RegistrationConfirmation} from './registration-confirmation';
 
 @Entity()
 @ObjectType()
@@ -37,6 +38,13 @@ export class User {
   @Field()
   @Column()
   public activated: boolean;
+
+  @OneToOne(
+    () => RegistrationConfirmation,
+    (registrationConfirmation: RegistrationConfirmation) => registrationConfirmation.user,
+  )
+  @JoinColumn()
+  public registrationConfirmation?: RegistrationConfirmation;
 
   @Field(() => [Comment])
   @OneToMany(

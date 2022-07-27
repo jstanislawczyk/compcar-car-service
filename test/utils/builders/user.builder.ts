@@ -26,6 +26,11 @@ export class UserBuilder extends Builder<User> {
     return this;
   }
 
+  public withRegisterDate(registerDate: string): UserBuilder {
+    this.entity.registerDate = registerDate;
+    return this;
+  }
+
   public withRole(role: UserRole): UserBuilder {
     this.entity.role = role;
     return this;

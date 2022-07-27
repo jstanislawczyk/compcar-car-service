@@ -51,7 +51,7 @@ context('TokenService', () => {
 
       // Act & Assert
       expect(() => tokenService.getUserToken(loginCredentials, user))
-        .to.throw('Authentication data are not valid')
+        .to.throw('Credentials are incorrect')
         .and.to.be.an.instanceOf(AuthenticationError);
     });
   });

@@ -11,6 +11,9 @@ import {AuthenticationError} from 'apollo-server';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
 import {EmailService} from '../services/email.service';
 import {RegistrationConfirmationEmail} from '../models/common/email/registration-confirmation.email';
+import {RegistrationConfirmationBuilder} from '../../test/utils/builders/registration-confirmation.builder';
+import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
+import {InactiveAccountError} from '../models/errors/inactive-account.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -68,36 +71,81 @@ context('SecurityFacade', () => {
         password: '1qazXSW@',
       };
 
-      userServiceStub.findOneByEmail.rejects(new Error('UserNotFound Error'));
+      userServiceStub.findOneByEmail.resolves();
 
       // Act
       const authenticationTokenResult: Promise<string> = securityFacade.authorizeUser(loginCredentials);
 
       // Assert
       await expect(authenticationTokenResult).to.eventually
-        .be.rejectedWith('Authentication data are not valid')
+        .be.rejectedWith('Credentials are incorrect')
         .and.be.an.instanceOf(AuthenticationError);
+      expect(userServiceStub.findOneByEmail).to.be.calledOnceWith(loginCredentials.email);
+      expect(tokenServiceStub.getUserToken).to.be.not.called;
+    });
+
+    it('should throw error if user finding fails', async () => {
+      // Arrange
+      const errorMessage: string = 'UserNotFound Error';
+      const loginCredentials: LoginCredentials = {
+        email: 'test@mail.com',
+        password: '1qazXSW@',
+      };
+
+      userServiceStub.findOneByEmail.rejects(new Error(errorMessage));
+
+      // Act
+      const authenticationTokenResult: Promise<string> = securityFacade.authorizeUser(loginCredentials);
+
+      // Assert
+      await expect(authenticationTokenResult).to.eventually
+        .be.rejectedWith(errorMessage)
+        .and.be.an.instanceOf(Error);
+      expect(userServiceStub.findOneByEmail).to.be.calledOnceWith(loginCredentials.email);
+      expect(tokenServiceStub.getUserToken).to.be.not.called;
+    });
+
+    it('should throw error if user is inactive', async () => {
+      // Arrange
+      const loginCredentials: LoginCredentials = {
+        email: 'test@mail.com',
+        password: '1qazXSW@',
+      };
+      const existingUser: User = new UserBuilder()
+        .withActivated(false)
+        .build();
+
+      userServiceStub.findOneByEmail.resolves(existingUser);
+
+      // Act
+      const authenticationTokenResult: Promise<string> = securityFacade.authorizeUser(loginCredentials);
+
+      // Assert
+      await expect(authenticationTokenResult).to.eventually
+        .be.rejectedWith('User account is inactive. Please confirm email')
+        .and.be.an.instanceOf(InactiveAccountError);
       expect(userServiceStub.findOneByEmail).to.be.calledOnceWith(loginCredentials.email);
       expect(tokenServiceStub.getUserToken).to.be.not.called;
     });
 
     it('should throw error if getUserToken fails', async () => {
       // Arrange
+      const errorMessage: string = 'TokenService Error';
       const loginCredentials: LoginCredentials = {
         email: 'test@mail.com',
         password: '1qazXSW@',
       };
 
       userServiceStub.findOneByEmail.resolves(new UserBuilder().build());
-      tokenServiceStub.getUserToken.throws('TokenService Error');
+      tokenServiceStub.getUserToken.throws(new Error(errorMessage));
 
       // Act
       const authenticationTokenResult: Promise<string> = securityFacade.authorizeUser(loginCredentials);
 
       // Assert
       await expect(authenticationTokenResult).to.eventually
-        .be.rejectedWith('Authentication data are not valid')
-        .and.be.an.instanceOf(AuthenticationError);
+        .be.rejectedWith(errorMessage)
+        .and.be.an.instanceOf(Error);
     });
   });
 
@@ -105,16 +153,22 @@ context('SecurityFacade', () => {
     it('should register user', async () => {
       // Arrange
       const userToSave: User = new UserBuilder().build();
+      const savedUser: User = new UserBuilder(true).build();
+      const registrationConfirmationToSave: RegistrationConfirmation = new RegistrationConfirmationBuilder().build();
 
-      userServiceStub.saveUser.resolves(new UserBuilder(true).build());
+      userServiceStub.saveUser.resolves(savedUser);
+      userServiceStub.createUserRegistrationConfirmation.resolves(registrationConfirmationToSave);
 
       // Act
-      const savedUser: User = await securityFacade.registerUser(userToSave);
+      const registeredUser: User = await securityFacade.registerUser(userToSave);
 
       // Assert
-      expect(savedUser).to.be.eql(new UserBuilder(true).build());
+      expect(registeredUser).to.be.eql(savedUser);
       expect(userServiceStub.saveUser).to.be.calledOnceWith(userToSave);
-      expect(emailServiceStub.sendMail).to.be.calledOnceWith(new RegistrationConfirmationEmail(savedUser));
+      expect(userServiceStub.createUserRegistrationConfirmation).to.be.calledOnceWith(savedUser);
+      expect(emailServiceStub.sendMail).to.be.calledOnceWith(
+        new RegistrationConfirmationEmail(registeredUser, registrationConfirmationToSave)
+      );
     });
 
     describe('should throw error', () => {
@@ -128,14 +182,39 @@ context('SecurityFacade', () => {
         // Assert
         await expect(userRegisterResult).to.eventually.be.rejectedWith('RegisterUser error');
         expect(userServiceStub.saveUser).to.be.calledOnce;
-        expect(emailServiceStub.sendMail).to.be.not.called;
+        expect(userServiceStub.createUserRegistrationConfirmation).to.not.be.called;
+        expect(emailServiceStub.sendMail).to.not.be.called;
+      });
+
+      it('from createUserRegistrationConfirmation method', async () => {
+        // Arrange
+        const userToSave: User = new UserBuilder().build();
+        const savedUser: User = new UserBuilder(true).build();
+        const errorMessage: string = 'RegistrationConfirmation Error';
+
+        userServiceStub.saveUser.resolves(savedUser);
+        userServiceStub.createUserRegistrationConfirmation.rejects(new Error(errorMessage));
+
+        // Act
+        const userRegisterResult: Promise<User> = securityFacade.registerUser(userToSave);
+
+        // Assert
+        await expect(userRegisterResult).to.eventually
+          .be.rejectedWith(errorMessage)
+          .and.be.instanceOf(Error);
+        expect(userServiceStub.saveUser).to.be.calledOnce;
+        expect(userServiceStub.createUserRegistrationConfirmation).to.be.calledOnce;
+        expect(emailServiceStub.sendMail).to.not.be.called;
       });
 
       it('from sendMail method', async () => {
         // Arrange
         const userToSave: User = new UserBuilder().build();
+        const savedUser: User = new UserBuilder(true).build();
+        const registrationConfirmationToSave: RegistrationConfirmation = new RegistrationConfirmationBuilder().build();
 
-        userServiceStub.saveUser.resolves(userToSave);
+        userServiceStub.saveUser.resolves(savedUser);
+        userServiceStub.createUserRegistrationConfirmation.resolves(registrationConfirmationToSave);
         emailServiceStub.sendMail.rejects(new Error('EmailSend error'));
 
         // Act

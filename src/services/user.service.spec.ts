@@ -10,6 +10,10 @@ import config from 'config';
 import {EntityAlreadyExistsError} from '../models/errors/entity-already-exists.error';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
 import {UserRole} from '../models/enums/user-role';
+import {RegistrationConfirmationRepository} from '../repositories/registration-confirmation.repository';
+import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
+import {RegistrationConfirmationBuilder} from '../../test/utils/builders/registration-confirmation.builder';
+import {StringUtils} from '../../test/utils/common/string.utils';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -18,13 +22,15 @@ context('UserService', () => {
 
   let sandbox: SinonSandbox;
   let userRepositoryStub: SinonStubbedInstance<UserRepository>;
+  let registrationConfirmationRepositoryStub: SinonStubbedInstance<RegistrationConfirmationRepository>;
   let userService: UserService;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
     userRepositoryStub = sandbox.createStubInstance(UserRepository);
-    userService = new UserService(userRepositoryStub);
+    registrationConfirmationRepositoryStub = sandbox.createStubInstance(RegistrationConfirmationRepository);
+    userService = new UserService(userRepositoryStub, registrationConfirmationRepositoryStub);
 
     userRepositoryStub.findOneOrFail.resolves(new UserBuilder().build());
   });
@@ -47,7 +53,7 @@ context('UserService', () => {
       const usersResult: User[] = await userService.findAll();
 
       // Assert
-      expect(usersResult).to.be.have.length(2);
+      expect(usersResult).to.be.an('array').length(2);
       expect(usersResult[0]).to.be.eql(usersList[0]);
       expect(usersResult[1]).to.be.eql(usersList[1]);
       expect(userRepositoryStub.find).to.be.calledOnce;
@@ -75,7 +81,6 @@ context('UserService', () => {
 
       // Assert
       expect(userResult).to.be.eql(userResult);
-      expect(userRepositoryStub.findOneOrFail).to.be.calledOnce;
       expect(userRepositoryStub.findOneOrFail).to.be.calledOnceWith({
         id: userId,
       });
@@ -99,21 +104,32 @@ context('UserService', () => {
       const email: string = 'test@mail.com';
 
       // Act
-      const userResult: User = await userService.findOneByEmail(email);
+      const userResult: User | undefined = await userService.findOneByEmail(email);
 
       // Assert
       expect(userResult).to.be.eql(userResult);
-      expect(userRepositoryStub.findOneOrFail).to.be.calledOnceWith({
+      expect(userRepositoryStub.findOne).to.be.calledOnceWith({
         email,
       });
     });
 
-    it('should throw error', async () => {
+    it('should return undefined', async () => {
       // Arrange
-      userRepositoryStub.findOneOrFail.rejects(new Error('Find error'));
+      userRepositoryStub.findOne.resolves();
 
       // Act
-      const userResult: Promise<User> = userService.findOneByEmail('test@mail.com');
+      const user: User | undefined = await userService.findOneByEmail('test@mail.com');
+
+      // Assert
+      await expect(user).to.be.undefined;
+    });
+
+    it('should throw error', async () => {
+      // Arrange
+      userRepositoryStub.findOne.rejects(new Error('Find error'));
+
+      // Act
+      const userResult: Promise<User | undefined> = userService.findOneByEmail('test@mail.com');
 
       // Assert
       await expect(userResult).to.eventually.be.rejectedWith('Find error');
@@ -266,6 +282,49 @@ context('UserService', () => {
 
       // Assert
       await expect(savedUserResult).to.eventually.be.rejectedWith('DB error');
+    });
+  });
+
+  describe('createUserRegistrationConfirmation', () => {
+    it('should save registration confirmation', async () => {
+      // Arrange
+      const user: User = new UserBuilder(true)
+        .withRegisterDate('2022-07-27T18:00:00.000Z')
+        .build();
+      const savedRegistrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder(true).build();
+
+      registrationConfirmationRepositoryStub.save.resolves(savedRegistrationConfirmation);
+
+      // Act
+      const returnedRegistrationConfirmation: RegistrationConfirmation =
+        await userService.createUserRegistrationConfirmation(user);
+
+      // Assert
+      expect(returnedRegistrationConfirmation).to.be.eql(savedRegistrationConfirmation);
+      expect(registrationConfirmationRepositoryStub.save).to.be.calledOnce;
+
+      const registrationConfirmationSaveArg: RegistrationConfirmation =
+        registrationConfirmationRepositoryStub.save.firstCall.firstArg;
+      expect(registrationConfirmationSaveArg.id).to.be.undefined;
+      expect(registrationConfirmationSaveArg.confirmedAt).to.be.undefined;
+      expect(registrationConfirmationSaveArg.allowedConfirmationDate).to.be.eql('2022-07-27T19:00:00.000Z');
+      expect(registrationConfirmationSaveArg.user).to.be.eql(user);
+      expect(StringUtils.isV4(returnedRegistrationConfirmation.code)).to.be.true;
+    });
+
+    it('should rethrow error', async () => {
+      // Arrange
+      const errorMessage: string = 'DB error';
+      const user: User = new UserBuilder(true).build();
+
+      registrationConfirmationRepositoryStub.save.rejects(new Error(errorMessage));
+
+      // Act
+      const registrationConfirmationSavingResult: Promise<RegistrationConfirmation> =
+        userService.createUserRegistrationConfirmation(user);
+
+      // Assert
+      await expect(registrationConfirmationSavingResult).to.eventually.be.rejectedWith(errorMessage);
     });
   });
 });
