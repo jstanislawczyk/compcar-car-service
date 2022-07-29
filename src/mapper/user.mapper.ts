@@ -12,7 +12,7 @@ export class UserMapper {
       password: registerInput.password,
       registerDate: new Date().toISOString(),
       role: UserRole.USER,
-      activated: true,
+      activated: false,
     };
   }
 }
