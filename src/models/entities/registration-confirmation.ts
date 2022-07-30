@@ -10,7 +10,6 @@ export class RegistrationConfirmation {
   @PrimaryGeneratedColumn()
   public id?: number;
 
-  @Field()
   @Column()
   public code: string;
 
