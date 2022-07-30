@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Addon} from '../../../src/models/entities/addon';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class AddonDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class AddonDatabaseUtils {
     return this.getAddonRepository().find();
   }
 
-  public static getAddonById(id: number): Promise<Addon | undefined> {
-    return this.getAddonRepository().findOne({ id });
+  public static getAddonById(id: number, options: FindOneOptions<Addon> = {}): Promise<Addon | undefined> {
+    return this.getAddonRepository().findOne({ id }, options);
   }
 
-  public static getAddonByIdOrFail(id: number): Promise<Addon> {
-    return this.getAddonRepository().findOneOrFail({ id });
+  public static getAddonByIdOrFail(id: number, options: FindOneOptions<Addon> = {}): Promise<Addon> {
+    return this.getAddonRepository().findOneOrFail({ id }, options);
   }
 
   public static saveAddon(addon: Addon): Promise<Addon> {

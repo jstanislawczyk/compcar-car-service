@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Engine} from '../../../src/models/entities/engine';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class EngineDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class EngineDatabaseUtils {
     return this.getEngineRepository().find();
   }
 
-  public static getEngineById(id: number): Promise<Engine | undefined> {
-    return this.getEngineRepository().findOne({ id });
+  public static getEngineById(id: number, options: FindOneOptions<Engine> = {}): Promise<Engine | undefined> {
+    return this.getEngineRepository().findOne({ id }, options);
   }
 
-  public static getEngineByIdOrFail(id: number): Promise<Engine> {
-    return this.getEngineRepository().findOneOrFail({ id });
+  public static getEngineByIdOrFail(id: number, options: FindOneOptions<Engine> = {}): Promise<Engine> {
+    return this.getEngineRepository().findOneOrFail({ id }, options);
   }
 
   public static saveEngine(engine: Engine): Promise<Engine> {

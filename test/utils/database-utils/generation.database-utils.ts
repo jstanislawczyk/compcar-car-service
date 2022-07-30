@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Generation} from '../../../src/models/entities/generation';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class GenerationDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class GenerationDatabaseUtils {
     return this.getGenerationRepository().find();
   }
 
-  public static getGenerationById(id: number): Promise<Generation | undefined> {
-    return this.getGenerationRepository().findOne({ id });
+  public static getGenerationById(id: number, options: FindOneOptions<Generation> = {}): Promise<Generation | undefined> {
+    return this.getGenerationRepository().findOne({ id }, options);
   }
 
-  public static getGenerationByIdOrFail(id: number): Promise<Generation> {
-    return this.getGenerationRepository().findOneOrFail({ id });
+  public static getGenerationByIdOrFail(id: number, options: FindOneOptions<Generation> = {}): Promise<Generation> {
+    return this.getGenerationRepository().findOneOrFail({ id }, options);
   }
 
   public static saveGeneration(generation: Generation): Promise<Generation> {

@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Photo} from '../../../src/models/entities/photo';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class PhotoDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class PhotoDatabaseUtils {
     return this.getPhotoRepository().find();
   }
 
-  public static getPhotoById(id: number): Promise<Photo | undefined> {
-    return this.getPhotoRepository().findOne({ id });
+  public static getPhotoById(id: number, options: FindOneOptions<Photo> = {}): Promise<Photo | undefined> {
+    return this.getPhotoRepository().findOne({ id }, options);
   }
 
-  public static getPhotoByIdOrFail(id: number): Promise<Photo> {
-    return this.getPhotoRepository().findOneOrFail({ id });
+  public static getPhotoByIdOrFail(id: number, options: FindOneOptions<Photo> = {}): Promise<Photo> {
+    return this.getPhotoRepository().findOneOrFail({ id }, options);
   }
 
   public static savePhoto(photo: Photo): Promise<Photo> {

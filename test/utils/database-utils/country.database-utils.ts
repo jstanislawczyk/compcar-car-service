@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Country} from '../../../src/models/entities/country';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class CountryDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class CountryDatabaseUtils {
     return this.getCountryRepository().find();
   }
 
-  public static getCountryById(id: number): Promise<Country | undefined> {
-    return this.getCountryRepository().findOne({ id });
+  public static getCountryById(id: number, options: FindOneOptions<Country> = {}): Promise<Country | undefined> {
+    return this.getCountryRepository().findOne({ id }, options);
   }
 
-  public static getCountryByIdOrFail(id: number): Promise<Country> {
-    return this.getCountryRepository().findOneOrFail({ id });
+  public static getCountryByIdOrFail(id: number, options: FindOneOptions<Country> = {}): Promise<Country> {
+    return this.getCountryRepository().findOneOrFail({ id }, options);
   }
 
   public static saveCountry(country: Country): Promise<Country> {
