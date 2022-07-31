@@ -10,6 +10,8 @@ import {RegistrationConfirmationRepository} from '../repositories/registration-c
 import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
 import {v4} from 'uuid';
 import {DateUtils} from '../common/date.utils';
+import {NotFoundError} from '../models/errors/not-found.error';
+import {OutdatedError} from '../models/errors/outdated.error';
 
 @Service()
 export class UserService {
@@ -65,6 +67,25 @@ export class UserService {
     registrationConfirmation.user = user;
 
     return this.registrationConfirmationRepository.save(registrationConfirmation);
+  }
+
+  public async activateUser(confirmationCode: string): Promise<RegistrationConfirmation> {
+    const registrationConfirmation: RegistrationConfirmation | undefined = await this.registrationConfirmationRepository
+      .findOne({
+        code: confirmationCode,
+      });
+
+    if (registrationConfirmation === undefined) {
+      throw new NotFoundError('Unknown registration confirmation code');
+    }
+
+    if (new Date() > new Date(registrationConfirmation.allowedConfirmationDate)) {
+      throw new OutdatedError('Unknown registration confirmation code');
+    }
+
+    registrationConfirmation.confirmedAt = new Date().toISOString();
+
+    return registrationConfirmation;
   }
 
   private async setupUserData(user: User): Promise<User> {

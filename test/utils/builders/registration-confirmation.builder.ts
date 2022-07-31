@@ -20,4 +20,14 @@ export class RegistrationConfirmationBuilder extends Builder<RegistrationConfirm
     this.entity.allowedConfirmationDate = allowedConfirmationDate;
     return this;
   }
+
+  public withConfirmedAt(confirmedAt: string): RegistrationConfirmationBuilder {
+    this.entity.confirmedAt = confirmedAt;
+    return this;
+  }
+
+  public withCode(code: string): RegistrationConfirmationBuilder {
+    this.entity.code = code;
+    return this;
+  }
 }

@@ -11,6 +11,9 @@ import {LoginCredentials} from '../models/common/security/login-credentials';
 import {User} from '../models/entities/user';
 import {RegisterInput} from '../models/inputs/user/register.input';
 import {UserBuilder} from '../../test/utils/builders/user.builder';
+import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
+import {RegistrationConfirmationBuilder} from '../../test/utils/builders/registration-confirmation.builder';
+import {v4} from 'uuid';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -122,6 +125,42 @@ context('SecurityResolver', () => {
 
       // Assert
       await expect(registeredUserResult).to.eventually.be.rejectedWith('RegisterUser error');
+    });
+  });
+
+  describe('activateUser', () => {
+    it('should activate user', async () => {
+      // Arrange
+      const confirmationCode: string = v4();
+      const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+        .withCode(confirmationCode)
+        .withConfirmedAt(new Date().toISOString())
+        .build();
+
+      securityFacadeStub.activateUser.resolves(registrationConfirmation);
+
+      // Act
+      const returnedRegistrationConfirmation: RegistrationConfirmation = await securityResolver.activateUser(confirmationCode);
+
+      // Assert
+      expect(returnedRegistrationConfirmation).to.be.eql(registrationConfirmation);
+      expect(securityFacadeStub.activateUser).to.be.calledOnceWith(confirmationCode);
+    });
+
+    it('should rethrow error from facade', async () => {
+      // Arrange
+      const errorMessage: string = 'ActivateUser error';
+
+      securityFacadeStub.activateUser.rejects(new Error(errorMessage));
+
+      // Act
+      const result: Promise<RegistrationConfirmation> = securityResolver.activateUser(v4());
+
+      // Assert
+      await expect(result).to.be
+        .eventually.rejectedWith(errorMessage)
+        .and.be.instanceOf(Error);
+      expect(securityFacadeStub.activateUser).to.be.calledOnce;
     });
   });
 });

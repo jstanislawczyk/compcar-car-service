@@ -14,6 +14,7 @@ import {RegistrationConfirmationEmail} from '../models/common/email/registration
 import {RegistrationConfirmationBuilder} from '../../test/utils/builders/registration-confirmation.builder';
 import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
 import {InactiveAccountError} from '../models/errors/inactive-account.error';
+import {v4} from 'uuid';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -225,6 +226,42 @@ context('SecurityFacade', () => {
         expect(userServiceStub.saveUser).to.be.calledOnce;
         expect(emailServiceStub.sendMail).to.be.calledOnce;
       });
+    });
+  });
+
+  describe('activateUser', () => {
+    it('should activate user', async () => {
+      // Arrange
+      const confirmationCode: string = v4();
+      const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+        .withCode(confirmationCode)
+        .withConfirmedAt(new Date().toISOString())
+        .build();
+
+      userServiceStub.activateUser.resolves(registrationConfirmation);
+
+      // Act
+      const returnedRegistrationConfirmation: RegistrationConfirmation = await securityFacade.activateUser(confirmationCode);
+
+      // Assert
+      expect(returnedRegistrationConfirmation).to.be.eql(registrationConfirmation);
+      expect(userServiceStub.activateUser).to.be.calledOnceWith(confirmationCode);
+    });
+
+    it('should rethrow error from user service', async () => {
+      // Arrange
+      const errorMessage: string = 'ActivateUser error';
+
+      userServiceStub.activateUser.rejects(new Error(errorMessage));
+
+      // Act
+      const result: Promise<RegistrationConfirmation> = securityFacade.activateUser(v4());
+
+      // Assert
+      await expect(result).to.be
+        .eventually.rejectedWith(errorMessage)
+        .and.be.instanceOf(Error);
+      expect(userServiceStub.activateUser).to.be.calledOnce;
     });
   });
 });

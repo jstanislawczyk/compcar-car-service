@@ -8,6 +8,7 @@ import {User} from '../models/entities/user';
 import {SecurityFacade} from '../facades/security.facade';
 import {LoginCredentials} from '../models/common/security/login-credentials';
 import {LoginCredentialsMapper} from '../mapper/login-credentials.mapper';
+import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
 
 @Service()
 @Resolver(() => User)
@@ -38,4 +39,10 @@ export class SecurityResolver {
     return await this.securityFacade.registerUser(user);
   }
 
+  @Mutation(() => RegistrationConfirmation)
+  public async activateUser(@Arg('confirmationCode') confirmationCode: string): Promise<RegistrationConfirmation> {
+    Logger.log(`Activate registration confirmation with code=${confirmationCode}`);
+
+    return await this.securityFacade.activateUser(confirmationCode);
+  }
 }

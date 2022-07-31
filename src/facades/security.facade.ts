@@ -45,4 +45,8 @@ export class SecurityFacade {
 
     return savedUser;
   }
+
+  public activateUser(confirmationCode: string): Promise<RegistrationConfirmation> {
+    return this.userService.activateUser(confirmationCode);
+  }
 }
