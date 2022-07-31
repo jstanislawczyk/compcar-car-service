@@ -30,9 +30,9 @@ context('ModelResolver', () => {
     modelResolver = new ModelResolver(modelFacadeStub, paginationMapperStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('getModelsWithCount', () => {
     it('should find models with count', async () => {
@@ -86,8 +86,8 @@ context('ModelResolver', () => {
 
       // Assert
       await expect(returnedModelsWithCountOutputResult).to.eventually
-          .be.rejectedWith('FindAllWithCount error')
-          .and.to.be.an.instanceOf(Error);
+        .be.rejectedWith('FindAllWithCount error')
+        .and.to.be.an.instanceOf(Error);
       expect(modelFacadeStub.findAllModelsWithCount).to.be.calledOnceWith(paginationOptions);
     });
   });
@@ -97,8 +97,8 @@ context('ModelResolver', () => {
       // Arrange
       const modelId: number = 1;
       const existingModel: Model = new ModelBuilder()
-          .withId(modelId)
-          .build();
+        .withId(modelId)
+        .build();
 
       modelFacadeStub.findModelById.resolves(existingModel);
 
@@ -121,8 +121,8 @@ context('ModelResolver', () => {
 
       // Assert
       await expect(returnedModelResult).to.eventually
-          .be.rejectedWith('Not Found')
-          .and.to.be.an.instanceOf(Error);
+        .be.rejectedWith('Not Found')
+        .and.to.be.an.instanceOf(Error);
       expect(modelFacadeStub.findModelById).to.be.calledOnceWith(modelId);
     });
   });

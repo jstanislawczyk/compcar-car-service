@@ -22,9 +22,9 @@ context('AuthChecker', () => {
     validateTokenStub = sandbox.stub(TokenService.prototype, 'isTokenValid');
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('customAuthChecker', () => {
     it('should validate token', () => {

@@ -39,9 +39,9 @@ context('SecurityFacade', () => {
     securityFacade = new SecurityFacade(userServiceStub, tokenServiceStub, emailServiceStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('authorizeUser', () => {
     it('should return token', async () => {

@@ -28,9 +28,9 @@ context('UserCommentFacade', () => {
     userCommentFacade = new UserCommentFacade(commentServiceStub, userServiceStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findAll', () => {
     it('should return comments list', async () => {
@@ -49,7 +49,7 @@ context('UserCommentFacade', () => {
       const comments: Comment[] = await userCommentFacade.findAll();
 
       // Assert
-      expect(comments).to.have.length(2);
+      expect(comments).to.be.an('array').length(2);
       expect(comments).to.be.eql(returnedComments);
     });
 

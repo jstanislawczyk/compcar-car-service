@@ -51,7 +51,7 @@ context('AddonResolver', () => {
       const addons: Addon[] = await addonResolver.getAddons();
 
       // Assert
-      expect(addons).to.have.length(2);
+      expect(addons).to.be.an('array').length(2);
       expect(addons).to.be.eql(savedAddons);
     });
 

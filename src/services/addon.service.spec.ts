@@ -49,7 +49,7 @@ context('AddonService', () => {
       const addonsResult: Addon[] = await addonService.findAll();
 
       // Assert
-      expect(addonsResult).to.be.have.length(2);
+      expect(addonsResult).to.be.an('array').length(2);
       expect(addonsResult[0]).to.be.eql(addonsList[0]);
       expect(addonsResult[1]).to.be.eql(addonsList[1]);
       expect(addonRepositoryStub.find).to.be.calledOnce;

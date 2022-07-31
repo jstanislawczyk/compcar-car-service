@@ -29,9 +29,9 @@ context('BrandCountryFacade', () => {
     brandCountryFacade = new BrandCountryFacade(brandServiceStub, countryServiceStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findOne', () => {
     it('should find brand by id', async () => {

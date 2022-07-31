@@ -17,9 +17,9 @@ context('MatchProperty', () => {
     matchPropertyValidator = new MatchPropertyValidator();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('validate', () => {
     it('should validate equal values', () => {

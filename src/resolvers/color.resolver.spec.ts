@@ -51,7 +51,7 @@ context('ColorResolver', () => {
       const colors: Color[] = await colorResolver.getColors();
 
       // Assert
-      expect(colors).to.have.length(2);
+      expect(colors).to.be.an('array').length(2);
       expect(colors).to.be.eql(savedColors);
     });
 

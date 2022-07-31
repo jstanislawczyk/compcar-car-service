@@ -36,9 +36,9 @@ context('CarFacade', () => {
     carFacade = new CarFacade(carServiceStub, generationServiceStub, photoServiceStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findAllCars', () => {
     it('should find all cars', async () => {
@@ -74,7 +74,7 @@ context('CarFacade', () => {
       await expect(returnedCarsResult).to.eventually
         .be.rejectedWith('Not Found')
         .and.to.be.an.instanceOf(Error);
-      expect(carServiceStub.findAll).to.be.calledOnceWith();
+      expect(carServiceStub.findAll).to.be.calledOnce;
     });
   });
 

@@ -17,9 +17,9 @@ context('MatchProperty', () => {
     isGreaterOrEqualThanValidator = new IsGreaterOrEqualThanValidator();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('validate', () => {
     it('should validate if property value is greater than compared property', () => {

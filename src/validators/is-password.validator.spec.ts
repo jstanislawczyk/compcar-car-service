@@ -16,9 +16,9 @@ context('IsPasswordValidator', () => {
     passwordValidator = new IsPasswordValidator();
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('validate', () => {
     it('should validate password', () => {

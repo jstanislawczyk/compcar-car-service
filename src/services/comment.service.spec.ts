@@ -44,7 +44,7 @@ context('CommentService', () => {
       const commentsResult: Comment[] = await commentService.findAll();
 
       // Assert
-      expect(commentsResult).to.be.have.length(2);
+      expect(commentsResult).to.be.an('array').length(2);
       expect(commentsResult[0]).to.be.eql(usersList[0]);
       expect(commentsResult[1]).to.be.eql(usersList[1]);
       expect(commentRepositoryStub.find).to.be.calledOnce;

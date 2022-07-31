@@ -36,9 +36,9 @@ context('SecurityResolver', () => {
     securityResolver = new SecurityResolver(securityFacadeStub, loginCredentialsMapperStub, userMapperStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('login', () => {
     it('should return authentication token', async () => {
