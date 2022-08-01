@@ -19,6 +19,9 @@ import nodemailer from 'nodemailer';
 import sinon, {SinonSandbox, SinonStub} from 'sinon';
 import {RegistrationConfirmation} from '../../src/models/entities/registration-confirmation';
 import sinonChai from 'sinon-chai';
+import {v4} from 'uuid';
+import {RegistrationConfirmationBuilder} from '../utils/builders/registration-confirmation.builder';
+import {RegistrationConfirmationDatabaseUtils} from '../utils/database-utils/registration-confirmation.database-utils';
 
 use(sinonChai);
 
@@ -419,6 +422,115 @@ describe('Security', () => {
       const errorsBody: ResponseError = response.body.errors[0];
       expect(errorsBody.message).to.be.eql('Credentials are incorrect');
       expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
+    });
+  });
+
+  describe('activateUser', () => {
+    it('should activate user', async () => {
+      // Arrange
+      const code: string = v4();
+
+      const query: string = `
+        mutation {
+          activateUser (
+            confirmationCode: "${code}",
+          ) {
+            id,
+            allowedConfirmationDate,
+            confirmedAt,
+          },
+        }
+      `;
+
+      const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+        .withCode(code)
+        .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+        .build();
+
+      const userToSave: User = new UserBuilder()
+        .withRegistrationConfirmation(registrationConfirmation)
+        .withActivated(false)
+        .build();
+
+      await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
+      await UserDatabaseUtils.saveUser(userToSave);
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({query})
+        .expect(200);
+
+      const returnedRegistrationConfirmationBody: RegistrationConfirmation =
+        response.body.data.activateUser as RegistrationConfirmation;
+
+      expect(Number(returnedRegistrationConfirmationBody.id)).to.be.above(0);
+      expect(returnedRegistrationConfirmationBody.allowedConfirmationDate).to.be
+        .eql(registrationConfirmation.allowedConfirmationDate);
+      expect(DateUtils.isISODate(returnedRegistrationConfirmationBody.confirmedAt as string)).to.be.true;
+
+      const activatedUser: User = await UserDatabaseUtils.getUserByIdOrFail(userToSave.id as number);
+      expect(activatedUser.activated).to.be.true;
+    });
+
+    describe('should throw error', () => {
+      it("if code doesn't exist", async () => {
+        // Arrange
+        const code: string = v4();
+
+        const query: string = `
+          mutation {
+            activateUser (
+              confirmationCode: "${code}",
+            ) {
+              id,
+            },
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({query})
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql(`Registration confirmation with code=${code} not found`);
+        expect(errorsBody.extensions.code).to.be.eql('NOT_FOUND');
+      });
+
+      it('if registration confirmation is outdated', async () => {
+        // Arrange
+        const code: string = v4();
+
+        const query: string = `
+          mutation {
+            activateUser (
+              confirmationCode: "${code}",
+            ) {
+              id,
+            },
+          }
+        `;
+
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withCode(code)
+          .withAllowedConfirmationDate(new Date(Date.now() - 10_000).toISOString())
+          .build();
+
+
+        await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({query})
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql(`Registration confirmation with code=${code} is outdated`);
+        expect(errorsBody.extensions.code).to.be.eql('OUTDATED');
+      });
     });
   });
 });

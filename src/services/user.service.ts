@@ -71,21 +71,36 @@ export class UserService {
 
   public async activateUser(confirmationCode: string): Promise<RegistrationConfirmation> {
     const registrationConfirmation: RegistrationConfirmation | undefined = await this.registrationConfirmationRepository
-      .findOne({
-        code: confirmationCode,
-      });
+      .findOne(
+        {
+          code: confirmationCode,
+        },
+        {
+          relations: ['user'],
+        }
+      );
 
     if (registrationConfirmation === undefined) {
-      throw new NotFoundError('Unknown registration confirmation code');
+      throw new NotFoundError(`Registration confirmation with code=${confirmationCode} not found`);
     }
 
     if (new Date() > new Date(registrationConfirmation.allowedConfirmationDate)) {
-      throw new OutdatedError('Unknown registration confirmation code');
+      throw new OutdatedError(`Registration confirmation with code=${confirmationCode} is outdated`);
     }
 
-    registrationConfirmation.confirmedAt = new Date().toISOString();
+    const activatedUser: User = await this.userRepository.save({
+      ...registrationConfirmation.user,
+      activated: true,
+    });
+    const confirmedRegistrationConfirmation = await this.registrationConfirmationRepository.save({
+      ...registrationConfirmation,
+      confirmedAt: new Date().toISOString(),
+    });
 
-    return registrationConfirmation;
+    return {
+      ...confirmedRegistrationConfirmation,
+      user: activatedUser,
+    };
   }
 
   private async setupUserData(user: User): Promise<User> {

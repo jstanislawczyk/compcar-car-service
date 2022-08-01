@@ -2,7 +2,7 @@ import {UserService} from './user.service';
 import {UserRepository} from '../repositories/user.repository';
 import {expect, use} from 'chai';
 import {User} from '../models/entities/user';
-import sinon, {SinonSandbox, SinonStub, SinonStubbedInstance} from 'sinon';
+import sinon, {SinonFakeTimers, SinonSandbox, SinonStub, SinonStubbedInstance} from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import bcrypt from 'bcryptjs';
@@ -14,6 +14,9 @@ import {RegistrationConfirmationRepository} from '../repositories/registration-c
 import {RegistrationConfirmation} from '../models/entities/registration-confirmation';
 import {RegistrationConfirmationBuilder} from '../../test/utils/builders/registration-confirmation.builder';
 import {StringUtils} from '../../test/utils/common/string.utils';
+import {v4} from 'uuid';
+import {NotFoundError} from '../models/errors/not-found.error';
+import {OutdatedError} from '../models/errors/outdated.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -24,6 +27,7 @@ context('UserService', () => {
   let userRepositoryStub: SinonStubbedInstance<UserRepository>;
   let registrationConfirmationRepositoryStub: SinonStubbedInstance<RegistrationConfirmationRepository>;
   let userService: UserService;
+  let clock: SinonFakeTimers;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -35,9 +39,13 @@ context('UserService', () => {
     userRepositoryStub.findOneOrFail.resolves(new UserBuilder().build());
   });
 
-  afterEach(() =>
-    sandbox.restore()
-  );
+  afterEach(() => {
+    if (clock) {
+      clock.restore();
+    }
+
+    sandbox.restore();
+  });
 
   describe('findAll', () => {
     it('should get users list', async () => {
@@ -325,6 +333,177 @@ context('UserService', () => {
 
       // Assert
       await expect(registrationConfirmationSavingResult).to.eventually.be.rejectedWith(errorMessage);
+    });
+  });
+
+  describe('activateUser', () => {
+    it('should activate user', async () => {
+      // Arrange
+      const code: string = v4();
+      const newDate: Date = new Date();
+      const user: User = new UserBuilder()
+        .withActivated(true)
+        .build();
+      const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+        .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+        .withCode(code)
+        .withUser(user)
+        .build();
+
+      clock = sinon.useFakeTimers(newDate);
+      registrationConfirmationRepositoryStub.findOne.resolves(registrationConfirmation);
+      registrationConfirmationRepositoryStub.save.resolves({
+        ...registrationConfirmation,
+        confirmedAt: newDate.toISOString(),
+      });
+      userRepositoryStub.save.resolves({
+        ...user,
+        activated: true,
+      });
+
+      // Act
+      const updatedRegistrationConfirmation: RegistrationConfirmation = await userService.activateUser(code);
+
+      // Assert
+      expect(updatedRegistrationConfirmation.id).to.be.eql(registrationConfirmation.id);
+      expect(updatedRegistrationConfirmation.allowedConfirmationDate).to.be.eql(registrationConfirmation.allowedConfirmationDate);
+      expect(updatedRegistrationConfirmation.confirmedAt).to.be.eql(newDate.toISOString());
+      expect(updatedRegistrationConfirmation.code).to.be.eql(registrationConfirmation.code);
+      expect(updatedRegistrationConfirmation.user).to.be.eql(user);
+
+      expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnceWith({ code });
+      expect(userRepositoryStub.save).to.be.calledOnceWith({
+        ...user,
+        activated: true,
+      });
+      expect(registrationConfirmationRepositoryStub.save).to.be.calledOnceWith({
+        ...registrationConfirmation,
+        confirmedAt: newDate.toISOString(),
+      });
+    });
+
+    describe('should throw error', () => {
+      it("if confirmation with code doesn't exist", async () => {
+        // Arrange
+        const code: string = v4();
+
+        registrationConfirmationRepositoryStub.findOne.resolves();
+
+        // Act
+        const result: Promise<RegistrationConfirmation> = userService.activateUser(code);
+
+        // Assert
+        await expect(result).to.eventually
+          .be.rejectedWith(`Registration confirmation with code=${code} not found`)
+          .and.be.instanceOf(NotFoundError);
+        expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnce;
+        expect(userRepositoryStub.save).to.be.not.called;
+        expect(registrationConfirmationRepositoryStub.save).to.be.not.called;
+      });
+
+      it('if confirmation is outdated', async () => {
+        // Arrange
+        const code: string = v4();
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withCode(code)
+          .withAllowedConfirmationDate(new Date(Date.now() - 10_000).toISOString())
+          .build();
+
+        registrationConfirmationRepositoryStub.findOne.resolves(registrationConfirmation);
+
+        // Act
+        const result: Promise<RegistrationConfirmation> = userService.activateUser(registrationConfirmation.code);
+
+        // Assert
+        await expect(result).to.eventually
+          .be.rejectedWith(`Registration confirmation with code=${code} is outdated`)
+          .and.be.instanceOf(OutdatedError);
+        expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnce;
+        expect(userRepositoryStub.save).to.be.not.called;
+        expect(registrationConfirmationRepositoryStub.save).to.be.not.called;
+      });
+
+      it('coming from registration confirmation repository findOne method', async () => {
+        // Arrange
+        const errorMessage: string = 'RegistrationConfirmation findOne error';
+
+        registrationConfirmationRepositoryStub.findOne.rejects(new Error(errorMessage));
+
+        // Act
+        const result: Promise<RegistrationConfirmation> = userService.activateUser(v4());
+
+        // Assert
+        await expect(result).to.eventually
+          .be.rejectedWith(errorMessage)
+          .and.be.instanceOf(Error);
+        expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnce;
+        expect(userRepositoryStub.save).to.be.not.called;
+        expect(registrationConfirmationRepositoryStub.save).to.be.not.called;
+      });
+
+      it('coming from user repository save method', async () => {
+        // Arrange
+        const errorMessage: string = 'User save error';
+        const code: string = v4();
+        const newDate: Date = new Date();
+        const user: User = new UserBuilder()
+          .withActivated(true)
+          .build();
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+          .withCode(code)
+          .withUser(user)
+          .build();
+
+        clock = sinon.useFakeTimers(newDate);
+        registrationConfirmationRepositoryStub.findOne.resolves(registrationConfirmation);
+        userRepositoryStub.save.rejects(new Error(errorMessage));
+
+        // Act
+        const result: Promise<RegistrationConfirmation> = userService.activateUser(code);
+
+        // Assert
+        await expect(result).to.eventually
+          .be.rejectedWith(errorMessage)
+          .and.be.instanceOf(Error);
+        expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnce;
+        expect(userRepositoryStub.save).to.be.calledOnce;
+        expect(registrationConfirmationRepositoryStub.save).to.be.not.called;
+      });
+
+      it('coming from registration confirmation repository save method', async () => {
+        // Arrange
+        const errorMessage: string = 'RegistrationConfirmation save error';
+        const code: string = v4();
+        const newDate: Date = new Date();
+        const user: User = new UserBuilder()
+          .withActivated(true)
+          .build();
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+          .withCode(code)
+          .withUser(user)
+          .build();
+
+        clock = sinon.useFakeTimers(newDate);
+        registrationConfirmationRepositoryStub.findOne.resolves(registrationConfirmation);
+        registrationConfirmationRepositoryStub.save.resolves({
+          ...registrationConfirmation,
+          confirmedAt: newDate.toISOString(),
+        });
+        registrationConfirmationRepositoryStub.save.rejects(new Error(errorMessage));
+
+        // Act
+        const result: Promise<RegistrationConfirmation> = userService.activateUser(code);
+
+        // Assert
+        await expect(result).to.eventually
+          .be.rejectedWith(errorMessage)
+          .and.be.instanceOf(Error);
+        expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnce;
+        expect(userRepositoryStub.save).to.be.calledOnce;
+        expect(registrationConfirmationRepositoryStub.save).to.be.calledOnce;
+      });
     });
   });
 });
