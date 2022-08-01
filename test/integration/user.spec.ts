@@ -9,8 +9,13 @@ import {User} from '../../src/models/entities/user';
 import {expect} from 'chai';
 import {StringUtils} from '../utils/common/string.utils';
 import {DateUtils} from '../utils/common/date.utils';
+import axios from 'axios';
+import config from 'config';
 
 describe('User', () => {
+
+  const emailHost: string = config.get('email.host');
+  const emailPort: number = config.get('email.port.http');
 
   let sandbox: SinonSandbox;
 
@@ -20,6 +25,7 @@ describe('User', () => {
 
   beforeEach(async () => {
     await UserDatabaseUtils.deleteAllUsers();
+    await axios.delete(`http://${emailHost}:${emailPort}/api/v1/messages`);
 
     sandbox = sinon.createSandbox();
   });
@@ -67,18 +73,31 @@ describe('User', () => {
       expect(returnedUserBody.email).to.be.eql('test@mail.com');
       expect(StringUtils.isBcryptPassword(returnedUserBody.password)).to.be.true;
       expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
-      expect(returnedUserBody.activated).to.be.true;
+      expect(returnedUserBody.activated).to.be.false;
       expect(returnedUserBody.role).to.be.eql(UserRole.ADMIN);
 
-      const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
-      expect(savedUsers).to.be.an('array').length(1);
+      const savedUser: User = await UserDatabaseUtils.getUserByIdOrFail(
+        Number(returnedUserBody.id),
+        {
+          relations: ['registrationConfirmation'],
+        }
+      );
 
-      expect(savedUsers[0].id).to.be.eql(Number(returnedUserBody.id));
-      expect(savedUsers[0].email).to.be.eql(returnedUserBody.email);
-      expect(savedUsers[0].password).to.be.eql(returnedUserBody.password);
-      expect(savedUsers[0].registerDate).to.be.eql(returnedUserBody.registerDate);
-      expect(savedUsers[0].activated).to.be.eql(returnedUserBody.activated);
-      expect(savedUsers[0].role).to.be.eql(returnedUserBody.role);
+      expect(savedUser.id).to.be.eql(Number(returnedUserBody.id));
+      expect(savedUser.email).to.be.eql(returnedUserBody.email);
+      expect(savedUser.password).to.be.eql(returnedUserBody.password);
+      expect(savedUser.registerDate).to.be.eql(returnedUserBody.registerDate);
+      expect(savedUser.activated).to.be.eql(returnedUserBody.activated);
+      expect(savedUser.role).to.be.eql(returnedUserBody.role);
+
+      const mailhogResponse: Record<string, any> = await axios.get(`http://${emailHost}:${emailPort}/api/v2/messages`);
+      const mailhogMessages: Record<string, any> = mailhogResponse.data.items;
+      expect(mailhogMessages).to.be.an('array').length(1);
+
+      const registrationMessage: Record<string, any> = mailhogMessages[0];
+      expect(registrationMessage.Raw.From).to.be.eql(config.get('email.auth.user'));
+      expect(registrationMessage.Raw.To).to.be.eql([registerInput.email]);
+      expect(registrationMessage.Content.Body).to.be.include(savedUser.registrationConfirmation?.code);
     });
   });
 });
