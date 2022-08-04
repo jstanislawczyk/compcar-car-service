@@ -22,14 +22,23 @@ module.exports = {
         bcrypt: {
             rounds: Number(process.env.BCRYPT_ROUNDS) || 10,
         },
+        emailConfirmationTimeoutMin: Number(process.env.EMAIL_CONFIRMATION_TIMEOUT_MIN) || 60,
     },
     email: {
         host: process.env.EMAIL_HOST || 'localhost',
-        port: Number(process.env.EMAIL_PORT) || 1025,
+        port: {
+            smtp: Number(process.env.EMAIL_PORT_SMTP) || 1025,
+            http: Number(process.env.EMAIL_PORT_HTTP) || 8025,
+        },
         secure: process.env.EMAIL_SECURE === 'true' || false,
         auth: {
             user: process.env.EMAIL_USER || 'test_email_user@sometestmail.com',
             password: process.env.EMAIL_PASS || 'pass',
         },
+    },
+    services: {
+      frontend: {
+          url: process.env.SERVICE_FRONTEND_URL || 'http://localhost:8080',
+      },
     },
 };

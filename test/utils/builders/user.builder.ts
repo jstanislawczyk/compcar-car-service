@@ -2,6 +2,7 @@ import {Builder} from './builder';
 import {User} from '../../../src/models/entities/user';
 import {UserFixtureProvider} from '../fixture-providers/user.fixture-provider';
 import {UserRole} from '../../../src/models/enums/user-role';
+import {RegistrationConfirmation} from '../../../src/models/entities/registration-confirmation';
 
 export class UserBuilder extends Builder<User> {
 
@@ -26,6 +27,11 @@ export class UserBuilder extends Builder<User> {
     return this;
   }
 
+  public withRegisterDate(registerDate: string): UserBuilder {
+    this.entity.registerDate = registerDate;
+    return this;
+  }
+
   public withRole(role: UserRole): UserBuilder {
     this.entity.role = role;
     return this;
@@ -33,6 +39,11 @@ export class UserBuilder extends Builder<User> {
 
   public withActivated(activated: boolean): UserBuilder {
     this.entity.activated = activated;
+    return this;
+  }
+
+  public withRegistrationConfirmation(registrationConfirmation: RegistrationConfirmation): UserBuilder {
+    this.entity.registrationConfirmation = registrationConfirmation;
     return this;
   }
 }

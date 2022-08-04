@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Comment} from '../../../src/models/entities/comment';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class CommentDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class CommentDatabaseUtils {
     return this.getCommentRepository().find();
   }
 
-  public static getCommentById(id: number): Promise<Comment | undefined> {
-    return this.getCommentRepository().findOne({ id });
+  public static getCommentById(id: number, options: FindOneOptions<Comment> = {}): Promise<Comment | undefined> {
+    return this.getCommentRepository().findOne({ id }, options);
   }
 
-  public static getCommentByIdOrFail(id: number): Promise<Comment> {
-    return this.getCommentRepository().findOneOrFail({ id });
+  public static getCommentByIdOrFail(id: number, options: FindOneOptions<Comment> = {}): Promise<Comment> {
+    return this.getCommentRepository().findOneOrFail({ id }, options);
   }
 
   public static saveComment(comment: Comment): Promise<Comment> {

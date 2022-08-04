@@ -24,9 +24,9 @@ context('GenerationResolver', () => {
     generationResolver = new GenerationResolver(generationFacadeStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('getGenerationById', () => {
     it('should find generation by id', async () => {

@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Car} from '../../../src/models/entities/car';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class CarDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class CarDatabaseUtils {
     return this.getCarRepository().find();
   }
 
-  public static getCarById(id: number): Promise<Car | undefined> {
-    return this.getCarRepository().findOne({ id });
+  public static getCarById(id: number, options: FindOneOptions<Car> = {}): Promise<Car | undefined> {
+    return this.getCarRepository().findOne({ id }, options);
   }
 
-  public static getCarByIdOrFail(id: number): Promise<Car> {
-    return this.getCarRepository().findOneOrFail({ id });
+  public static getCarByIdOrFail(id: number, options: FindOneOptions<Car> = {}): Promise<Car> {
+    return this.getCarRepository().findOneOrFail({ id }, options);
   }
 
   public static saveCar(car: Car): Promise<Car> {

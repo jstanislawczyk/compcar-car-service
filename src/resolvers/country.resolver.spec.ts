@@ -28,9 +28,9 @@ context('CountryResolver', () => {
     countryResolver = new CountryResolver(countryServiceStub, countryMapperStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('createCountry', () => {
     it('should create country', async () => {

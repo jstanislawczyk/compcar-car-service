@@ -49,7 +49,7 @@ context('ColorService', () => {
       const colorsResult: Color[] = await colorService.findAll();
 
       // Assert
-      expect(colorsResult).to.be.have.length(2);
+      expect(colorsResult).to.be.an('array').length(2);
       expect(colorsResult[0]).to.be.eql(colorsList[0]);
       expect(colorsResult[1]).to.be.eql(colorsList[1]);
       expect(colorRepositoryStub.find).to.be.calledOnce;

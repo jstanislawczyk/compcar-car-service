@@ -24,9 +24,9 @@ context('EngineResolver', () => {
     engineResolver = new EngineResolver(engineServiceStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('getEngineById', () => {
     it('should find engine by id', async () => {

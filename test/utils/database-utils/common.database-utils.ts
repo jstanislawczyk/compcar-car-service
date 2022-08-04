@@ -6,6 +6,7 @@ import {BrandDatabaseUtils} from './brand.database-utils';
 import {ModelDatabaseUtils} from './model.database-utils';
 import {GenerationDatabaseUtils} from './generation.database-utils';
 import {CarDatabaseUtils} from './car.database-utils';
+import {RegistrationConfirmationDatabaseUtils} from './registration-confirmation.database-utils';
 
 export class CommonDatabaseUtils {
 
@@ -18,5 +19,6 @@ export class CommonDatabaseUtils {
     await ColorDatabaseUtils.deleteAllColors();
     await BrandDatabaseUtils.deleteAllBrands();
     await CountryDatabaseUtils.deleteAllCountries();
+    await RegistrationConfirmationDatabaseUtils.deleteAllRegistrationConfirmations();
   }
 }

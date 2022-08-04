@@ -15,7 +15,7 @@ export class EmailService {
   constructor() {
     EmailService.serviceEmail = config.get('email.auth.user');
     const host: string = config.get('email.host');
-    const port: number = config.get('email.port');
+    const port: number = config.get('email.port.smtp');
     const transporterOptions: Options = config.get('common.environment') === 'production'
       ? {
         host,

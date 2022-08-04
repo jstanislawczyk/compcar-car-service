@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {User} from '../../../src/models/entities/user';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class UserDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class UserDatabaseUtils {
     return this.getUserRepository().find();
   }
 
-  public static getUserById(id: number): Promise<User | undefined> {
-    return this.getUserRepository().findOne({ id });
+  public static getUserById(id: number, options: FindOneOptions<User> = {}): Promise<User | undefined> {
+    return this.getUserRepository().findOne({ id }, options);
   }
 
-  public static getUserByIdOrFail(id: number): Promise<User> {
-    return this.getUserRepository().findOneOrFail({ id });
+  public static getUserByIdOrFail(id: number, options: FindOneOptions<User> = {}): Promise<User> {
+    return this.getUserRepository().findOneOrFail({ id }, options);
   }
 
   public static saveUser(user: User): Promise<User> {

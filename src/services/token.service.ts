@@ -22,7 +22,7 @@ export class TokenService {
     if (isCorrectPassword) {
       return this.createJwtToken(user);
     } else {
-      throw new AuthenticationError('Authentication data are not valid');
+      throw new AuthenticationError('Credentials are incorrect');
     }
   }
 

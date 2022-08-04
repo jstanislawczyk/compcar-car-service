@@ -1,5 +1,6 @@
 import {getRepository, MoreThan, Repository} from 'typeorm';
 import {Color} from '../../../src/models/entities/color';
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions';
 
 export class ColorDatabaseUtils {
 
@@ -7,12 +8,12 @@ export class ColorDatabaseUtils {
     return this.getColorRepository().find();
   }
 
-  public static getColorById(id: number): Promise<Color | undefined> {
-    return this.getColorRepository().findOne({ id });
+  public static getColorById(id: number, options: FindOneOptions<Color> = {}): Promise<Color | undefined> {
+    return this.getColorRepository().findOne({ id }, options);
   }
 
-  public static getColorByIdOrFail(id: number): Promise<Color> {
-    return this.getColorRepository().findOneOrFail({ id });
+  public static getColorByIdOrFail(id: number, options: FindOneOptions<Color> = {}): Promise<Color> {
+    return this.getColorRepository().findOneOrFail({ id }, options);
   }
 
   public static saveColor(color: Color): Promise<Color> {

@@ -24,9 +24,9 @@ context('GenerationFacade', () => {
     generationFacade = new GenerationFacade(generationServiceStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('findGenerationById', () => {
     it('should find generation by id', async () => {

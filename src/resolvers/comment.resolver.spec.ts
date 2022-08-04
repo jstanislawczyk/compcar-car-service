@@ -48,7 +48,7 @@ context('CommentResolver', () => {
       const comments: Comment[] = await commentResolver.getComments();
 
       // Assert
-      expect(comments).to.have.length(2);
+      expect(comments).to.be.an('array').length(2);
       expect(comments).to.be.eql(savedComments);
     });
 

@@ -45,7 +45,7 @@ context('UserResolver', () => {
       const users: User[] = await userResolver.getUsers();
 
       // Assert
-      expect(users).to.have.length(2);
+      expect(users).to.be.an('array').length(2);
       expect(users).to.be.eql(savedUsers);
     });
 

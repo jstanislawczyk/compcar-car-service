@@ -1,6 +1,6 @@
 import request, {Response} from 'supertest';
 import {application} from '../hooks/application-hook';
-import {expect} from 'chai';
+import {expect, use} from 'chai';
 import {UserDatabaseUtils} from '../utils/database-utils/user.database-utils';
 import {RegisterInput} from '../../src/models/inputs/user/register.input';
 import {User} from '../../src/models/entities/user';
@@ -17,6 +17,13 @@ import config from 'config';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import sinon, {SinonSandbox, SinonStub} from 'sinon';
+import {RegistrationConfirmation} from '../../src/models/entities/registration-confirmation';
+import sinonChai from 'sinon-chai';
+import {v4} from 'uuid';
+import {RegistrationConfirmationBuilder} from '../utils/builders/registration-confirmation.builder';
+import {RegistrationConfirmationDatabaseUtils} from '../utils/database-utils/registration-confirmation.database-utils';
+
+use(sinonChai);
 
 describe('Security', () => {
 
@@ -90,18 +97,35 @@ describe('Security', () => {
         expect(returnedUserBody.email).to.be.eql('test@mail.com');
         expect(StringUtils.isBcryptPassword(returnedUserBody.password)).to.be.true;
         expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
-        expect(returnedUserBody.activated).to.be.true;
+        expect(returnedUserBody.activated).to.be.false;
         expect(returnedUserBody.role).to.be.eql(UserRole.ADMIN);
 
-        const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
-        expect(savedUsers).to.be.an('array').length(1);
+        const savedUser: User = await UserDatabaseUtils.getUserByIdOrFail(
+          Number(returnedUserBody.id),
+          {
+            relations: ['registrationConfirmation'],
+          },
+        );
 
-        expect(savedUsers[0].id).to.be.eql(Number(returnedUserBody.id));
-        expect(savedUsers[0].email).to.be.eql(returnedUserBody.email);
-        expect(savedUsers[0].password).to.be.eql(returnedUserBody.password);
-        expect(savedUsers[0].registerDate).to.be.eql(returnedUserBody.registerDate);
-        expect(savedUsers[0].activated).to.be.eql(returnedUserBody.activated);
-        expect(savedUsers[0].role).to.be.eql(returnedUserBody.role);
+        expect(savedUser.id).to.be.eql(Number(returnedUserBody.id));
+        expect(savedUser.email).to.be.eql(returnedUserBody.email);
+        expect(savedUser.password).to.be.eql(returnedUserBody.password);
+        expect(savedUser.registerDate).to.be.eql(returnedUserBody.registerDate);
+        expect(savedUser.activated).to.be.eql(returnedUserBody.activated);
+        expect(savedUser.role).to.be.eql(returnedUserBody.role);
+
+        const registrationConfirmation = savedUser.registrationConfirmation as RegistrationConfirmation;
+
+        expect(registrationConfirmation.id).to.be.above(0);
+        expect(registrationConfirmation.confirmedAt).to.be.null;
+        expect(DateUtils.isISODate(registrationConfirmation.allowedConfirmationDate)).to.be.true;
+        expect(StringUtils.isV4(registrationConfirmation.code)).to.be.true;
+
+        expect(sendMailStub).to.be.calledOnce;
+        expect(sendMailStub.firstCall.firstArg.to).to.be.eql(savedUser.email);
+        expect(sendMailStub.firstCall.firstArg.from).to.be.eql(config.get('email.auth.user'));
+        expect(sendMailStub.firstCall.firstArg.html).to.include(registrationConfirmation.code);
+        expect(sendMailStub.firstCall.firstArg.text).to.include(registrationConfirmation.code);
       });
 
       it(`with role ${UserRole.USER}`, async () => {
@@ -144,21 +168,29 @@ describe('Security', () => {
         expect(returnedUserBody.email).to.be.eql('test@mail.com');
         expect(StringUtils.isBcryptPassword(returnedUserBody.password)).to.be.true;
         expect(DateUtils.isISODate(returnedUserBody.registerDate)).to.be.true;
-        expect(returnedUserBody.activated).to.be.true;
+        expect(returnedUserBody.activated).to.be.false;
         expect(returnedUserBody.role).to.be.eql(UserRole.USER);
 
-        const savedUsers: User[] = await UserDatabaseUtils.getAllUsers();
-        const registeredUser: User = savedUsers.find((user: User) =>
-          user.id === Number(returnedUserBody.id)
-        ) as User;
-        expect(savedUsers).to.be.an('array').length(2);
+        const savedUser: User = await UserDatabaseUtils.getUserByIdOrFail(
+          Number(returnedUserBody.id),
+          {
+            relations: ['registrationConfirmation'],
+          },
+        );
 
-        expect(registeredUser.id).to.be.eql(Number(returnedUserBody.id));
-        expect(registeredUser.email).to.be.eql(returnedUserBody.email);
-        expect(registeredUser.password).to.be.eql(returnedUserBody.password);
-        expect(registeredUser.registerDate).to.be.eql(returnedUserBody.registerDate);
-        expect(registeredUser.activated).to.be.eql(returnedUserBody.activated);
-        expect(registeredUser.role).to.be.eql(returnedUserBody.role);
+        expect(savedUser.id).to.be.eql(Number(returnedUserBody.id));
+        expect(savedUser.email).to.be.eql(returnedUserBody.email);
+        expect(savedUser.password).to.be.eql(returnedUserBody.password);
+        expect(savedUser.registerDate).to.be.eql(returnedUserBody.registerDate);
+        expect(savedUser.activated).to.be.eql(returnedUserBody.activated);
+        expect(savedUser.role).to.be.eql(returnedUserBody.role);
+
+        const registrationConfirmation = savedUser.registrationConfirmation as RegistrationConfirmation;
+
+        expect(registrationConfirmation.id).to.be.above(0);
+        expect(registrationConfirmation.confirmedAt).to.be.null;
+        expect(DateUtils.isISODate(registrationConfirmation.allowedConfirmationDate)).to.be.true;
+        expect(StringUtils.isV4(registrationConfirmation.code)).to.be.true;
       });
     });
 
@@ -255,6 +287,79 @@ describe('Security', () => {
   });
 
   describe('login', () => {
+    it('should authenticate user', async () => {
+      // Arrange
+      const loginInput: LoginInput = {
+        email: 'test@mail.com',
+        password: '1qazXSW@',
+      } as LoginInput;
+
+      const query: string = `
+        {
+          login (
+            loginInput: {
+              email: "${loginInput.email}",
+              password: "${loginInput.password}",
+            }
+          )
+        }
+      `;
+
+      const saltRounds: number = config.get('security.bcrypt.rounds');
+      const userToSave: User = new UserBuilder()
+        .withEmail(loginInput.email)
+        .withPassword(bcrypt.hashSync(loginInput.password, saltRounds))
+        .build();
+
+      await UserDatabaseUtils.saveUser(userToSave);
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
+
+      expect(StringUtils.isJwtToken(response.body.data.login)).to.be.true;
+    });
+
+    it('should fail authentication for inactive user', async () => {
+      // Arrange
+      const loginInput: LoginInput = {
+        email: 'test@mail.com',
+        password: '1qazXSW@',
+      } as LoginInput;
+
+      const query: string = `
+        {
+          login (
+            loginInput: {
+              email: "${loginInput.email}",
+              password: "${loginInput.password}",
+            }
+          )
+        }
+      `;
+
+      const saltRounds: number = config.get('security.bcrypt.rounds');
+      const userToSave: User = new UserBuilder()
+        .withEmail(loginInput.email)
+        .withPassword(bcrypt.hashSync(loginInput.password, saltRounds))
+        .withActivated(false)
+        .build();
+
+      await UserDatabaseUtils.saveUser(userToSave);
+
+      // Act & Assert
+      const response: Response = await request(application.serverInfo.url)
+        .post('/graphql')
+        .send({ query })
+        .expect(200);
+
+      const errorsBody: ResponseError = response.body.errors[0];
+      expect(errorsBody.message).to.be.eql('User account is inactive. Please confirm email');
+      expect(errorsBody.extensions.code).to.be.eql('INACTIVE_ACCOUNT');
+    });
+
     it('should fail authentication for wrong email provided', async () => {
       // Arrange
       const loginInput: LoginInput = {
@@ -280,7 +385,7 @@ describe('Security', () => {
         .expect(200);
 
       const errorsBody: ResponseError = response.body.errors[0];
-      expect(errorsBody.message).to.be.eql('Authentication data are not valid');
+      expect(errorsBody.message).to.be.eql('Credentials are incorrect');
       expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
     });
 
@@ -315,43 +420,149 @@ describe('Security', () => {
         .expect(200);
 
       const errorsBody: ResponseError = response.body.errors[0];
-      expect(errorsBody.message).to.be.eql('Authentication data are not valid');
+      expect(errorsBody.message).to.be.eql('Credentials are incorrect');
       expect(errorsBody.extensions.code).to.be.eql('UNAUTHENTICATED');
     });
+  });
 
-    it('should authenticate user', async () => {
+  describe('activateUser', () => {
+    it('should activate user', async () => {
       // Arrange
-      const loginInput: LoginInput = {
-        email: 'test@mail.com',
-        password: '1qazXSW@',
-      } as LoginInput;
+      const code: string = v4();
 
       const query: string = `
-        {
-          login (
-            loginInput: {
-              email: "${loginInput.email}",
-              password: "${loginInput.password}",
-            }
-          )
+        mutation {
+          activateUser (
+            confirmationCode: "${code}",
+          ) {
+            id,
+            allowedConfirmationDate,
+            confirmedAt,
+          },
         }
       `;
 
-      const saltRounds: number = config.get('security.bcrypt.rounds');
-      const userToSave: User = new UserBuilder()
-        .withEmail(loginInput.email)
-        .withPassword(bcrypt.hashSync(loginInput.password, saltRounds))
+      const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+        .withCode(code)
+        .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
         .build();
 
+      const userToSave: User = new UserBuilder()
+        .withRegistrationConfirmation(registrationConfirmation)
+        .withActivated(false)
+        .build();
+
+      await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
       await UserDatabaseUtils.saveUser(userToSave);
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
         .post('/graphql')
-        .send({ query })
+        .send({query})
         .expect(200);
 
-      expect(StringUtils.isJwtToken(response.body.data.login)).to.be.true;
+      const returnedRegistrationConfirmationBody: RegistrationConfirmation =
+        response.body.data.activateUser as RegistrationConfirmation;
+
+      expect(Number(returnedRegistrationConfirmationBody.id)).to.be.above(0);
+      expect(returnedRegistrationConfirmationBody.allowedConfirmationDate).to.be
+        .eql(registrationConfirmation.allowedConfirmationDate);
+      expect(DateUtils.isISODate(returnedRegistrationConfirmationBody.confirmedAt as string)).to.be.true;
+
+      const activatedUser: User = await UserDatabaseUtils.getUserByIdOrFail(userToSave.id as number);
+      expect(activatedUser.activated).to.be.true;
+    });
+
+    describe('should throw error', () => {
+      it("if code doesn't exist", async () => {
+        // Arrange
+        const code: string = v4();
+
+        const query: string = `
+          mutation {
+            activateUser (
+              confirmationCode: "${code}",
+            ) {
+              id,
+            },
+          }
+        `;
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({query})
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql(`Registration confirmation with code=${code} not found`);
+        expect(errorsBody.extensions.code).to.be.eql('NOT_FOUND');
+      });
+
+      it('if registration confirmation is outdated', async () => {
+        // Arrange
+        const code: string = v4();
+
+        const query: string = `
+          mutation {
+            activateUser (
+              confirmationCode: "${code}",
+            ) {
+              id,
+            },
+          }
+        `;
+
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withCode(code)
+          .withAllowedConfirmationDate(new Date(Date.now() - 10_000).toISOString())
+          .build();
+
+        await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({query})
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql(`Registration confirmation with code=${code} is outdated`);
+        expect(errorsBody.extensions.code).to.be.eql('OUTDATED');
+      });
+
+      it('if confirmation was already confirmed', async () => {
+        // Arrange
+        const code: string = v4();
+
+        const query: string = `
+          mutation {
+            activateUser (
+              confirmationCode: "${code}",
+            ) {
+              id,
+            },
+          }
+        `;
+
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withCode(code)
+          .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+          .withConfirmedAt(new Date(Date.now() + 5_000).toISOString())
+          .build();
+
+        await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({query})
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql(`Registration confirmation with code=${code} was already confirmed`);
+        expect(errorsBody.extensions.code).to.be.eql('ALREADY_CONFIRMED');
+      });
     });
   });
 });

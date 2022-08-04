@@ -24,9 +24,9 @@ context('HealthResolver', () => {
     healthResolver = new HealthResolver(healthServiceStub);
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('getApplicationHealth', () => {
     it(`should return ${HealthStatus.OK} status`, async () => {

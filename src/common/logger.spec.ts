@@ -16,9 +16,9 @@ context('Logger', () => {
     initLoggerSpy = sandbox.spy(Logger as any, 'initLogger');
   });
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  afterEach(() =>
+    sandbox.restore()
+  );
 
   describe('log', () => {
     it('should init logger if it is first call', () => {

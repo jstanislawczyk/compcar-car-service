@@ -29,7 +29,7 @@ context('UserMapper', () => {
       expect(userToRegister.email).to.be.eql(registerInput.email);
       expect(userToRegister.password).to.be.eql(registerInput.password);
       expect(userToRegister.role).to.be.eql(UserRole.USER);
-      expect(userToRegister.activated).to.be.true;
+      expect(userToRegister.activated).to.be.false;
       expect(DateUtils.isISODate(userToRegister.registerDate)).to.be.true;
       expect(userToRegister.id).to.be.undefined;
       expect(userToRegister.comments).to.be.undefined;
