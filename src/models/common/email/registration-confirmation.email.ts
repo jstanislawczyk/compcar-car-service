@@ -27,7 +27,7 @@ export class RegistrationConfirmationEmail extends Email {
       `Thank you for registering. Please activate your email ${confirmationLink}.\n` +
       `Confirmation email will be active until: ${allowedConfirmationDate}\n.` +
       `Registration date: ${registrationDate}\n` +
-      `Thanks & regards` +
+      `Thanks & regards\n` +
       `Compcar team`;
 
     super(user.email, subject, html, text);
