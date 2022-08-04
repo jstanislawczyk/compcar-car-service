@@ -97,7 +97,9 @@ describe('User', () => {
       const registrationMessage: Record<string, any> = mailhogMessages[0];
       expect(registrationMessage.Raw.From).to.be.eql(config.get('email.auth.user'));
       expect(registrationMessage.Raw.To).to.be.eql([registerInput.email]);
-      expect(registrationMessage.Content.Body).to.be.include(savedUser.registrationConfirmation?.code);
+      expect(registrationMessage.Content.Body).to.be
+        .a('string')
+        .and.include(savedUser.registrationConfirmation?.code);
     });
   });
 });

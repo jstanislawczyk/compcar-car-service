@@ -518,7 +518,6 @@ describe('Security', () => {
           .withAllowedConfirmationDate(new Date(Date.now() - 10_000).toISOString())
           .build();
 
-
         await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
 
         // Act & Assert
@@ -530,6 +529,39 @@ describe('Security', () => {
         const errorsBody: ResponseError = response.body.errors[0];
         expect(errorsBody.message).to.be.eql(`Registration confirmation with code=${code} is outdated`);
         expect(errorsBody.extensions.code).to.be.eql('OUTDATED');
+      });
+
+      it('if confirmation was already confirmed', async () => {
+        // Arrange
+        const code: string = v4();
+
+        const query: string = `
+          mutation {
+            activateUser (
+              confirmationCode: "${code}",
+            ) {
+              id,
+            },
+          }
+        `;
+
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withCode(code)
+          .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+          .withConfirmedAt(new Date(Date.now() + 5_000).toISOString())
+          .build();
+
+        await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
+
+        // Act & Assert
+        const response: Response = await request(application.serverInfo.url)
+          .post('/graphql')
+          .send({query})
+          .expect(200);
+
+        const errorsBody: ResponseError = response.body.errors[0];
+        expect(errorsBody.message).to.be.eql(`Registration confirmation with code=${code} was already confirmed`);
+        expect(errorsBody.extensions.code).to.be.eql('ALREADY_CONFIRMED');
       });
     });
   });

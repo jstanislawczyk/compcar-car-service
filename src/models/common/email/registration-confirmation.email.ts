@@ -17,14 +17,18 @@ export class RegistrationConfirmationEmail extends Email {
 
     const html: string = `
       <h1>Thank you for registering</h1>
-      <p>Please activate your email <a href="${confirmationLink}" target="_blank">here</a>.</p>
+      <p>Please activate your email <a href="${confirmationLink}" target="_blank">${confirmationLink}</a>.</p>
       <p>Confirmation email will be active until: ${allowedConfirmationDate}.</p>
-      <p>Registration date: ${registrationDate}</p>
+      <p>Registration date: ${registrationDate}</p><br />
+      <p>Thanks & regards</p>
+      <p>Compcar team</p>
     `;
     const text: string =
-      `Thank you for registering. Please activate your email ${confirmationLink}\n.` +
-      `Confirmation email will be active until: ${allowedConfirmationDate}\n.`;
-      `Registration date: ${registrationDate}`;
+      `Thank you for registering. Please activate your email ${confirmationLink}.\n` +
+      `Confirmation email will be active until: ${allowedConfirmationDate}\n.` +
+      `Registration date: ${registrationDate}\n` +
+      `Thanks & regards` +
+      `Compcar team`;
 
     super(user.email, subject, html, text);
   }

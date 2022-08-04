@@ -38,7 +38,7 @@ module.exports = {
     },
     services: {
       frontend: {
-          url: process.env.SERVICE_FRONTEND_URL || 'localhost:8080',
+          url: process.env.SERVICE_FRONTEND_URL || 'http://localhost:8080',
       },
     },
 };

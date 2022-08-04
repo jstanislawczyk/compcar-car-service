@@ -12,6 +12,7 @@ import {v4} from 'uuid';
 import {DateUtils} from '../common/date.utils';
 import {NotFoundError} from '../models/errors/not-found.error';
 import {OutdatedError} from '../models/errors/outdated.error';
+import {AlreadyConfirmedError} from '../models/errors/already-confirmed.error';
 
 @Service()
 export class UserService {
@@ -82,6 +83,10 @@ export class UserService {
 
     if (registrationConfirmation === undefined) {
       throw new NotFoundError(`Registration confirmation with code=${confirmationCode} not found`);
+    }
+
+    if (registrationConfirmation.confirmedAt) {
+      throw new AlreadyConfirmedError(`Registration confirmation with code=${confirmationCode} was already confirmed`);
     }
 
     if (new Date() > new Date(registrationConfirmation.allowedConfirmationDate)) {

@@ -17,6 +17,7 @@ import {StringUtils} from '../../test/utils/common/string.utils';
 import {v4} from 'uuid';
 import {NotFoundError} from '../models/errors/not-found.error';
 import {OutdatedError} from '../models/errors/outdated.error';
+import {AlreadyConfirmedError} from '../models/errors/already-confirmed.error';
 
 use(sinonChai);
 use(chaiAsPromised);
@@ -418,6 +419,29 @@ context('UserService', () => {
         await expect(result).to.eventually
           .be.rejectedWith(`Registration confirmation with code=${code} is outdated`)
           .and.be.instanceOf(OutdatedError);
+        expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnce;
+        expect(userRepositoryStub.save).to.be.not.called;
+        expect(registrationConfirmationRepositoryStub.save).to.be.not.called;
+      });
+
+      it('if confirmation was already confirmed', async () => {
+        // Arrange
+        const code: string = v4();
+        const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
+          .withCode(code)
+          .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+          .withConfirmedAt(new Date(Date.now() + 5_000).toISOString())
+          .build();
+
+        registrationConfirmationRepositoryStub.findOne.resolves(registrationConfirmation);
+
+        // Act
+        const result: Promise<RegistrationConfirmation> = userService.activateUser(registrationConfirmation.code);
+
+        // Assert
+        await expect(result).to.eventually
+          .be.rejectedWith(`Registration confirmation with code=${code} was already confirmed`)
+          .and.be.instanceOf(AlreadyConfirmedError);
         expect(registrationConfirmationRepositoryStub.findOne).to.be.calledOnce;
         expect(userRepositoryStub.save).to.be.not.called;
         expect(registrationConfirmationRepositoryStub.save).to.be.not.called;
