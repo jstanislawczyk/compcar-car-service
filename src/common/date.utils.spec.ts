@@ -26,7 +26,7 @@ describe('DateUtils', () => {
       const formattedDate: string = DateUtils.formatISODateToReadableFormat(date);
 
       // Assert
-      expect(formattedDate).to.be.eql('Wednesday, 27 July 2022 at 20:00:00 CEST');
+      expect(formattedDate).to.be.eql('Wednesday, 27 July 2022 at 18:00:00 UTC');
     });
   });
 });

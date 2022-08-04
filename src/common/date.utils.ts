@@ -12,6 +12,7 @@ export class DateUtils {
     return new Intl.DateTimeFormat('en-GB', {
       dateStyle: 'full',
       timeStyle: 'long',
+      timeZone: 'UTC',
     }).format(Date.parse(iSODate));
   }
 }
