@@ -1,0 +1,29 @@
+{
+  "name": "registration-confirmation-clearer",
+  "version": "1.0.0",
+  "description": "Scheduled lambda that clears outdated registration confirmations",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "lint": "eslint . --ext .ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jstanislawczyk/compcar-car-service.git"
+  },
+  "keywords": [
+    "lambda",
+    "scheduled"
+  ],
+  "author": "Jakub Stanislawczyk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jstanislawczyk/compcar-car-service/issues"
+  },
+  "homepage": "https://github.com/jstanislawczyk/compcar-car-service#readme",
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+  }
+}

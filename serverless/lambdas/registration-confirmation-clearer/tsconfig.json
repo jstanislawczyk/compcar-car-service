@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ES2021"
+    ],
+    "target": "ES2018",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "inlineSourceMap": true,
+    "skipLibCheck": true,
+    "rootDirs": [
+      "src",
+      "test"
+    ],
+    "outDir": "build"
+  },
+  "include": [
+    "src",
+    "test"
+  ],
+  "exclude": [
+    "node_modules/*",
+    "build/*"
+  ]
+}
