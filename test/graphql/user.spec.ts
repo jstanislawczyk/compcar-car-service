@@ -107,29 +107,6 @@ describe('User', () => {
         expect(error.message).to.be.eql("Given token doesn't match pattern 'Bearer token'");
         expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
       });
-
-      it("if token isn't provided", async () => {
-        // Arrange
-        const role: UserRole = UserRole.USER;
-        const query: string = `
-          {
-            getUsers {
-              id,
-            }
-          }
-        `;
-
-        // Act & Assert
-        const response: Response = await request(application.serverInfo.url)
-          .post('/graphql')
-          .set('Authorization', TokenUtils.getAuthToken(role))
-          .send({ query })
-          .expect(200);
-
-        const error: ResponseError = response.body.errors[0];
-        expect(error.message).to.be.eql(`User with role=${role} is not allowed to perform this action`);
-        expect(error.extensions.code).to.be.eql('INVALID_TOKEN');
-      });
     });
   });
 });

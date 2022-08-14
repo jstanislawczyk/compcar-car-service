@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne} from 'typeorm';
 import {ObjectType, Field, ID} from 'type-graphql';
 import {Comment} from './comment';
 import {TypeormLoader} from 'type-graphql-dataloader';
@@ -43,7 +43,6 @@ export class User {
     () => RegistrationConfirmation,
     (registrationConfirmation: RegistrationConfirmation) => registrationConfirmation.user,
   )
-  @JoinColumn()
   public registrationConfirmation?: RegistrationConfirmation;
 
   @Field(() => [Comment])

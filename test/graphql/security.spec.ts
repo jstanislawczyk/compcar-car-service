@@ -36,6 +36,7 @@ describe('Security', () => {
   );
 
   beforeEach(async () => {
+    await RegistrationConfirmationDatabaseUtils.deleteAllRegistrationConfirmations();
     await UserDatabaseUtils.deleteAllUsers();
 
     sandbox = sinon.createSandbox();
@@ -442,18 +443,17 @@ describe('Security', () => {
         }
       `;
 
+      const userToSave: User = new UserBuilder()
+        .withActivated(false)
+        .build();
       const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
         .withCode(code)
         .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
+        .withUser(userToSave)
         .build();
 
-      const userToSave: User = new UserBuilder()
-        .withRegistrationConfirmation(registrationConfirmation)
-        .withActivated(false)
-        .build();
-
-      await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
       await UserDatabaseUtils.saveUser(userToSave);
+      await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
 
       // Act & Assert
       const response: Response = await request(application.serverInfo.url)
@@ -513,11 +513,16 @@ describe('Security', () => {
           }
         `;
 
+        const userToSave: User = new UserBuilder()
+          .withActivated(false)
+          .build();
         const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
           .withCode(code)
           .withAllowedConfirmationDate(new Date(Date.now() - 10_000).toISOString())
+          .withUser(userToSave)
           .build();
 
+        await UserDatabaseUtils.saveUser(userToSave);
         await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
 
         // Act & Assert
@@ -545,12 +550,17 @@ describe('Security', () => {
           }
         `;
 
+        const userToSave: User = new UserBuilder()
+          .withActivated(false)
+          .build();
         const registrationConfirmation: RegistrationConfirmation = new RegistrationConfirmationBuilder()
           .withCode(code)
           .withAllowedConfirmationDate(new Date(Date.now() + 10_000).toISOString())
           .withConfirmedAt(new Date(Date.now() + 5_000).toISOString())
+          .withUser(userToSave)
           .build();
 
+        await UserDatabaseUtils.saveUser(userToSave);
         await RegistrationConfirmationDatabaseUtils.saveRegistrationConfirmation(registrationConfirmation);
 
         // Act & Assert

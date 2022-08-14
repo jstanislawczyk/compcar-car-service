@@ -1,4 +1,4 @@
-import {Column, Entity, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Field, ID, ObjectType} from 'type-graphql';
 import {User} from './user';
 
@@ -29,5 +29,7 @@ export class RegistrationConfirmation {
     () => User,
     (user: User) => user.registrationConfirmation,
   )
+  @JoinColumn()
+  @JoinColumn()
   public user: User;
 }
