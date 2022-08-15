@@ -3,7 +3,7 @@ module.exports = {
         port: Number(process.env.SERVER_PORT) || 4000,
     },
     common: {
-        isDev: process.env.IS_DEV === 'true' || false,
+        isDev: process.env.IS_DEV === 'true',
         environment: process.env.ENVIRONMENT || 'local',
     },
     mysql: {

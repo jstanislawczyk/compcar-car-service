@@ -12,7 +12,7 @@ export class RegistrationConfirmationDatabaseUtils {
     id: number,
     options: FindOneOptions<RegistrationConfirmation> = {},
   ): Promise<RegistrationConfirmation | undefined> {
-    return this.getRegistrationConfirmationRepository().findOneOrFail({ id }, options);
+    return this.getRegistrationConfirmationRepository().findOne({ id }, options);
   }
 
   public static getRegistrationConfirmationByIdOrFail(
