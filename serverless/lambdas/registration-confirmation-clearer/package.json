@@ -12,8 +12,8 @@
     "test:unit:coverage": "export NODE_ENV=test && npm run compile && nyc mocha './build/src/**/*.spec.js' --timeout 2000 --exit",
     "test:unit:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/src/**/*.spec.js' --timeout 2000 --exit",
     "test:unit:windows:coverage": "SET \"NODE_ENV=test\" && npm run compile && nyc mocha './build/src/**/*.spec.js' --timeout 2000 --exit",
-    "test:component": "export NODE_ENV=test && npm run compile && mocha './build/test/graphql/**/*.spec.js' --timeout 5000 --exit",
-    "test:component:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/test/graphql/**/*.spec.js' --timeout 5000 --exit"
+    "test:component": "export NODE_ENV=test && npm run compile && mocha './build/test/component/**/*.spec.js' --timeout 5000 --exit",
+    "test:component:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/test/component/**/*.spec.js' --timeout 5000 --exit"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "@types/mocha": "^9.1.1",
     "@types/sinon": "^10.0.13",
     "@types/sinon-chai": "^3.2.8",
+    "@types/uuid": "^8.3.4",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "eslint": "^8.21.0",
@@ -47,6 +48,7 @@
   "dependencies": {
     "mysql2": "^2.3.3",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.3.7"
+    "typeorm": "^0.3.7",
+    "uuid": "^8.3.2"
   }
 }

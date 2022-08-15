@@ -60,7 +60,7 @@ describe('Index', () => {
     });
 
     describe('should rethrow error', () => {
-      it('from DatabaseConfig', async () => {
+      it('from TestDatabaseConfig', async () => {
         // Arrange
         const errorMessage: string = 'DataSource error';
 

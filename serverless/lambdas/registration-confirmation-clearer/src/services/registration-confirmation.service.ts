@@ -8,7 +8,7 @@ export class RegistrationConfirmationService {
   ) {
   }
 
-  public deleteOutdatedRegistrationConfirmations(): Promise<DeleteResult> {
+  public async deleteOutdatedRegistrationConfirmations(): Promise<DeleteResult> {
     const currentIsoDate: string = new Date().toISOString();
 
     return this.registrationConfirmationRepository.delete({

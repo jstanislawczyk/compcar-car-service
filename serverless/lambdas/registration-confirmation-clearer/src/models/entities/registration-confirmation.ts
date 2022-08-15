@@ -7,5 +7,8 @@ export class RegistrationConfirmation {
   public id?: number;
 
   @Column()
+  public code: string;
+
+  @Column()
   public allowedConfirmationDate: string;
 }

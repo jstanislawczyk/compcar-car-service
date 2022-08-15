@@ -11,6 +11,7 @@ export class DatabaseConfig {
     if (!DatabaseConfig.dataSource) {
       console.log('Preparing new database config');
 
+      const isDev: boolean = process.env.IS_DEV === 'true';
       const dataSourceConfig: DataSource = new DataSource({
         type: 'mysql',
         host: config.mysql.host,
@@ -19,8 +20,9 @@ export class DatabaseConfig {
         password: config.mysql.password,
         database: config.mysql.database,
         entities: [
-          `${__dirname}/../../build/models/entities/*.js`,
-          `${__dirname}/../../models/entities/*.ts`,
+          isDev
+            ? 'src/models/entities/*.ts'
+            : 'build/src/models/entities/*.js',
         ],
       });
 
