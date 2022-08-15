@@ -5,7 +5,15 @@
   "main": "index.js",
   "scripts": {
     "compile": "tsc",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "build:prod": "export IS_DEV=false && npm run compile",
+    "build:prod:windows": "SET \"IS_DEV=false\" && npm run compile",
+    "test:unit": "export NODE_ENV=test && npm run compile && mocha './build/src/**/*.spec.js' --timeout 2000 --exit",
+    "test:unit:coverage": "export NODE_ENV=test && npm run compile && nyc mocha './build/src/**/*.spec.js' --timeout 2000 --exit",
+    "test:unit:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/src/**/*.spec.js' --timeout 2000 --exit",
+    "test:unit:windows:coverage": "SET \"NODE_ENV=test\" && npm run compile && nyc mocha './build/src/**/*.spec.js' --timeout 2000 --exit",
+    "test:component": "export NODE_ENV=test && npm run compile && mocha './build/test/graphql/**/*.spec.js' --timeout 5000 --exit",
+    "test:component:windows": "SET \"NODE_ENV=test\" && npm run compile && mocha './build/test/graphql/**/*.spec.js' --timeout 5000 --exit"
   },
   "repository": {
     "type": "git",
@@ -22,8 +30,23 @@
   },
   "homepage": "https://github.com/jstanislawczyk/compcar-car-service#readme",
   "devDependencies": {
-    "typescript": "^4.7.4"
+    "@types/config": "0.0.41",
+    "@types/mocha": "^9.1.1",
+    "@types/sinon": "^10.0.13",
+    "@types/sinon-chai": "^3.2.8",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^8.21.0",
+    "mocha": "^10.0.0",
+    "nyc": "^15.1.0",
+    "sinon": "^14.0.0",
+    "sinon-chai": "^3.5.0",
+    "typescript": "^4.7.4",
+    "ts-node": "^10.9.1"
   },
   "dependencies": {
+    "mysql2": "^2.3.3",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.3.7"
   }
 }
