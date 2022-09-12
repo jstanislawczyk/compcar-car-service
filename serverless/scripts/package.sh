@@ -18,15 +18,19 @@ for directory in ./* ; do
   rm -rf node_modules
   npm i --omit=dev --silent
 
-  # Copy node_modules to build
-  mv ./node_modules ./build
+  # Remove test files
+  find ./build/src -name '*.spec.*' -type f -delete
+  rm -rf ./build/test
 
   # Zip lambda
-  cd ./build
-  zip -r -q $directory.zip ./
-  mv ./$directory.zip ../../../artifacts
+  #cd ../../../artifacts
+  echo "Packaging lambda"
+  zip -r -q $directory.zip node_modules build
+
+  # Copy files
+  # mv $directory.zip ../../../artifacts
 
   echo "Created artifact for $directory"
   echo ""
-  cd ../../
+  cd ../
 done

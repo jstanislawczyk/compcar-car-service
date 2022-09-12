@@ -5,6 +5,16 @@ resource "aws_lambda_function" "registration_confirmation_clearer" {
   handler       = "index.handler"
   runtime       = "nodejs16.x"
 
+  environment {
+    variables = {
+      MYSQL_URL      = aws_db_instance.mysql.address
+      MYSQL_PORT     = aws_db_instance.mysql.port
+      MYSQL_USERNAME = aws_db_instance.mysql.username
+      MYSQL_PASSWORD = aws_db_instance.mysql.password
+      MYSQL_DATABASE = aws_db_instance.mysql.db_name
+    }
+  }
+
   source_code_hash = filebase64sha256("registration-confirmation-clearer.zip")
 }
 

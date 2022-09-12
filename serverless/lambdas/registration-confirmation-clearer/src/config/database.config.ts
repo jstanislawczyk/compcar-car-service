@@ -24,6 +24,12 @@ export class DatabaseConfig {
             ? 'src/models/entities/*.ts'
             : 'build/src/models/entities/*.js',
         ],
+        migrations: [
+          isDev
+            ? 'src/models/entities/*.ts'
+            : 'build/src/models/entities/*.js',
+        ],
+        synchronize: true,
       });
 
       DatabaseConfig.dataSource = await dataSourceConfig.initialize();
