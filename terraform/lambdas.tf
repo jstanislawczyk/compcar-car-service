@@ -2,7 +2,7 @@ resource "aws_lambda_function" "registration_confirmation_clearer" {
   filename      = "registration-confirmation-clearer.zip"
   function_name = "${local.environment}-registration-confirmation-clearer"
   role          = aws_iam_role.registration_confirmation_clearer_role.arn
-  handler       = "index.handler"
+  handler       = "build/src/index.handler"
   runtime       = "nodejs16.x"
 
   environment {

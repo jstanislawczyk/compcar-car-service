@@ -13,22 +13,22 @@ for directory in ./* ; do
 
   cd ./$directory
 
-  # Install only required dependencies
+  # Install only required dependencies and build
   echo "Installing production dependencies"
   rm -rf node_modules
   npm i --omit=dev --silent
+  npm run build:prod
 
   # Remove test files
   find ./build/src -name '*.spec.*' -type f -delete
   rm -rf ./build/test
 
   # Zip lambda
-  #cd ../../../artifacts
   echo "Packaging lambda"
   zip -r -q $directory.zip node_modules build
 
   # Copy files
-  # mv $directory.zip ../../../artifacts
+  mv $directory.zip ../../artifacts
 
   echo "Created artifact for $directory"
   echo ""
