@@ -35,7 +35,6 @@ export class DatabaseConfig {
         migrationsDir: 'src/migration',
         subscribersDir: 'src/subscriber',
       },
-      useUnifiedTopology: true,
     };
   }
 }

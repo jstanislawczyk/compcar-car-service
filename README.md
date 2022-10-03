@@ -19,7 +19,7 @@ Service for handling cars, their data and comments
 * Nodemailer
 
 ## Prerequisites
-* Installed Node 14
+* Installed Node 16
 * Installed NPM
 * Configured local or remote MySQL Server
 

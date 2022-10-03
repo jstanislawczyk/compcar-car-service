@@ -1,6 +1,7 @@
 # Common
 build
 node_modules
+*.zip
 
 # IDE
 .idea
@@ -9,6 +10,10 @@ node_modules
 # Logs
 logs
 *.log
+
+# Terrraform
+*.terraform*
+terraform.tfstate*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

@@ -15,10 +15,10 @@ export class CommonDatabaseUtils {
     await GenerationDatabaseUtils.deleteAllGenerations();
     await ModelDatabaseUtils.deleteAllModels();
     await CommentDatabaseUtils.deleteAllComments();
+    await RegistrationConfirmationDatabaseUtils.deleteAllRegistrationConfirmations();
     await UserDatabaseUtils.deleteAllUsers();
     await ColorDatabaseUtils.deleteAllColors();
     await BrandDatabaseUtils.deleteAllBrands();
     await CountryDatabaseUtils.deleteAllCountries();
-    await RegistrationConfirmationDatabaseUtils.deleteAllRegistrationConfirmations();
   }
 }
