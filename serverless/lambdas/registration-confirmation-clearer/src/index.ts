@@ -6,11 +6,13 @@ import {RegistrationConfirmationService} from './services/registration-confirmat
 import {ClearingProcessor} from './services/clearing.processor';
 import {RegistrationConfirmation} from './models/entities/registration-confirmation';
 import {DataSource, Repository} from 'typeorm';
+import {SsmService} from './services/ssm.service';
 
 export const handler = async (): Promise<void> => {
   console.log('Starting clearing');
 
-  const config: Config = Config.getInstance();
+  const ssmService: SsmService = new SsmService();
+  const config: Config = await Config.getInstance(ssmService);
   const dataSource: DataSource = await DatabaseConfig.initDataSource(config);
 
   const registrationConfirmationRepository: Repository<RegistrationConfirmation> =

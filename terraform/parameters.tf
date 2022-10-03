@@ -46,7 +46,6 @@ resource "aws_ssm_parameter" "mysql_db_username" {
   }
 }
 
-
 resource "aws_ssm_parameter" "mysql_db_password" {
   name        = "/${local.environment}/database/mysql/DB_PASSWORD"
   description = "MySQL database password"
