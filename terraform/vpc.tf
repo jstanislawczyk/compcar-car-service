@@ -4,7 +4,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 }
 
-resource "aws_subnet" "open_subnets" {
+resource "aws_subnet" "public_subnet" {
   count = length(data.aws_availability_zones.available_zones.names)
 
   vpc_id                  = aws_vpc.main.id
@@ -13,7 +13,12 @@ resource "aws_subnet" "open_subnets" {
   map_public_ip_on_launch = true
 }
 
+resource "aws_subnet" "private_subnet" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.0.32.0/24"
+}
+
 resource "aws_db_subnet_group" "mysql_subnet_group" {
   name       = "${local.environment}-mysql-subnet-group"
-  subnet_ids = aws_subnet.open_subnets.*.id
+  subnet_ids = aws_subnet.public_subnet.*.id
 }

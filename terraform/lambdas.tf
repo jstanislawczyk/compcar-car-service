@@ -5,6 +5,8 @@ resource "aws_lambda_function" "registration_confirmation_clearer" {
   handler       = "build/src/index.handler"
   runtime       = "nodejs16.x"
 
+  source_code_hash = filebase64sha256("registration-confirmation-clearer.zip")
+
   environment {
     variables = {
       MYSQL_URL      = aws_ssm_parameter.mysql_db_url.value
@@ -14,7 +16,10 @@ resource "aws_lambda_function" "registration_confirmation_clearer" {
     }
   }
 
-  source_code_hash = filebase64sha256("registration-confirmation-clearer.zip")
+  vpc_config {
+    subnet_ids         = [aws_subnet.private_subnet.id]
+    security_group_ids = [aws_default_security_group.default_security_group.id]
+  }
 }
 
 resource "aws_lambda_permission" "registration_confirmation_clearer_permission" {

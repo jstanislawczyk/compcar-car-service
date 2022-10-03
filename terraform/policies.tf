@@ -18,3 +18,9 @@ resource "aws_iam_policy" "lambda_new_order_processor_policy" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment_lambda_vpc_access_execution" {
+  role       = aws_iam_role.registration_confirmation_clearer_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
