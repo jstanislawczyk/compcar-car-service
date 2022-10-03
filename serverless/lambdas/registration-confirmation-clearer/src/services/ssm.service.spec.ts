@@ -8,15 +8,15 @@ import {GetParameterResult} from 'aws-sdk/clients/ssm';
 describe('SsmService', () => {
 
   let sandbox: SinonSandbox;
-  let ssmDecryptStub: SinonStub;
+  let ssmGetParameterStub: SinonStub;
   let ssmService: SsmService;
 
   beforeEach(() => {
     AWSMock.setSDKInstance(AWS);
     sandbox = sinon.createSandbox();
 
-    ssmDecryptStub = sandbox.stub();
-    AWSMock.mock('SSM', 'getParameter', ssmDecryptStub);
+    ssmGetParameterStub = sandbox.stub();
+    AWSMock.mock('SSM', 'getParameter', ssmGetParameterStub);
 
     ssmService = new SsmService();
   });
@@ -38,14 +38,14 @@ describe('SsmService', () => {
           },
         };
 
-        ssmDecryptStub.onFirstCall().resolves(getParameterResult);
+        ssmGetParameterStub.onFirstCall().resolves(getParameterResult);
 
         // Act
         const returnedValue: string | undefined = await ssmService.getParameter(name);
 
         // Assert
         expect(returnedValue).to.be.eql(value);
-        expect(ssmDecryptStub).to.be.calledOnceWith({
+        expect(ssmGetParameterStub).to.be.calledOnceWith({
           Name: name,
           WithDecryption: true,
         });
@@ -61,14 +61,14 @@ describe('SsmService', () => {
           },
         };
 
-        ssmDecryptStub.onFirstCall().resolves(getParameterResult);
+        ssmGetParameterStub.onFirstCall().resolves(getParameterResult);
 
         // Act
         const returnedValue: string | undefined = await ssmService.getParameter(name, false);
 
         // Assert
         expect(returnedValue).to.be.eql(value);
-        expect(ssmDecryptStub).to.be.calledOnceWith({
+        expect(ssmGetParameterStub).to.be.calledOnceWith({
           Name: name,
           WithDecryption: false,
         });
@@ -77,19 +77,19 @@ describe('SsmService', () => {
 
     it('should get not existing parameter', async () => {
       // Arrange
-      ssmDecryptStub.onFirstCall().resolves({});
+      ssmGetParameterStub.onFirstCall().resolves({});
 
       // Act
       const returnedValue: string | undefined = await ssmService.getParameter('test/MY_PARAMETER');
 
       // Assert
       expect(returnedValue).to.be.undefined;
-      expect(ssmDecryptStub).to.be.calledOnce;
+      expect(ssmGetParameterStub).to.be.calledOnce;
     });
 
     it('should handle error', async () => {
       // Arrange
-      ssmDecryptStub.onFirstCall().rejects(new Error('Get parameter error'));
+      ssmGetParameterStub.onFirstCall().rejects(new Error('Get parameter error'));
 
       // Act
       const result: Promise<string | undefined> = ssmService.getParameter('test/MY_PARAMETER');
