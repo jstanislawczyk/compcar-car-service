@@ -4,16 +4,42 @@ import {RegistrationConfirmationBuilder} from '../utils/builders/registration-co
 import {DateUtils} from '../common/date.utils';
 import {RegistrationConfirmationDatabaseUtils} from '../utils/database-utils/registration-confirmation.database-utils';
 import {expect} from 'chai';
+import sinon, {SinonSandbox, SinonStub} from 'sinon';
+import AWSMock from 'aws-sdk-mock';
+import AWS from 'aws-sdk';
+import {GetParameterResult} from 'aws-sdk/clients/ssm';
 
 describe('RegistrationConfirmationClearer', () => {
+
+  const getParameterResult: GetParameterResult = {
+    Parameter: {
+      Value: 'root',
+    },
+  };
+
+  let sandbox: SinonSandbox;
+  let ssmGetParameterStub: SinonStub;
 
   before(() =>
     initEnvVariables()
   );
 
-  beforeEach(() =>
-    RegistrationConfirmationDatabaseUtils.deleteAllRegistrationConfirmations()
-  );
+  beforeEach(() => {
+    RegistrationConfirmationDatabaseUtils.deleteAllRegistrationConfirmations();
+
+    AWSMock.setSDKInstance(AWS);
+    sandbox = sinon.createSandbox();
+
+    ssmGetParameterStub = sandbox.stub();
+    AWSMock.mock('SSM', 'getParameter', ssmGetParameterStub);
+
+    ssmGetParameterStub.resolves(getParameterResult);
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+    AWSMock.restore();
+  });
 
   it('should delete multiple outdated registration confirmations', async () => {
     // Arrange
@@ -63,10 +89,10 @@ describe('RegistrationConfirmationClearer', () => {
   });
 
   const initEnvVariables = (): void => {
+    process.env.ENVIRONMENT = process.env.MYSQL_PASSWORD || 'root';
     process.env.MYSQL_URL = process.env.MYSQL_URL || 'localhost';
     process.env.MYSQL_PORT = process.env.MYSQL_PORT || '3306';
     process.env.MYSQL_USERNAME = process.env.MYSQL_USERNAME || 'root';
-    process.env.MYSQL_PASSWORD = process.env.MYSQL_PASSWORD || 'root';
     process.env.MYSQL_DATABASE = process.env.MYSQL_DATABASE || 'compcar-test';
   };
 });
