@@ -24,7 +24,7 @@ Service for handling cars, their data and comments
 * Configured local or remote MySQL Server
 
 ## Setup
-1. Install Node 14
+1. Install Node 16
 2. Go to package.json and install dependencies `npm i`
 3. Configuration
 
